@@ -1,0 +1,3 @@
+[submodule "addins/libms"]
+	path = addins/libms
+	url = https://github.com/LoigiFan72/LibMessageStudio.git

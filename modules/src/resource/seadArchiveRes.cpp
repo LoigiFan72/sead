@@ -1,0 +1,16 @@
+#include <resource/seadArchiveRes.h>
+
+namespace sead
+{
+void ArchiveRes::doCreate_(u8* buf, u32, Heap*)
+{
+    mEnable = prepareArchive_(buf);
+}
+
+#if SEAD_ARCHIVERES_ISEXISTFILEIMPL
+bool ArchiveRes::isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN
+{
+    return convertPathToEntryIDImpl_(path) != -1;
+}
+#endif
+}  // namespace sead
