@@ -8,11 +8,17 @@ The objective is to recreate the standard library as accurately as possible, so 
 
 Because sead is statically linked in games (and only in games), acquiring the original sead requires legally owning at least one recent first-party Nintendo game. Picking a game that ships with debugging symbols is strongly recommended:
 
+-NX-
+
 * Super Mario Odyssey (version 1.0.0) ([buy it here](https://www.nintendo.com/games/detail/super-mario-odyssey-switch/))
 * Splatoon 2 (version <= 3.1.0) ([buy it here](https://www.nintendo.com/games/detail/splatoon-2-switch/))
-* Mario Kart 7 (Download Play all regions except Chinese) ([purchase discontinued](https://www.nintendo.com/au/games/nintendo-3ds/mario-kart-7/))
 * [Nintendo Labo](https://labo.nintendo.com/) (the pilot build has symbols, file names and assertions)
 * Any other title that has symbols and uses sead
+
+-CTR-
+
+* Mario Kart 7 (Download Play all regions except Chinese) ([purchase discontinued](https://www.nintendo.com/au/games/nintendo-3ds/mario-kart-7/))
+* Animal Crossing: New Leaf Welcome Amiibo(version 1.2 and above, RTTI) ([purchase Discontinued](https://www.nintendo.com/au/games/nintendo-3ds/animal-crossing-new-leaf-welcome-amiibo/))
 
 File names, function names and the file organization come from debugging symbols, assertions and information in all of the aforementioned titles.
 Nobody except Nintendo has the source code of sead, not even third-party developers.
