@@ -42,8 +42,6 @@ public:
     DateSpan diff(DateTime time) const;
     DateSpan diffToNow() const;
 
-    static void initializeSystemTimeModule();
-
 protected:
     static bool mIsInitialized;
     u64 mUnixTime;

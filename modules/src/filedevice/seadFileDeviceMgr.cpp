@@ -1,12 +1,5 @@
-#ifdef cafe
-#include <cafe.h>
-#include <nn/save.h>
-#endif  // cafe
-
-#ifdef NNSDK
-#include <nn/fs/fs_mount.h>
-#include <nn/fs/fs_rom.h>
-#include <nn/fs/fs_save.h>
+#ifdef CTRSDK
+    #include <nn/fs.h>
 #endif
 
 #include <basis/seadNew.h>
@@ -222,7 +215,7 @@ void FileDeviceMgr::unmount(FileDevice* device)
 
 void FileDeviceMgr::unmount(const SafeString& name)
 {
-    auto* device = findDevice(name);
+    FileDevice* device = findDevice(name);
     if (!device)
     {
         SEAD_ASSERT_MSG(false, "drive not found: %s\n", name.cstr());

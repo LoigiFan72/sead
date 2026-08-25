@@ -24,7 +24,7 @@ ControllerMgr::ControllerMgr(const TaskConstructArg& arg)
 
 void ControllerMgr::prepare()
 {
-    auto* parameter = DynamicCast<Parameter>(mParameter);
+    Parameter* parameter = DynamicCast<Parameter>(mParameter);
     if (parameter)
     {
         initialize(parameter->controllerMax, nullptr);
@@ -66,9 +66,8 @@ void ControllerMgr::initializeDefault(Heap* heap)
 
 void ControllerMgr::finalizeDefault()
 {
-#ifdef NNSDK
-    // NON_MATCHING: missing cbz instruction within loop
-    for (auto& device : mDevices)
+#ifdef cafe
+    for (ControlDevice& device : mDevices)
     {
         if (device.getId() == 13)
         {
@@ -84,16 +83,16 @@ void ControllerMgr::finalizeDefault()
 
 void ControllerMgr::calc()
 {
-    for (auto it = mDevices.begin(); it != mDevices.end(); ++it)
+    for (OffsetList<sead::ControlDevice>::iterator it = mDevices.begin(); it != mDevices.end(); ++it)
         it->calc();
 
-    for (auto it = mControllers.begin(); it != mControllers.end(); ++it)
+    for (PtrArray<sead::Controller>::iterator it = mControllers.begin(); it != mControllers.end(); ++it)
         it->calc();
 }
 
 Controller* ControllerMgr::getControllerByOrder(ControllerDefine::ControllerId id, s32 index) const
 {
-    for (auto& controller : mControllers)
+    for (Controller& controller : mControllers)
     {
         if (controller.mId == id)
         {
@@ -109,7 +108,7 @@ Controller* ControllerMgr::getControllerByOrder(ControllerDefine::ControllerId i
 
 ControlDevice* ControllerMgr::getControlDevice(ControllerDefine::DeviceId id) const
 {
-    for (auto& device : mDevices)
+    for (ControlDevice& device : mDevices)
     {
         if (device.mId == id)
             return &device;
@@ -143,7 +142,7 @@ s32 ControllerMgr::findControllerPort(const Controller* controller) const
     SEAD_ASSERT(controller);
 
     s32 i = 0;
-    for (auto& controller_it : mControllers)
+    for (Controller& controller_it : mControllers)
     {
         if (&controller_it == controller)
             return i;

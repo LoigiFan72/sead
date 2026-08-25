@@ -5,11 +5,12 @@
 #include "prim/seadScopedLock.h"
 #include "thread/seadThreadUtil.h"
 
-namespace sead{
-
+namespace sead
+{
 const s32 Thread::cDefaultPriority = 0x10;
 
-bool Thread::sendMessage(MessageQueue::Element msg, MessageQueue::BlockType block_type){
+bool Thread::sendMessage(MessageQueue::Element msg, MessageQueue::BlockType block_type)
+{
     if (msg == MessageQueue::cNullElement){
         SEAD_ASSERT_MSG(false, "Can not send cNullElement(==%ld)", MessageQueue::cNullElement);
         return false;
@@ -28,13 +29,15 @@ bool Thread::sendMessage(MessageQueue::Element msg, MessageQueue::BlockType bloc
     return mMessageQueue.push(msg, block_type);
 }
 
-MessageQueue::Element Thread::recvMessage(MessageQueue::BlockType block_type){
+MessageQueue::Element Thread::recvMessage(MessageQueue::BlockType block_type)
+{
     if (mState == State::cQuitting)
         return 0;
     return mMessageQueue.pop(block_type);
 }
 
-void Thread::quit(bool is_jam){
+void Thread::quit(bool is_jam)
+{
     if (isDone()){
         SEAD_WARN("Thread is done. Can not quit.");
         return;
@@ -49,22 +52,36 @@ void Thread::quit(bool is_jam){
         mMessageQueue.push(mQuitMsg, MessageQueue::BlockType::Blocking);
 }
 
-void Thread::quitAndWaitDoneSingleThread(bool is_jam){
+void Thread::quitAndWaitDoneSingleThread(bool is_jam)
+{
     quit(is_jam);
     waitDone();
 }
 
 constexpr u32 cStackCanaryMagic = 0x5EAD5CEC;
 
-static bool checkStackMagic(uintptr_t addr){
+static bool checkStackMagic(uintptr_t addr)
+{
     return BitUtil::bitCastPtr<u32>(reinterpret_cast<const void*>(addr)) == cStackCanaryMagic;
 }
 
-s32 Thread::calcStackUsedSizePeak() const{
-    // TODO
+// FIXME
+s32 Thread::calcStackUsedSizePeak() const
+{
+    s32 stackSize = getStackSize();
+    s32 offset = reinterpret_cast<s32>(PtrUtil::addOffset(mStackTop, mStackSize));
+    for(;;)
+    {
+        if(offset <= stackSize)
+            return 0;
+        if(stackSize != 0x5ead5cec) break;
+        stackSize += 4;
+    }
+    return PtrUtil::diff(reinterpret_cast<void*>(offset), reinterpret_cast<void*>(stackSize));
 }
 
-void Thread::checkStackOverFlow(const char* source_file, s32 source_line) const{
+void Thread::checkStackOverFlow(const char* source_file, s32 source_line) const
+{
     const uintptr_t ptr = ThreadUtil::GetCurrentStackPointer();
     const uintptr_t start = getStackCheckStartAddress_();
     if (start)
@@ -82,7 +99,7 @@ void Thread::checkStackOverFlow(const char* source_file, s32 source_line) const{
 
 void Thread::run_()
 {
-    while (true)
+    while(true)
     {
 #ifdef SEAD_DEBUG
         checkStackOverFlow(nullptr, 0);
@@ -111,6 +128,8 @@ void Thread::initStackCheck_()
     for (u32 i = 0; i < ((len / 4 + 1) % 8); i += 4)
         *addr++ = cStackCanaryMagic;
 }
+
+/* sead::ThreadMgr main */
 
 SEAD_SINGLETON_DISPOSER_IMPL(ThreadMgr)
 
@@ -181,5 +200,4 @@ void ThreadMgr::quitAndWaitDoneMultipleThread(Thread** threads, s32 num, bool is
 
     waitDoneMultipleThread(threads, num);
 }
-
 }  // namespace sead

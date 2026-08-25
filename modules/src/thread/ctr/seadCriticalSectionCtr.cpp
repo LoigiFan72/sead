@@ -4,11 +4,13 @@
 
 #include "thread/seadCriticalSection.h"
 
-namespace sead{
-
+namespace sead
+{
 CriticalSection::CriticalSection():
     IDisposer()
-{}
+{
+    
+}
 
 CriticalSection::~CriticalSection(){}
 
@@ -32,5 +34,4 @@ void CriticalSection::unlock()
 {
     mCriticalSectionInner.Leave();
 }
-
-}
+}// namespace sead

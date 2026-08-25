@@ -1,7 +1,7 @@
 #pragma once
 
-#ifdef NNSDK
-#include <nn/os.h>
+#ifdef CTRSDK
+    #include <nn/os.h>
 #endif
 
 #include <basis/seadTypes.h>
@@ -17,8 +17,8 @@ public:
 
     u64 toTicks() const { return mTick; }
 
-#ifdef NNSDK
-    void setNow() { mTick = nn::os::GetSystemTick().value; }
+#ifdef CTRSDK
+    void setNow() { mTick = nn::os::Tick::GetSystemTick(); }
 #else
     void setNow();
 #endif

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifdef NNSDK
-#include <nn/os.h>
+#ifdef CTRSDK
+    #include <nn/os.h>
 #endif
 
 namespace sead
@@ -11,7 +11,7 @@ class Heap;
 class MessageQueue
 {
 public:
-#ifdef NNSDK
+#ifdef CTRSDK
     using Element = s64;
 #else
 #error "Unknown platform"
@@ -37,8 +37,8 @@ public:
     static constexpr Element cNullElement = 0;
 
 private:
-#ifdef NNSDK
-    nn::os::MessageQueueType mMessageQueueInner;
+#ifdef CTRSDK
+    nn::os::BlockingQueue mMessageQueueInner;
     Element* mBuffer = nullptr;
 #else
 #error "Unknown platform"

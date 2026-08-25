@@ -1,7 +1,7 @@
 #pragma once
 
-#ifdef NNSDK
-#include <nn/os.h>
+#ifdef CTRSDK
+    #include <nn/os.h>
 #endif
 
 #include "heap/seadDisposer.h"
@@ -39,8 +39,8 @@ private:
 #endif
     }
 
-#ifdef NNSDK
-    nn::os::LightEventType mEventInner;
+#ifdef CTRSDK
+    nn::os::Event mEventInner;
 #else
 #error "Unknown platform"
 #endif

@@ -16,7 +16,5 @@ CalendarTime::Week calcWeekDay(const CalendarTime::Year& year, const CalendarTim
                                const CalendarTime::Day& day);
 
 void calcSecondToCalendarSpan(CalendarSpan* out_span, u64 seconds);
-
-bool parseW3CDTFString(CalendarTime* out_time, CalendarSpan* out_span, const SafeString& string);
 }  // namespace DateUtil
 }  // namespace sead

@@ -54,7 +54,7 @@ void ControllerWrapperBase::setEnableOtherWrappers(bool enable) const
         return;
 
     OffsetList<ControllerWrapperBase>& wrappers = mController->mWrappers;
-    for (auto it = wrappers.begin(); it != wrappers.end(); ++it)
+    for (OffsetList<sead::ControllerWrapperBase>::iterator it = wrappers.begin(); it != wrappers.end(); ++it)
     {
         ControllerWrapperBase& wrapper = *it;
         if (&wrapper != this)

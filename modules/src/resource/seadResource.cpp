@@ -8,11 +8,20 @@
 
 namespace sead
 {
-Resource::Resource() = default;
+Resource::Resource()
+{ 
 
-Resource::~Resource() = default;
+}
 
-DirectResource::DirectResource() = default;
+Resource::~Resource()
+{
+
+}
+
+DirectResource::DirectResource()
+{
+
+}
 
 DirectResource::~DirectResource()
 {

@@ -10,6 +10,7 @@
 
 namespace
 {
+
 #ifdef cafe
 __attribute__((aligned(0x20))) s32 decodeSZSCafeAsm_(void* dst, const void* src)
 {
@@ -117,6 +118,60 @@ __attribute__((aligned(0x20))) s32 decodeSZSCafeAsm_(void* dst, const void* src)
 }
 #endif  // cafe
 }  // namespace
+
+#ifdef CTR
+__attribute__((naked)) s32 decodeSZSCtrAsm_(void* dst, const void* src)
+{
+    asm("push {r4-r8,lr}\n");
+    asm("ldr r4, [r1,#4]\n");
+    asm("eor r5, r4, r4,ror#16\n");
+    asm("bic r5, r5, #0xff0000\n");
+    asm("mov r4, r4,ror#8\n");
+    asm("eor r4, r4, r5,lsr#8\n");
+    asm("mov r2, r4\n");
+    asm("add r1, r1, #0x10\n");
+    asm("mov r5, #0\n");
+    asm("mov lr, #0x1000\n");
+    asm("sub lr, lr, #1\n");
+
+    asm("_decloop0: movs r5, r5,lsr#1\n");
+    asm("bne _decloop1\n");
+    asm("ldrb r6, [r1],#1\n");
+    asm("mov r5, #0x80\n");
+
+    asm("_decloop1: tst r6, r5\n");
+    asm("bne _decloop5\n");
+    asm("ldrb r3, [r1],#1\n");
+    asm("ldrb r7, [r1],#1\n");
+    asm("add r3, r7, r3,lsl#8\n");
+    asm("movs r7, r3,lsr#12\n");
+    asm("and r3, r3, lr\n");
+    asm("add r3, r3, #1\n");
+    asm("add r7, r7, #2\n");
+    asm("bne _decloop2\n");
+    asm("ldrb r7, [r1],#1\n");
+    asm("add r7, r7, #0x12\n");
+
+    asm("_decloop2: sub r4, r4, r7\n");
+
+    asm("_decloop3: ldrb r12, [r0,-r3]\n");
+    asm("subs r7, r7, #1\n");
+    asm("strb r12, [r0],#1\n");
+    asm("bne _decloop3\n");
+    asm("cmp r4, #0\n");
+    asm("bne _decloop0\n");
+    asm("b _decloop8\n");
+
+    asm("_decloop5: ldrb r12, [r1],#1\n");
+    asm("subs r4, r4, #1\n");
+    asm("strb r12, [r0],#1\n");
+    asm("bne _decloop0\n");
+
+    asm("_decloop8: pop {r4-r8,lr}\n");
+    asm("mov r0, r2\n");
+    asm("bx lr\n");
+}
+#endif // CTR
 
 #ifdef SWITCH
 s32 decodeSZSNxAsm64_(void* dst, const void* src)
@@ -480,10 +535,8 @@ s32 SZSDecompressor::decomp(void* dst, u32 dstSize, const void* src, u32)
     s32 error = -2;
     if (dstSize >= decompSize)
     {
-#ifdef cafe
-        error = decodeSZSCafeAsm_(dst, src);
-#elif defined(SWITCH)
-        error = decodeSZSNxAsm64_(dst, src);
+#if defined(CTR)
+        error = decodeSZSCtrAsm_(dst, src);
 #else
         SEAD_ASSERT_MSG(false, "SZSDecompressor::decomp not implemented");
 #endif  // cafe

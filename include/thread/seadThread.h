@@ -2,7 +2,7 @@
 
 #include <utility>
 #ifdef CTRSDK
-#include <nn/os.h>
+    #include <nn/os.h>
 #endif
 
 #include <basis/seadRawPrint.h>
@@ -87,6 +87,9 @@ public:
 
     static const s32 cDefaultPriority;
 
+#ifdef SEAD_PLATFORM_CTR
+    static void ctrThreadFunc_(uptr param);
+#endif
 protected:
     virtual void run_();
     virtual void calc_(MessageQueue::Element msg) = 0;

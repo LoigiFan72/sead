@@ -4,12 +4,14 @@
 
 #include "thread/seadMutex.h"
 
-namespace sead{
-
+namespace sead
+{
 Mutex::Mutex():
     IDisposer(),
     mMutexInner(false)
-{}
+{
+    
+}
 
 bool Mutex::tryLock()
 {
@@ -25,5 +27,4 @@ void Mutex::unlock()
 {
     mMutexInner.Unlock();
 }
-
-}
+} // namespace sead

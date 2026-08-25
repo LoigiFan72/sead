@@ -63,7 +63,7 @@ void Controller::setIdle_()
 {
     setIdleBase_();
 
-    for (auto it = mWrappers.begin(); it != mWrappers.end(); ++it)
+    for (sead::OffsetList<sead::ControllerWrapperBase>::iterator it = mWrappers.begin(); it != mWrappers.end(); ++it)
         it->setIdle();
 }
 

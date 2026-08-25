@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 project(sead CXX ASM)
 
 option(SEAD_DEBUG "Enable debug assertions and warnings" OFF)
-set(SEAD_PLATFORM "nin" CACHE STRING "Target platform (default: nin)")
+set(SEAD_PLATFORM "ctr" CACHE STRING "Target platform (default: ctr)")
 set_property(
   CACHE SEAD_PLATFORM
-  PROPERTY STRINGS "nin"
+  PROPERTY STRINGS "ctr"
 )
 
 add_library(sead OBJECT
@@ -109,7 +109,6 @@ add_library(sead OBJECT
   include/gfx/seadPrimitiveRendererUtil.h
   include/gfx/seadProjection.h
   include/gfx/seadTexture.h
-  modules/src/gfx/nvn/seadDebugFontMgrNvn.cpp
   modules/src/gfx/seadCamera.cpp
   modules/src/gfx/seadColor.cpp
   modules/src/gfx/seadDrawLockContext.cpp
@@ -280,42 +279,29 @@ if(SEAD_DEBUG)
   )
 endif()
 
-if(SEAD_PLATFORM STREQUAL "nin")
+if(SEAD_PLATFORM STREQUAL "ctr")
   if(NOT TARGET CTRSDK)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/addins/CTRSDK)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}../CtrSDK)
   endif()
   target_link_libraries(sead PUBLIC CTRSDK)
 
   target_sources(sead PRIVATE
-    include/controller/nin/seadNinJoyNpadDevice.h
+    #include/filedevice/ctr/seadCtrFileStream.h
+    #include/filedevice/ctr/seadCtrHostIOFileDevice.h
+    #include/filedevice/ctr/seadCtrSDFileDeviceCtr.h
+    #modules/src/filedevice/ctr/seadCtrFileStream.cpp
+    #modules/src/filedevice/ctr/seadCtrHostIOFileDevice.cpp
+    #modules/src/filedevice/ctr/seadCtrSDFileDeviceCtr.cpp
 
-    include/filedevice/nin/seadNinAocFileDeviceNin.h
-    include/filedevice/nin/seadNinContentFileDeviceNin.h
-    include/filedevice/nin/seadNinFileDeviceBaseNin.h
-    include/filedevice/nin/seadNinHostIOFileDevice.h
-    include/filedevice/nin/seadNinSaveFileDeviceNin.h
-    include/filedevice/nin/seadNinSDFileDeviceNin.h
-    modules/src/filedevice/nin/seadNinAocFileDeviceNin.cpp
-    modules/src/filedevice/nin/seadNinContentFileDeviceNin.cpp
-    modules/src/filedevice/nin/seadNinFileDeviceBaseNin.cpp
-    modules/src/filedevice/nin/seadNinHostIOFileDevice.cpp
-    modules/src/filedevice/nin/seadNinSaveFileDeviceNin.cpp
-    modules/src/filedevice/nin/seadNinSDFileDeviceNin.cpp
-
-    include/thread/nin/seadThreadLocalStorageNin.hpp
-    modules/src/thread/nin/seadCriticalSectionNin.cpp
-    modules/src/thread/nin/seadEventNin.cpp
-    modules/src/thread/nin/seadMessageQueueNin.cpp
-    modules/src/thread/nin/seadMutexNin.cpp
-    modules/src/thread/nin/seadSemaphoreNin.cpp
-    modules/src/thread/nin/seadThreadNin.cpp
+    include/thread/ctr/seadThreadLocalStorage.hpp
+    modules/src/thread/ctr/seadCriticalSectionCtr.cpp
+    modules/src/thread/ctr/seadEventCtr.cpp
+    modules/src/thread/ctr/seadMessageQueueCtr.cpp
+    modules/src/thread/ctr/seadMutexCtr.cpp
+    modules/src/thread/ctr/seadThreadCtr.cpp
   )
 endif()
 
-target_compile_options(sead PRIVATE -fno-exceptions)
-target_compile_options(sead PRIVATE -fno-strict-aliasing)
-target_compile_options(sead PRIVATE -Wall -Wextra -Wdeprecated)
-target_compile_options(sead PRIVATE -Wno-invalid-offsetof)
 target_include_directories(sead PUBLIC include/)
 
 if(SEAD_DEBUG)

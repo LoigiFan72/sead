@@ -781,12 +781,12 @@ bool FileDevice::tryMakeDirectoryWithParent(const SafeString& path, u32 x)
         dir_name.trim(0);
 
     int num_path_components = 0;
-    auto counting_iterator = path.tokenBegin("/");
-    const auto end = path.tokenEnd("/");
+    SafeString::token_iterator counting_iterator = path.tokenBegin("/");
+    const SafeString::token_iterator end = path.tokenEnd("/");
     for (; end != counting_iterator; ++counting_iterator)
         ++num_path_components;
 
-    auto it = path.tokenBegin("/");
+    SafeString::token_iterator it = path.tokenBegin("/");
     int num_levels_to_create = num_path_components - num_existing_parents;
     for (; end != it; ++it)
     {

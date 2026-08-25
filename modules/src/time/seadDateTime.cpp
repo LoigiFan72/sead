@@ -1,5 +1,5 @@
-#ifdef NNSDK
-#include <nn/time.h>
+#ifdef CTRSDK
+#include <nn/fnd.h>
 #else
 #error "Unknown platform"
 #endif
@@ -130,20 +130,16 @@ DateTime::DateTime(const CalendarTime::Year& year, const CalendarTime::Month& mo
 
 u64 DateTime::setNow()
 {
-#ifdef NNSDK
-    initializeSystemTimeModule();
+#ifdef CTRSDK
+    nn::fnd::DateTime ctime;
+    ctime = nn::fnd::DateTime::GetNow();
 
-    nn::time::PosixTime now;
-    nn::time::CalendarTime ctime;
-    nn::time::StandardUserSystemClock::GetCurrentTime(&now);
-    nn::time::ToCalendarTime(&ctime, nullptr, now);
-
-    const auto year = CalendarTime::Year(ctime.year);
-    const auto month = CalendarTime::Month::makeFromValueOneOrigin(ctime.month);
-    const auto day = CalendarTime::Day(ctime.day);
-    const auto hour = CalendarTime::Hour(ctime.hour);
-    const auto minute = CalendarTime::Minute(ctime.minute);
-    const auto second = CalendarTime::Second(ctime.second);
+    const auto year = CalendarTime::Year(ctime.GetYear());
+    const auto month = CalendarTime::Month::makeFromValueOneOrigin(ctime.GetMonth());
+    const auto day = CalendarTime::Day(ctime.GetDay());
+    const auto hour = CalendarTime::Hour(ctime.GetHour());
+    const auto minute = CalendarTime::Minute(ctime.GetMinute());
+    const auto second = CalendarTime::Second(ctime.GetSecond());
     setUnixTime(year, month, day, hour, minute, second);
 #endif
     return mUnixTime;
@@ -194,19 +190,6 @@ DateSpan DateTime::diffToNow() const
     DateTime now(0);
     now.setNow();
     return now.diff(*this);
-}
-
-void DateTime::initializeSystemTimeModule()
-{
-    if (mIsInitialized)
-        return;
-
-#ifdef NNSDK
-    if (!nn::time::IsInitialized())
-        nn::time::Initialize();
-#endif
-
-    mIsInitialized = true;
 }
 
 DateSpan operator-(DateTime lhs, DateTime rhs)

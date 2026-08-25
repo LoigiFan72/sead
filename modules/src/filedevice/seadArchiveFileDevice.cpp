@@ -205,7 +205,7 @@ u8* ArchiveFileDevice::doLoadWithEntryID_(s32 entry_id, LoadArg& arg)
     }
 
     ArchiveRes::FileInfo info{};
-    auto* ret = mArchive->getFileFast(entry_id, &info);
+    const void* ret = mArchive->getFileFast(entry_id, &info);
     if (!ret)
         return nullptr;
 
@@ -235,7 +235,7 @@ u8* ArchiveFileDevice::doLoad_(LoadArg& arg)
         return FileDevice::doLoad_(arg);
 
     ArchiveRes::FileInfo info{};
-    auto* ret = mArchive->getFile(arg.path, &info);
+    const void* ret = mArchive->getFile(arg.path, &info);
     if (!ret)
         return nullptr;
 
@@ -274,9 +274,9 @@ FileDevice* ArchiveFileDevice::doOpen_(FileHandle* handle, const SafeString& pat
         return nullptr;
     }
 
-    auto* inner = constructArchiveFileHandle_(handle);
+    ArchiveFileHandle* inner = constructArchiveFileHandle_(handle);
 
-    auto* file_data = static_cast<const u8*>(mArchive->getFile(path, &inner->mFileInfo));
+    const u8* file_data = static_cast<const u8*>(mArchive->getFile(path, &inner->mFileInfo));
     if (!file_data)
         return nullptr;
 
@@ -300,9 +300,9 @@ FileDevice* ArchiveFileDevice::doOpenWithEntryID_(FileHandle* handle, s32 id,
         return nullptr;
     }
 
-    auto* inner = constructArchiveFileHandle_(handle);
+    ArchiveFileHandle* inner = constructArchiveFileHandle_(handle);
 
-    auto* file_data = static_cast<const u8*>(mArchive->getFileFast(id, &inner->mFileInfo));
+    const u8* file_data = static_cast<const u8*>(mArchive->getFileFast(id, &inner->mFileInfo));
     if (!file_data)
         return nullptr;
 
@@ -436,14 +436,14 @@ bool ArchiveFileDevice::doCloseDirectory_(DirectoryHandle* handle)
 bool ArchiveFileDevice::doReadDirectory_(u32* entriesRead, DirectoryHandle* handle,
                                          DirectoryEntry* entry, u32 entriesToRead)
 {
-    auto* archive = mArchive;
+    ArchiveRes* archive = mArchive;
     if (!archive)
     {
         SEAD_ASSERT_MSG(false, "no archive mounted");
         return false;
     }
 
-    auto* buffer = &getHandleBaseHandleBuffer_(handle);
+    HandleBuffer* buffer = &getHandleBaseHandleBuffer_(handle);
     SEAD_ASSERT(entry);
     const u32 actual_read_count = archive->readDirectory(buffer, entry, entriesToRead);
     if (entriesRead)

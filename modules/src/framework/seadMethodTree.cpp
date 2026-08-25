@@ -10,7 +10,7 @@ void MethodTreeNode::pushBackChild(MethodTreeNode* node)
     node->mCriticalSection = mCriticalSection;
     if (node->child())
     {
-        auto* parent = node->child()->value();
+        MethodTreeNode* parent = node->child()->value();
         if (parent)
             parent->attachMutexRec_(mCriticalSection);
     }
@@ -25,7 +25,7 @@ void MethodTreeNode::pushFrontChild(MethodTreeNode* node)
     node->mCriticalSection = mCriticalSection;
     if (node->child())
     {
-        auto* parent = node->child()->value();
+        MethodTreeNode* parent = node->child()->value();
         if (parent)
             parent->attachMutexRec_(mCriticalSection);
     }
@@ -39,7 +39,7 @@ void MethodTreeNode::attachMutexRec_(CriticalSection* m) const
 
     do
     {
-        auto* child = node->child();
+        TTreeNode<sead::MethodTreeNode *>* child = node->child();
         node->mCriticalSection = m;
         if (child && child->value())
             child->value()->attachMutexRec_(m);
@@ -87,7 +87,7 @@ void MethodTreeNode::callRec_()
     if (!mPauseFlag.isOn(cPause_Self))
         (*mDelegateHolder.data())();
 
-    auto* node = child();
+    TTreeNode<sead::MethodTreeNode *>* node = child();
     if (node && !mPauseFlag.isOn(cPause_Child))
     {
         while (node)
