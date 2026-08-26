@@ -3,6 +3,10 @@
 
 #include <basis/seadTypes.h>
 
+#ifdef CTRSDK
+    #include <nn/os.h>
+#endif
+
 namespace sead
 {
 class Arena
@@ -14,9 +18,11 @@ public:
     void initialize(size_t size);
     void destroy();
 
-    u8* mStart = nullptr;
-    size_t mSize = 0;
-    bool mInitWithStartAddress = false;
+    u8* mStart;
+    size_t mSize;
+    bool mInitWithStartAddress;
+
+    static bool sIsUsingDeviceMemory;
 };
 
 }  // namespace sead

@@ -14,7 +14,8 @@ Controller::Controller(ControllerMgr* mgr):
     mWrappers.initOffset(offsetof(ControllerWrapperBase, mListNode));
 }
 
-void Controller::calc(){
+void Controller::calc()
+{
     u32 prev_hold = getHoldMask();
     bool prev_pointer_on = isPointerOn();
 

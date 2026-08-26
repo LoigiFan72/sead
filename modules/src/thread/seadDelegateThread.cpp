@@ -13,7 +13,9 @@ DelegateThread::DelegateThread(const SafeString& name,
 {
 }
 
-DelegateThread::~DelegateThread() = default;
+DelegateThread::~DelegateThread()
+{
+}
 
 void DelegateThread::calc_(MessageQueue::Element msg)
 {

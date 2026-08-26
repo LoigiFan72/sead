@@ -7,8 +7,7 @@
 namespace sead
 {
 Mutex::Mutex():
-    IDisposer(),
-    mMutexInner(false)
+    IDisposer(), mMutexInner(false)
 {
     
 }

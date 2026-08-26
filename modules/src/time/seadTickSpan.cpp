@@ -17,12 +17,11 @@ namespace sead
 
 s64 TickSpan::toNanoSeconds() const
 {
-
+    //multiplyAndDivide_();
 }
 
 void TickSpan::setNanoSeconds(s64 nsec)
 {
 
 }
-
 }  // namespace sead

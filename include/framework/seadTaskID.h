@@ -13,7 +13,7 @@ class TaskParameter;
 
 struct TaskConstructArg
 {
-    TaskConstructArg() = default;
+    TaskConstructArg(){ }
 
     HeapArray* heap_array;
     TaskMgr* mgr;

@@ -16,16 +16,20 @@ CtrFileStreamFileDevice::CtrFileStreamFileDevice(const SafeString& name):
 bool CtrFileStreamFileDevice::doIsAvailable_() const
 {
     nn::fs::Directory dir;
-    SafeString slash("/");
 
-    s32 error = doGetLastRawError_();
-
-    //SafeString err(error);
-
+    SafeString outter;
+    doGetLastRawError_();
+    SafeString inner;
+    error_result = openDirectryImpl_(&dir, inner, outter);
+    return error_result.IsSuccess();
 }
 
-Result CtrFileStreamFileDevice::openDirectryImpl_(nn::fs::Directory* dir, SafeString const& pathInner, SafeString const& pathOutter)
+nn::Result CtrFileStreamFileDevice::openDirectryImpl_(nn::fs::Directory* dr, SafeString const& pathInner, SafeString const& pathOutter)
 {
-
+    SEAD_ASSERT(dr);
+    WFixedSafeString<256> sstring;
+    s32 len = sstring.format(L"%s:%s", pathInner.cstr(), pathOutter.cstr());
+    SEAD_ASSERT(len < cFileNameFormatBufSize - 1);
+    return dr->TryInitialize(sstring.cstr());
 }
 }

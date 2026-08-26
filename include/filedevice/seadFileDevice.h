@@ -59,6 +59,11 @@ public:
         cSeekOrigin_End = 2
     };
 
+    enum FileType
+    {
+        cFileNameFormatBufSize = 254
+    };
+
     struct LoadArg
     {
         SafeString path;

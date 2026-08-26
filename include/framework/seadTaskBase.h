@@ -5,6 +5,7 @@
 #include <container/seadTreeNode.h>
 #include <framework/seadHeapPolicies.h>
 #include <framework/seadTaskID.h>
+#include <framework/seadMethodTreeMgr.h>
 #include <heap/seadDisposer.h>
 #include <prim/seadBitFlag.h>
 #include <prim/seadDelegateEventSlot.h>
@@ -16,6 +17,7 @@ namespace sead
 {
 class FaderTaskBase;
 class MethodTreeNode;
+class MethodTreeMgr;
 class TaskEvent;
 class TaskMgr;
 class TaskParameter;
@@ -115,6 +117,7 @@ public:
     virtual void onDestroy();
 
     DelegateThread* getFramework() const;  // seems to return mTaskMgr->mPrepareThread;
+    MethodTreeMgr* getMethodTreeMgr() const;
 
     TaskParameter* mParameter;
     BitFlag32 mInternalFlag;
