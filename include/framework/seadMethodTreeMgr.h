@@ -22,6 +22,8 @@ public:
     virtual void pauseAll(bool) = 0;
     virtual void pauseAppCalc(bool) = 0;
 
+    CriticalSection* getTreeCriticalSection(){ return &mCS; }
+
     CriticalSection mCS;
 };
 

@@ -124,7 +124,6 @@ add_library(sead OBJECT
   include/heap/seadHeap.h
   include/heap/seadHeapMgr.h
   include/heap/seadMemBlock.h
-  modules/src/heap/seadArena.cpp
   modules/src/heap/seadDisposer.cpp
   modules/src/heap/seadExpHeap.cpp
   modules/src/heap/seadHeap.cpp
@@ -286,12 +285,23 @@ if(SEAD_PLATFORM STREQUAL "ctr")
   target_link_libraries(sead PUBLIC CTRSDK)
 
   target_sources(sead PRIVATE
-    #include/filedevice/ctr/seadCtrFileStream.h
+  # filedevice #
+    include/filedevice/ctr/seadCtrFileStreamFileDeviceCtr.h
+    include/filedevice/ctr/seadCtrFileDevice.h
     #include/filedevice/ctr/seadCtrHostIOFileDevice.h
-    #include/filedevice/ctr/seadCtrSDFileDeviceCtr.h
-    #modules/src/filedevice/ctr/seadCtrFileStream.cpp
+    include/filedevice/ctr/seadCtrSDFileDeviceCtr.h
+    modules/src/filedevice/ctr/seadCtrFileStreamFileDeviceCtr.cpp
+    modules/src/filedevice/ctr/seadCtrFileDevice.cpp
     #modules/src/filedevice/ctr/seadCtrHostIOFileDevice.cpp
-    #modules/src/filedevice/ctr/seadCtrSDFileDeviceCtr.cpp
+    modules/src/filedevice/ctr/seadCtrSDFileDeviceCtr.cpp
+  
+  # framework #
+    #include/framework/seadDualScreenMethodTreeMgr.h
+    include/framework/seadDualScreenTask.h
+    #include/framework/seadUlcdTask.h
+    modules/src/framework/seadDualScreenTask.cpp
+  # heap #
+    modules/src/heap/seadArenaCtr.cpp
 
     include/thread/ctr/seadThreadLocalStorage.hpp
     modules/src/thread/ctr/seadCriticalSectionCtr.cpp

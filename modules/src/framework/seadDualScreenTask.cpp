@@ -89,8 +89,86 @@ void DualScreenTask::pauseDraw(bool b)
 
 void DualScreenTask::attachCalcImpl()
 {
-    //ScopedLock(getMethodTreeMgr::getTreeCriticalSection());
-    //if(mTaskListNode.parent() == NULL)
+    ScopedLock<CriticalSection> lock(getMethodTreeMgr()->getTreeCriticalSection());
+
+    TaskBase* parentTask = nullptr;
+    if (parent() != nullptr)
+        parentTask = *parent()->val();
+
+    if (getTag() == cSystem)
+    {
+        attachMethodWithCheck(cMethodType_SystemCalc, &mBothNode);
+    }
+    else
+    {
+        SEAD_ASSERT_MSG(getTag() == cApp, "Undefined Tag(%d).", mTag);
+
+        if (parentTask == nullptr)
+        {
+            attachMethodWithCheck(cMethodType_AppCalc, &mBothNode);
+        }
+        else
+        {
+            SEAD_ASSERT_MSG(parentTask->isConnectable(this),
+                             "illigal parent ( MethodTreeMgr matching failed ) .");
+
+            MethodTreeNode* calcNode = parentTask->getMethodTreeNode(cMethodType_AppCalc);
+            SEAD_ASSERT(calcNode);
+
+            calcNode->pushBackChild(&mBothNode);
+        }
+    }
 }
+
+void DualScreenTask::attachDrawImpl()
+{
+    ScopedLock<CriticalSection> lock(getMethodTreeMgr()->getTreeCriticalSection());
+
+    TaskBase* parentTask = nullptr;
+    if (parent() != nullptr)
+        parentTask = *parent()->val();
+
+    if (getTag() == cSystem)
+    {
+        attachMethodWithCheck(cMethodType_SystemDrawTop, &mTopNode);
+        attachMethodWithCheck(cMethodType_SystemDrawBtm, &mBtmNode);
+    }
+    else
+    {
+        SEAD_ASSERT_MSG(mTag == cApp, "Undefined Tag(%d).", mTag);
+
+        if (parentTask == nullptr)
+        {
+            attachMethodWithCheck(cMethodType_AppDrawTop, &mTopNode);
+            attachMethodWithCheck(cMethodType_AppDrawBtm, &mBtmNode);
+        }
+        else
+        {
+            SEAD_ASSERT_MSG(parentTask->isConnectable(this),
+                             "illigal parent ( MethodTreeMgr matching failed ) .");
+
+            MethodTreeNode* topDraw = parentTask->getMethodTreeNode(cMethodType_AppDrawTop);
+            SEAD_ASSERT(topDraw);
+            topDraw->pushFrontChild(&mTopNode);
+
+            MethodTreeNode* btmDraw = parentTask->getMethodTreeNode(cMethodType_AppDrawBtm);
+            SEAD_ASSERT(btmDraw);
+            btmDraw->pushFrontChild(&mBtmNode);
+        }
+    }
+}
+
+void DualScreenTask::detachCalcImpl()
+{
+    mBothNode.detachAll();
+}
+
+void DualScreenTask::detachDrawImpl()
+{
+    mTopNode.detachAll();
+    mBtmNode.detachAll();
+}
+
+
 
 }

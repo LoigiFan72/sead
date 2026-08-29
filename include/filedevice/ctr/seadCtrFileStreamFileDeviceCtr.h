@@ -17,8 +17,6 @@ protected:
     virtual bool doIsAvailable_() const;
     virtual FileDevice* doOpen_(FileHandle* handle, const SafeString& path, FileOpenFlag flag);
     virtual bool doClose_(FileHandle* handle);
-    virtual bool doFlush_(FileHandle* handle);
-    virtual bool doRemove_(const SafeString& path);
     virtual bool doRead_(u32* bytesRead, FileHandle* handle, u8* outBuffer, u32 bytesToRead);
     virtual bool doWrite_(u32* bytesWritten, FileHandle* handle, const u8* inBuffer,
                   u32 bytesToWrite);
@@ -33,13 +31,26 @@ protected:
     virtual bool doReadDirectory_(u32* entriesRead, DirectoryHandle* handle, DirectoryEntry* entries,
                           u32 entriesToRead);
     virtual bool doMakeDirectory_(const SafeString& path, u32 u_32);
-    virtual s32 doGetLastRawError_() const { return error_result.GetValue(); }
+    virtual s32 doGetLastRawError_() const { return nn_result.GetValue(); }
     virtual void doResolvePath_(BufferedSafeString* out, const SafeString& path) const;
 
     nn::Result openDirectryImpl_(nn::fs::Directory* dir, SafeString const& pathInner, SafeString const& pathOutter);
-    nn::Result openFileStreanImpl_(nn::fs::FileStream* strm, SafeString const& pathInner, SafeString const& pathOutter);
+    nn::Result openFileStreamImpl_(nn::fs::FileStream* fs, SafeString const& pathInner, SafeString const& pathOutter, u32 mode);
+    class FileStreamFileHandle;
 
-    nn::Result error_result;
-    SafeString mMountPoint;
+    FileStreamFileHandle* getFileStreamFileHandle_(FileHandle* h) const;
+    Directory* getNnFsDirectory_(DirectoryHandle* h) const;
+
+    nn::Result nn_result;
+    bool mDoFlush;
+
+    struct FileStreamFileHandle : public FileStream
+    {
+    public:
+        FileStreamFileHandle(){ }
+        ~FileStreamFileHandle(){ }
+
+        FileOpenFlag mFlag;
+    };
 };
 }

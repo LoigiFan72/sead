@@ -103,6 +103,10 @@ public:
     virtual void pauseCalcChild(bool b);
     virtual void pauseDrawChild(bool b);
 
+    virtual void taskListenPropertyEvent(const hostio::PropertyEvent* event);
+    virtual void taskGenMessage(hostio::Context* ctx);
+    virtual void taskDoGenMessage(hostio::Context* ctx);
+    virtual void taskDoListenPropertyEvent(const hostio::PropertyEvent* event);
     virtual void prepare();
     virtual void enterCommon();
     virtual void enter();
@@ -118,6 +122,9 @@ public:
 
     DelegateThread* getFramework() const;  // seems to return mTaskMgr->mPrepareThread;
     MethodTreeMgr* getMethodTreeMgr() const;
+    Tag getTag() const { return mTag; }
+    bool isConnectable(TaskBase* other) const;
+    void doneDestroy();
 
     TaskParameter* mParameter;
     BitFlag32 mInternalFlag;

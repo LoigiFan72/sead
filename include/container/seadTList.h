@@ -16,6 +16,11 @@ public:
 
     TList() : ListImpl() {}
 
+    void parent
+    {
+        
+    }
+
     void pushBack(TListNode<T>* item)
     {
         item->erase();

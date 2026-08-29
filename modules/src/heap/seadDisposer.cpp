@@ -56,6 +56,11 @@ IDisposer::~IDisposer()
 
         *reinterpret_cast<uintptr_t*>(&mDisposerHeap) = cDestructedFlag;
     }
+    else
+    {
+        #pragma line 96
+        SEAD_ASSERT_MSG(false, "Destruct twice. [%p] Your class has possibilities for wrong order of multiple inheri tance.", this);
+    }
 }
 
 }  // namespace sead

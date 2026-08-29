@@ -64,6 +64,7 @@ void DebugBreak();
 void Print(const char* format, ...);
 void PrintV(const char* format, va_list);
 void PrintString(const char* format, s32);
+void PrintStringImpl(const char* format);
 
 void Warning(const char* file, int line, const char* msg, ...);
 void SetWarningEnable(bool enable);

@@ -2,5 +2,7 @@
 
 namespace sead
 {
-Job::~Job() = default;
+Job::~Job()
+{
+}
 }

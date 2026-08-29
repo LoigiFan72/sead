@@ -83,8 +83,17 @@ public:
 
     void emit(T arg)
     {
-        for (auto& slot_node : mList.robustRange())
+        for (TList<T>::RobustRange& slot_node : mList.robustRange())
             slot_node.mData->invoke_(arg);
+    }
+
+    void fire(T arg)
+    {   
+        for(TList<Slot*>::robustIterator it = mSlotList.robustBegin(); it != mSlotList.robustEnd(); ++it)
+        {
+            Slot* slot = *it;
+            slot->invoke_(arg);
+        }
     }
 
     int getNumSlots() const { return mList.size(); }

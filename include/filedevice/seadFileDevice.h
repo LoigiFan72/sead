@@ -330,8 +330,6 @@ protected:
     virtual bool doSave_(SaveArg& arg);
     virtual FileDevice* doOpen_(FileHandle* handle, const SafeString& path, FileOpenFlag flag) = 0;
     virtual bool doClose_(FileHandle* handle) = 0;
-    virtual bool doFlush_(FileHandle* handle) = 0;
-    virtual bool doRemove_(const SafeString& str) = 0;
     virtual bool doRead_(u32* bytesRead, FileHandle* handle, u8* outBuffer, u32 bytesToRead) = 0;
     virtual bool doWrite_(u32* bytesWritten, FileHandle* handle, const u8* inBuffer,
                           u32 bytesToWrite) = 0;
