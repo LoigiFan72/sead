@@ -15,7 +15,7 @@ public:
     void setName(const SafeString& name) { mINamableName = name; }
 
 private:
-    SafeString mINamableName = "";
+    SafeString mINamableName;
 };
 
 }  // namespace sead

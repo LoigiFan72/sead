@@ -1,6 +1,6 @@
 #pragma once
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 
 namespace sead

@@ -1,7 +1,7 @@
 #ifndef SEAD_OFFSET_LIST_H_
 #define SEAD_OFFSET_LIST_H_
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 #include <container/seadListImpl.h>
 #include <prim/seadPtrUtil.h>

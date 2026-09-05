@@ -1,14 +1,17 @@
 #pragma once
 
-#include "filedevice/ctr/seadCtrFileDevice.h"
+#include "filedevice/ctr/seadCtrFileStreamFileDeviceCtr.h"
 
 namespace sead
 {
-class CtrBackupFileDevice : public CtrFileDevice
+class CtrBackupFileDevice : public CtrFileStreamFileDevice
 {
-    SEAD_RTTI_OVERRIDE(CtrBackupFileDevice, CtrFileDevice)
+    SEAD_RTTI_OVERRIDE(CtrBackupFileDevice, CtrFileStreamFileDevice)
 public:
-    CtrBackupFileDevice(const SafeString& name){ }
+    CtrBackupFileDevice():
+        CtrFileStreamFileDevice("backup")
+    {
+    }
 protected:
 
     virtual ~CtrBackupFileDevice(){ }

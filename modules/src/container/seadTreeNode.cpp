@@ -1,4 +1,4 @@
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <container/seadTreeNode.h>
 
 namespace sead

@@ -3,7 +3,7 @@
 // Project: StandardEAD C++ Library for CTR
 
 #include "heap/seadArena.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include <nn/os.h>
 
 namespace sead

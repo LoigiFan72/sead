@@ -43,7 +43,6 @@ For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/s
 * **hostio** - Host IO (communication with PCs)
 * **math** - Maths utilities (vector, matrix, etc.)
 * **message** - libms wrapper
-* **mc** - Multi-core support
 * **prim** - Primitives (strings, enums, RTTI, etc.)
 * **random** - Random number generator
 * **resource** - Resource (loading, decompressing, etc.)

@@ -23,11 +23,13 @@ public:
     virtual void attachDrawImpl();
     virtual void detachCalcImpl();
     virtual void detachDrawImpl();
+    virtual const RuntimeTypeInfo::Interface* getCorrespondingMethodTreeMgrTypeInfo() const;
+    virtual MethodTreeNode* getMethodTreeNode(s32 methodType);
     virtual void calc(){ }
     virtual void drawTop(){ }
     virtual void drawBtm(){ }
 
-    MethodTreeNode mBothNode;
+    MethodTreeNode mCalcNode;
     MethodTreeNode mTopNode;
     MethodTreeNode mBtmNode;
 };

@@ -45,3 +45,5 @@ tgt/*
 
 # SDK for Dev
 addins/CTRSDK/*
+addins/NintendoWare4Ctr
+.vscode/*

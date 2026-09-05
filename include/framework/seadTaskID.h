@@ -13,7 +13,19 @@ class TaskParameter;
 
 struct TaskConstructArg
 {
-    TaskConstructArg(){ }
+    TaskConstructArg(): 
+        heap_array(nullptr), 
+        mgr(nullptr), 
+        param(nullptr)
+    {
+    }
+
+    TaskConstructArg(HeapArray* heapArray_, TaskMgr* mgr_, TaskParameter* param_): 
+        heap_array(heapArray_), 
+        mgr(mgr_), 
+        param(param_)
+    {
+    }
 
     HeapArray* heap_array;
     TaskMgr* mgr;
@@ -39,10 +51,35 @@ public:
         cString = 3
     };
 
-    TaskClassID() = default;
+    TaskBase* create(const TaskConstructArg& arg) const;
+
+    TaskClassID(){ }
     TaskClassID(s32 i) : mType(Type::cInt) { mID.mInt = i; }
     TaskClassID(TaskFactory f) : mType(Type::cFactory) { mID.mFactory = f; }
     TaskClassID(const char* s) : mType(Type::cString) { mID.mString = s; }
+
+    friend bool operator==(const TaskClassID& a, const TaskClassID& b)
+    {
+        if (a.mType != b.mType)
+            return false;
+
+        switch (a.mType)
+        {
+            case TaskClassID::Type::cInt:
+                return a.mID.mInt == b.mID.mInt;
+
+            case TaskClassID::Type::cFactory:
+                return a.mID.mFactory == b.mID.mFactory;
+
+            case TaskClassID::Type::cString:
+                return SafeString(a.mID.mString) == SafeString(b.mID.mString);
+
+            default:
+                SEAD_ASSERT_MSG(false, "UNKNOWN TYPE %d\n", a.mType);
+        }
+
+        return false;
+    }
 
 public:
     Type mType = Type::cInvalid;

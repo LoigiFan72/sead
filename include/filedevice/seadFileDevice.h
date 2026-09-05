@@ -30,9 +30,9 @@ public:
 protected:
     friend class FileDevice;
 
-    FileDevice* mDevice = nullptr;
-    FileDevice* mOriginalDevice = nullptr;
-    HandleBuffer mHandleBuffer{};
+    FileDevice* mDevice;
+    FileDevice* mOriginalDevice;
+    HandleBuffer mHandleBuffer;
 };
 
 class FileHandle;

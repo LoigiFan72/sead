@@ -1,7 +1,7 @@
 #pragma once
 
 #include <math.h>
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #ifndef SEAD_MATH_MATH_CALC_COMMON_H_
 #include <math/seadMathCalcCommon.h>
 #endif

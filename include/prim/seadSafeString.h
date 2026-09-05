@@ -2,7 +2,7 @@
 
 #include <cstdarg>
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 
 namespace sead
@@ -175,8 +175,33 @@ public:
         }
     }
 
-    BufferedSafeStringBase(const BufferedSafeStringBase&) = default;
-    ~BufferedSafeStringBase() SEAD_SAFESTRING_OVERRIDE_TOKEN = default;
+    BufferedSafeStringBase(const BufferedSafeStringBase&){ };
+    BufferedSafeStringBase(SafeStringBase<T>* original, s32 size):
+        SafeStringBase<T>(original->cstr())
+    {
+        if (original == nullptr)
+        {
+            SEAD_ASSERT_MSG(false, "original string must not be nullptr.");
+            this->mStringTop = nullptr;
+            mBufferSize = 0;
+            return;
+        }
+
+        if (pos < 0 || pos >= original->getBufferSize())
+        {
+            SEAD_ASSERT_MSG(false, "pos(%d) out of bounds[0,%d)", pos,
+                        original->getBufferSize());
+            this->mStringTop = nullptr;
+            mBufferSize = 0;
+            return;
+        }
+
+        this->mStringTop = original->getMutableStringTop_() + pos;
+        mBufferSize = original->getBufferSize() - pos;
+
+        this->assureTerminationImpl_();
+    }
+    ~BufferedSafeStringBase() SEAD_SAFESTRING_OVERRIDE_TOKEN{ };
 
     BufferedSafeStringBase<T>&
     operator=(const SafeStringBase<T>& other) SEAD_SAFESTRING_OVERRIDE_TOKEN;

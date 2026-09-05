@@ -1,8 +1,7 @@
 #include "controller/seadPatternRumbleAddon.h"
 
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 
-// unchecked copy from Wii U-decomp
 namespace sead
 {
 PatternRumbleAddon::PatternRumbleAddon(Controller* controller)

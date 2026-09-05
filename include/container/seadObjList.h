@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include "basis/seadNew.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include "basis/seadTypes.h"
 #include "container/seadFreeList.h"
 #include "container/seadListImpl.h"
@@ -71,6 +71,20 @@ public:
 
     T* front() const { return listNodeToObjWithNullCheck(ListImpl::front()); }
     T* back() const { return listNodeToObjWithNullCheck(ListImpl::back()); }
+
+    T* birthBack()
+    {
+        if (isFull())
+        {
+            SEAD_ASSERT_MSG(false, "buffer full.");
+            return nullptr;
+        }
+
+        Node* node = new(mFreeList.get()) Node();
+        ListImpl::pushBack(objToListNode(&node->item));
+
+        return &node->item;
+    }
 
     T popBack()
     {

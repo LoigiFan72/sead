@@ -4,7 +4,7 @@
 #error "Unknown platform"
 #endif
 
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include "time/seadDateTime.h"
 #include "time/seadDateUtil.h"
 

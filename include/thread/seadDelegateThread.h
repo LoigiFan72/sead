@@ -11,9 +11,9 @@ class IDelegate2;
 class DelegateThread : public Thread
 {
 public:
-    DelegateThread(const SafeString& name, IDelegate2<Thread*, MessageQueue::Element>* delegate,
-                   Heap* heap, s32 priority, MessageQueue::BlockType block_type,
-                   MessageQueue::Element quit_msg, s32 stack_size, s32 message_queue_size);
+    DelegateThread(const SafeString& name, IDelegate2<Thread*, MessageQueue::Element>* deleg, Heap* heap, s32 platformPriority = cDefaultPriority,
+                   MessageQueue::BlockType blockType = MessageQueue::BlockType::Blocking, MessageQueue::Element quitMsg = cDefaultQuitMsg,
+                   s32 stackSize = cDefaultStackSize, s32 msgQueueSize = cDefaultMsgQueueSize);
     ~DelegateThread() override;
 
 protected:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math/seadMatrixCalcCommon.h>
+#include <math/ctr/seadMatrixCalcCtr.h>
 #ifndef SEAD_MATH_MATRIX_H_
 #include <math/seadMatrix.h>
 #endif
@@ -32,7 +33,7 @@ inline T& Matrix22<T>::operator()(s32 i, s32 j)
 template <typename T>
 inline Matrix22<T>& Matrix22<T>::operator=(const Self& n)
 {
-    Matrix22CalcCommon<T>::copy(*this, n);
+    Matrix22CalcCtr<T>::copy(*this, n);
     return *this;
 }
 
@@ -51,13 +52,13 @@ inline void Matrix22<T>::makeZero()
 template <typename T>
 inline void Matrix22<T>::setInverse(const Self& n)
 {
-    Matrix22CalcCommon<T>::inverse(*this, n);
+    Matrix22CalcCtr<T>::inverse(*this, n);
 }
 
 template <typename T>
 inline void Matrix22<T>::setInverseTranspose(const Self& n)
 {
-    Matrix22CalcCommon<T>::inverseTranspose(*this, n);
+    Matrix22CalcCtr<T>::inverseTranspose(*this, n);
 }
 
 template <typename T>
@@ -670,7 +671,7 @@ inline T& Matrix44<T>::operator()(s32 i, s32 j)
 template <typename T>
 inline Matrix44<T>& Matrix44<T>::operator=(const Self& n)
 {
-    Matrix44CalcCommon<T>::copy(*this, n);
+    Matrix44CalcCtr<T>::copy(*this, n);
     return *this;
 }
 
@@ -689,7 +690,7 @@ inline void Matrix44<T>::makeZero()
 template <typename T>
 inline void Matrix44<T>::setInverse(const Self& n)
 {
-    Matrix44CalcCommon<T>::inverse(*this, n);
+    Matrix44CalcCtr<T>::inverse(*this, n);
 }
 
 template <typename T>

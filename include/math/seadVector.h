@@ -3,7 +3,7 @@
 #include <math.h>
 #include <basis/seadTypes.h>
 #include <math/seadMathPolicies.h>
-#include <math/seadVectorCalcCtr.h>
+#include <math/ctr/seadVectorCalcCtr.h>
 
 namespace sead {
 template <typename T>
@@ -53,6 +53,8 @@ struct Vector2 : public Policies<T>::Vec2Base {
 
     void set(const Vector2& other);
     void set(T x_, T y_);
+
+    void setAdd(const Vector2& x, const Vector2& y);
 
     static const Vector2 zero;
     static const Vector2 ex;

@@ -2,5 +2,7 @@
 
 namespace sead
 {
-StackTraceBase::StackTraceBase() = default;
+StackTraceBase::StackTraceBase()
+{
+}
 }

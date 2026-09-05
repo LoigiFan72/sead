@@ -1,6 +1,6 @@
 #pragma once
 
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include "container/seadFreeList.h"
 #include "prim/seadBitUtil.h"
 #include "prim/seadDelegate.h"

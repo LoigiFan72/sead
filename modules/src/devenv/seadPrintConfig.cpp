@@ -24,8 +24,12 @@ void PrintConfig::execCallbacks(const PrintEventArg& assertMessage)
 {
     sPrintEvent.fire(assertMessage);
     if (sFinalCallback)
+    {
         sFinalCallback->invoke(assertMessage);
+    }
     else
+    {
         system::PrintStringImpl(assertMessage);
+    }
 }
 }  // namespace sead

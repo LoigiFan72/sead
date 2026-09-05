@@ -1,4 +1,4 @@
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <filedevice/seadPath.h>
 #include <heap/seadHeapMgr.h>
 #include <resource/seadResource.h>

@@ -1,4 +1,4 @@
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <heap/seadHeapMgr.h>
 #include <prim/seadMemUtil.h>
 #include <prim/seadPtrUtil.h>

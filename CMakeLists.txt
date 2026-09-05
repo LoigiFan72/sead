@@ -1,6 +1,40 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.24)
 
 project(sead CXX ASM)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(NOT DEFINED ENV{ARMCC_PATH})
+    message(FATAL_ERROR "please set ARMCC_PATH")
+endif()
+
+find_program(ARM_ASM NAMES armasm.exe PATHS $ENV{ARMCC_PATH}/bin REQUIRED NO_DEFAULT_PATH)
+find_program(ARM_AR NAMES armar.exe PATHS $ENV{ARMCC_PATH}/bin REQUIRED NO_DEFAULT_PATH)
+find_program(ARM_CC NAMES armcc.exe PATHS $ENV{ARMCC_PATH}/bin REQUIRED NO_DEFAULT_PATH)
+find_program(ARM_LINK NAMES armlink.exe PATHS $ENV{ARMCC_PATH}/bin REQUIRED NO_DEFAULT_PATH)
+
+macro (set_compilers)
+    set(CMAKE_CXX_COMPILER_ID ARMCC)
+
+    set(CMAKE_AR ${ARM_AR})
+    set(CMAKE_C_COMPILER ${ARM_CC})
+    set(CMAKE_CXX_COMPILER ${ARM_CC})
+    set(CMAKE_ASM_COMPILER ${ARM_ASM})
+    set(CMAKE_LINKER ${ARM_LINK})
+endmacro()
+
+endmacro()
+
+if (WIN32)
+    set_compilers()
+    set(CMAKE_C_COMPILER_WORKS TRUE)
+    set(CMAKE_CXX_COMPILER_WORKS TRUE)
+    set(CMAKE_ASM_COMPILER_WORKS TRUE)
+endif()
+
+__compiler_armcc(C)
+__compiler_armcc(CXX)
+__compiler_armcc(ASM)
 
 option(SEAD_DEBUG "Enable debug assertions and warnings" OFF)
 set(SEAD_PLATFORM "ctr" CACHE STRING "Target platform (default: ctr)")
@@ -9,7 +43,24 @@ set_property(
   PROPERTY STRINGS "ctr"
 )
 
+add_library(libms OBJECT
+  addins/libms/include/LMS/commonbin.h
+  addins/libms/include/LMS/libms.h
+  addins/libms/include/LMS/msgfile.h
+  addins/libms/include/LMS/projfile.h
+  #addins/libms/include/flowfile.h
+  addins/libms/include/LMS/types.h
+
+  addins/libms/src/commonbin.c
+  addins/libms/src/libms.c
+  addins/libms/src/msgfile.c
+  addins/libms/src/projfile.c
+  #addins/libms/src/flowfile.c
+)
+
 add_library(sead OBJECT
+  target_link_libraries(sead PUBLIC libms)
+
   include/basis/seadNew.h
   include/basis/seadRawPrint.h
   include/basis/seadTypes.h
@@ -78,6 +129,7 @@ add_library(sead OBJECT
 
   include/framework/nx/seadGameFrameworkNx.h
   include/framework/seadCalculateTask.h
+  include/framework/seadFaderTask.h
   include/framework/seadFramework.h
   include/framework/seadHeapPolicies.h
   include/framework/seadGameFramework.h
@@ -86,17 +138,21 @@ add_library(sead OBJECT
   include/framework/seadMethodTreeMgr.h
   include/framework/seadProcessMeter.h
   include/framework/seadProcessMeterBar.h
+  include/framework/seadSingleScreenMethodTreeMgr.cpp
   include/framework/seadTask.h
   include/framework/seadTaskBase.h
   include/framework/seadTaskID.h
   include/framework/seadTaskMgr.h
   include/framework/seadTaskParameter.h
   modules/src/framework/seadCalculateTask.cpp
+  modules/src/framework/seadFaderTask.cpp
   modules/src/framework/seadFramework.cpp
   modules/src/framework/seadGameFramework.cpp
   modules/src/framework/seadMethodTree.cpp
   modules/src/framework/seadProcessMeterBar.cpp
+  modules/src/framework/seadSingleScreenMethodTreeMgr.cpp
   modules/src/framework/seadTaskBase.cpp
+  modules/src/framework/seadTaskID.cpp
   modules/src/framework/seadTaskMgr.cpp
 
   include/gfx/nvn/seadDebugFontMgrNvn.h
@@ -165,6 +221,9 @@ add_library(sead OBJECT
   modules/src/mc/seadJobQueue.cpp
   modules/src/mc/seadWorker.cpp
   modules/src/mc/seadWorkerMgr.cpp
+
+  include/message/seadMessageSet.h
+  modules/src/message/seadMessageSet.cpp
 
   include/prim/seadBitFlag.h
   include/prim/seadBitUtil.h
@@ -266,9 +325,12 @@ target_sources(sead PRIVATE
 )
 if(SEAD_DEBUG)
   target_sources(sead PRIVATE
+    include/hostio/seadHostIOContext.h
+    include/hostio/seadHostIODefine.h
     include/hostio/seadHostIOEventListener.h
     include/hostio/seadHostIOMgr.h
     include/hostio/seadHostIONode.h
+    include/hostio/seadHostIOPortBase.h
     include/hostio/seadHostIOReflexible.h
     include/hostio/seadHostIOThreadLock.h
     modules/src/hostio/seadHostIOEventListener.cpp
@@ -280,28 +342,35 @@ endif()
 
 if(SEAD_PLATFORM STREQUAL "ctr")
   if(NOT TARGET CTRSDK)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}../CtrSDK)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}../CtrSDK) # change depend on prj
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}../NintendoWare4Ctr) # change depend on prj
   endif()
   target_link_libraries(sead PUBLIC CTRSDK)
 
   target_sources(sead PRIVATE
-  # filedevice #
     include/filedevice/ctr/seadCtrFileStreamFileDeviceCtr.h
     include/filedevice/ctr/seadCtrFileDevice.h
+    include/filedevice/ctr/seadCtrBackupFileDevice.h
     #include/filedevice/ctr/seadCtrHostIOFileDevice.h
     include/filedevice/ctr/seadCtrSDFileDeviceCtr.h
     modules/src/filedevice/ctr/seadCtrFileStreamFileDeviceCtr.cpp
     modules/src/filedevice/ctr/seadCtrFileDevice.cpp
+    modules/src/filedevice/ctr/seadCtrBackupFileDevice.cpp
     #modules/src/filedevice/ctr/seadCtrHostIOFileDevice.cpp
     modules/src/filedevice/ctr/seadCtrSDFileDeviceCtr.cpp
-  
-  # framework #
-    #include/framework/seadDualScreenMethodTreeMgr.h
+
+    include/framework/seadDualScreenMethodTreeMgr.h
     include/framework/seadDualScreenTask.h
-    #include/framework/seadUlcdTask.h
+    include/framework/seadUlcdMethodTreeMgr.h
+    include/framework/seadUlcdTask.h
+    modules/src/framework/seadDualScreenMethodTreeMgr.h
     modules/src/framework/seadDualScreenTask.cpp
-  # heap #
+    modules/src/framework/seadUlcdMethodTreeMgr.cpp
+    modules/src/framework/seadUlcdTask.cpp
+
     modules/src/heap/seadArenaCtr.cpp
+
+    include/prim/ctr/seadMemUtilCtr.hpp
 
     include/thread/ctr/seadThreadLocalStorage.hpp
     modules/src/thread/ctr/seadCriticalSectionCtr.cpp

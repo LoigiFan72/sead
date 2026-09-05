@@ -1,6 +1,6 @@
 #include "controller/seadControllerMgr.h"
 #include "basis/seadNew.h"
-#include "controller/nin/seadNinJoyNpadDevice.h"
+//#include "controller/nin/seadNinJoyNpadDevice.h"
 #include "controller/seadControlDevice.h"
 #include "framework/seadTaskID.h"
 #include "prim/seadDelegate.h"

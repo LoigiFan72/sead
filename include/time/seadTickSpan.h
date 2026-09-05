@@ -3,7 +3,7 @@
 
 #include <climits>
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 
 namespace sead
@@ -78,6 +78,7 @@ public:
     friend TickSpan operator*(TickSpan a, f32 x) { return a.mSpan * x; }
     friend TickSpan operator*(f32 x, TickSpan a) { return a.mSpan * x; }
     friend TickSpan operator/(TickSpan a, f32 x) { return a.mSpan / x; }
+    friend TickSpan operator<(TickSpan a, TickSpan b) { return a.mSpan < b.mSpan; }
 
     static TickSpan makeFromNanoSeconds(s64 nsec)
     {

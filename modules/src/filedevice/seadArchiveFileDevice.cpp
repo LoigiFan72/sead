@@ -1,5 +1,5 @@
 #include "filedevice/seadArchiveFileDevice.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadWarning.h"
 #include "math/seadMathCalcCommon.h"
 #include "prim/seadPtrUtil.h"
 #include "resource/seadArchiveRes.h"

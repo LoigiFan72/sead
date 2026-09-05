@@ -95,18 +95,19 @@ public:
     explicit TaskBase(const TaskConstructArg& arg);
     TaskBase(const TaskConstructArg& arg, const char* name);
     virtual ~TaskBase();
-
     virtual void pauseCalc(bool b) = 0;
     virtual void pauseDraw(bool b) = 0;
     virtual void pauseCalcRec(bool b) = 0;
     virtual void pauseDrawRec(bool b) = 0;
-    virtual void pauseCalcChild(bool b);
-    virtual void pauseDrawChild(bool b);
+    virtual void pauseCalcChild(bool b){ }
+    virtual void pauseDrawChild(bool b){ }
 
+#if defined(SEAD_DEBUG)
     virtual void taskListenPropertyEvent(const hostio::PropertyEvent* event);
     virtual void taskGenMessage(hostio::Context* ctx);
     virtual void taskDoGenMessage(hostio::Context* ctx);
     virtual void taskDoListenPropertyEvent(const hostio::PropertyEvent* event);
+#endif // SEAD_DEBUG
     virtual void prepare();
     virtual void enterCommon();
     virtual void enter();
@@ -120,11 +121,103 @@ public:
     virtual MethodTreeNode* getMethodTreeNode(s32 method_type) = 0;
     virtual void onDestroy();
 
-    DelegateThread* getFramework() const;  // seems to return mTaskMgr->mPrepareThread;
-    MethodTreeMgr* getMethodTreeMgr() const;
+    void setFlag_(u32 flag){ mInternalFlag.set(flag); }
     Tag getTag() const { return mTag; }
-    bool isConnectable(TaskBase* other) const;
+
+    void attachCalc();
+    void attachCalcDraw();
+    void attachDraw();
+
     void doneDestroy();
+
+    bool isConnectable(TaskBase* child) const;
+    bool isDescendantOf(TaskBase* ancestor) const;
+
+    void attachMethodWithCheck(s32 methodType, MethodTreeNode* node);
+
+    bool requestCreateTask(const CreateArg& arg);
+    TaskBase* createTaskSync(const CreateArg& arg);
+    TaskBase* createChildTaskSync(CreateArg& arg);
+
+    bool requestTakeover(const TakeoverArg& arg);
+    bool requestTransition(TaskBase* next, FaderTaskBase* fader);
+
+
+    bool requestPush(const PushArg& arg);
+    bool requestPop();
+    TaskBase* pushSync(const PushArg& arg);
+
+    void adjustHeap(s32 index);
+    void adjustHeapAll();
+    void adjustHeapWithSlack(s32 index, size_t size);
+    void adjustHeapWithSlackWithoutLock_(s32 index, size_t size);
+
+    TaskBase* getParentTask() const
+    {
+        return parent() ? parent()->val() : nullptr;
+    }
+
+    const HeapArray& getHeapArray() const
+    {
+        return mHeapArray;
+    }
+
+    TaskMgr* getTaskMgr() const
+    {
+        return mTaskMgr;
+    }
+
+    template <typename T>
+    T* getParameter() const
+    {
+        T* param = DynamicCast<T>(mParameter);
+        return param;
+    }
+
+    Tag getTag() const
+    {
+        return mTag;
+    }
+
+    void detachCalc()
+    { 
+        detachCalcImpl(); 
+    }
+
+    void detachDraw()
+    { 
+        detachDrawImpl(); 
+    }
+
+    void detachCalcDraw()
+    {
+        detachCalc();
+        detachDraw();
+    }
+
+    Framework* getFramework() const;
+    MethodTreeMgr* getMethodTreeMgr() const;
+
+public:
+    void setFlag_(u32 f)
+    {
+        mInternalFlag.set(f);
+    }
+
+    void resetFlag_(u32 f)
+    {
+        mInternalFlag.reset(f);
+    }
+
+    void clearFlag_()
+    {
+        mInternalFlag.makeAllZero();
+    }
+
+    bool checkFlag_(u32 f) const
+    {
+        return mInternalFlag.isOn(f);
+    }
 
     TaskParameter* mParameter;
     BitFlag32 mInternalFlag;

@@ -13,15 +13,15 @@ public:
     ThreadLocalStorage(){ }
     ~ThreadLocalStorage(){}
 
-    ThreadLocalStorage(const ThreadLocalStorage&) = delete;
-    ThreadLocalStorage& operator=(const ThreadLocalStorage&) = delete;
+    ThreadLocalStorage(const ThreadLocalStorage&){ };
+    ThreadLocalStorage& operator=(const ThreadLocalStorage&){ };
 
     void setValue(uptr value){}
     uptr getValue() const{}
 
 private:
 #ifdef CTRSDK
-    nn::os::ThreadLocalStorage mTls;
+    nn::os::ThreadLocalStorage mTlsSlot;
 #endif
 };
 }  // namespace sead

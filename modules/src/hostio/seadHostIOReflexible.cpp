@@ -1,5 +1,5 @@
 #include "hostio/seadHostIOReflexible.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include "heap/seadHeap.h"
 #include "heap/seadHeapMgr.h"
 #include "prim/seadMemUtil.h"

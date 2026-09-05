@@ -1,5 +1,5 @@
 #include "thread/seadThreadUtil.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 
 namespace sead
 {

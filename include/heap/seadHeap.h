@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 #include <container/seadOffsetList.h>
 #include <heap/seadDisposer.h>
@@ -40,7 +40,7 @@ public:
 
     Heap(const SafeString& name, Heap* parent, void* address, size_t size, HeapDirection direction,
          bool);
-    ~Heap() override;
+    virtual ~Heap();
 
     SEAD_RTTI_BASE(Heap)
 
@@ -59,7 +59,7 @@ public:
     virtual uintptr_t getEndAddress() const = 0;
     virtual size_t getSize() const = 0;
     virtual size_t getFreeSize() const = 0;
-    virtual size_t getMaxAllocatableSize(int alignment) const = 0;
+    virtual size_t getMaxAllocatableSize(int alignment = cDefaultAlignment) const = 0;
     virtual bool isInclude(const void*) const = 0;
     virtual bool isEmpty() const = 0;
     virtual bool isFreeable() const = 0;
@@ -71,8 +71,8 @@ public:
     void dumpTreeYAML(WriteStream& stream, int) const;
 
 #ifdef SEAD_DEBUG
-    void listenPropertyEvent(const hostio::PropertyEvent* event) override;
-    void genMessage(hostio::Context*) override;
+    virtual void listenPropertyEvent(const hostio::PropertyEvent* event);
+    virtual void genMessage(hostio::Context*);
 #endif
     virtual void genInformation_(hostio::Context*);
     virtual void makeMetaString_(BufferedSafeString*);

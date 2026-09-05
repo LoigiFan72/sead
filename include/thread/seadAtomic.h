@@ -94,6 +94,9 @@ struct Atomic : AtomicBase<T>
     /// @return whether the bit was set and is now cleared.
     bool setBitOff(unsigned int bit);
 
+    T getValue() const{ return mValue.load(); }
+    void setValue(T value){ mValue.store(value); }
+
     T operator+=(T x) { return fetchAdd(x); }
     T operator-=(T x) { return fetchSub(x); }
     T operator&=(T x) { return fetchAnd(x); }

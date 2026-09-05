@@ -9,8 +9,8 @@ namespace sead
 {
 class InfLoopChecker : public CalculateTask
 {
-    SEAD_TASK_SINGLETON(InfLoopChecker)
-    SEAD_RTTI_OVERRIDE(InfLoopChecker, CalculateTask)
+    SEAD_RTTI_OVERRIDE(InfLoopChecker, CalculateTask);
+    SEAD_TASK_SINGLETON_DISPOSER(InfLoopChecker);
 
 public:
     struct InfLoopParam
@@ -20,21 +20,69 @@ public:
     using InfLoopEvent = DelegateEvent<const InfLoopParam&>;
 
     explicit InfLoopChecker(const TaskConstructArg& arg);
-    ~InfLoopChecker() override;
+    virtual ~InfLoopChecker();
+    virtual void prepare();
+    virtual void calc();
 
     void countUp();
-    void prepare() override;
-    void calc() override;
+    
+    u32 getCounter() const
+    {
+        return mLoopCounter;
+    }
 
-    InfLoopEvent& getEvent() { return mEvent; }
+    void resetCounter()
+    {
+        mLoopCounter = 0;
+    }
+
+    u32 getThreshold() const
+    {
+        return mLoopThreshold;
+    }
+
+    void setThreshold(u32 threashold)
+    {
+        SEAD_ASSERT(threashold > 1);
+        mLoopThreshold = threashold;
+    }
+
+    void setDisableCounter(u32 counter)
+    {
+        mDisableCounter.setValue(counter);
+    }
+
+    void setEnable(bool enable)
+    {
+        mEnable = enable;
+    }
+
+    bool isEnable() const
+    {
+        return mEnable;
+    }
+
+    //? Unofficial name but probably exists
+    void registerCallback(InfLoopEvent::Slot& slot)
+    {
+        mInfLoopEvent.connect(slot);
+    }
+
+    //? Unofficial name but probably exists
+    void unregisterCallback(InfLoopEvent::Slot& slot)
+    {
+        mInfLoopEvent.disconnect(slot);
+    }
+protected:
+    void onInfLoop_();
 
 private:
     void onInfLoop_();
 
-    u32 mLoopCount;
+    u32 mLoopCounter;
     u32 mLoopThreshold;
-    bool mEnabled;
-    InfLoopEvent mEvent;
-    sead::Atomic<u32> mSkipCounter;
+    bool mEnable;
+    InfLoopEvent mInfLoopEvent;
+    sead::Atomic<u32> mDisableCounter;
 };
 }  // namespace sead

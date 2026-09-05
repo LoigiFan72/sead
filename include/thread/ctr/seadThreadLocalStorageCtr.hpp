@@ -4,14 +4,16 @@
 
 #include "basis/seadRawPrint.h"
 
-namespace sead{
-
-inline void ThreadLocalStorage::setValue(uptr value){
-    mTls.SetValue(value);
+namespace sead
+{
+inline void ThreadLocalStorage::setValue(uptr value)
+{
+    mTlsSlot.SetValue(value);
 }
 
-inline uptr ThreadLocalStorage::getValue() const{
-    return mTls.GetValue();
+inline uptr ThreadLocalStorage::getValue() const
+{
+    return mTlsSlot.GetValue();
 }
 
 }

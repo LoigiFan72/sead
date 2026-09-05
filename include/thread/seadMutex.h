@@ -1,7 +1,7 @@
 #pragma once
 
-#if defined(CTRSDK)
-    #include <nn/os.h>
+#ifdef CTRSDK
+#include <nn/os.h>
 #endif
 
 #include <basis/seadTypes.h>
@@ -30,7 +30,7 @@ public:
     bool try_lock() { return tryLock(); }
 
 
-#if defined(CTRSDK)
+#ifdef CTRSDK
     nn::os::Mutex mMutexInner;
 #else
 #error "Unknown platform"

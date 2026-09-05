@@ -13,24 +13,24 @@ class Task : public TaskBase
 public:
     explicit Task(const TaskConstructArg& arg);
     Task(const TaskConstructArg& arg, const char* name);
-    ~Task() override;
-    void pauseCalc(bool b) override;
-    void pauseDraw(bool b) override;
-    void pauseCalcRec(bool b) override;
-    void pauseDrawRec(bool b) override;
-    void pauseCalcChild(bool b) override;
-    void pauseDrawChild(bool b) override;
-    void attachCalcImpl() override;
-    void attachDrawImpl() override;
-    void detachCalcImpl() override;
-    void detachDrawImpl() override;
-    const RuntimeTypeInfo::Interface* getCorrespondingMethodTreeMgrTypeInfo() const override;
-    MethodTreeNode* getMethodTreeNode(s32 method_type) override;
+    virtual ~Task();
+    virtual void pauseCalc(bool b);
+    virtual void pauseDraw(bool b);
+    virtual void pauseCalcRec(bool b);
+    virtual void pauseDrawRec(bool b);
+    virtual void pauseCalcChild(bool b);
+    virtual void pauseDrawChild(bool b);
+    virtual void attachCalcImpl();
+    virtual void attachDrawImpl();
+    virtual void detachCalcImpl();
+    virtual void detachDrawImpl();
+    virtual const RuntimeTypeInfo::Interface* getCorrespondingMethodTreeMgrTypeInfo() const;
+    virtual MethodTreeNode* getMethodTreeNode(s32 method_type);
     virtual void calc() {}
     virtual void draw() {}
 
 protected:
-    MethodTreeNode mCalcNode{nullptr};
-    MethodTreeNode mDrawNode{nullptr};
+    MethodTreeNode mCalcNode;
+    MethodTreeNode mDrawNode;
 };
 }  // namespace sead

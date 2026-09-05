@@ -26,13 +26,11 @@ public:
 }  // namespace sead
 
 #define SEAD_PRIM_MEM_UTIL_H_
-#ifdef cafe
-#include <prim/cafe/seadMemUtilCafe.hpp>
-#elif NNSDK
-#include <prim/nin/seadMemUtilNin.hpp>
+#ifdef CTRSDK
+#include <prim/ctr/seadMemUtilCtr.hpp>
 #else
 #error "Unknown platform"
-#endif  // cafe
+#endif  // CTRSDK
 #undef SEAD_PRIM_MEM_UTIL_H_
 
 #endif  // SEAD_MEM_UTIL_H_

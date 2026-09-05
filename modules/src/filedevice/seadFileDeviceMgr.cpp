@@ -1,9 +1,9 @@
-#ifdef CTRSDK
-    #include <nn/fs.h>
-#endif
+#include <nn/fs.h>
+#include <nn/fs/CTR/MPCore/fs_FileSystemBase.h>
 
 #include <basis/seadNew.h>
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
+#include <basis/seadWarning.h>
 #include <devenv/seadEnvUtil.h>
 #include <filedevice/seadFileDeviceMgr.h>
 #include <filedevice/seadPath.h>
@@ -40,90 +40,11 @@ FileDeviceMgr::~FileDeviceMgr()
     unmount_();
 }
 
-void FileDeviceMgr::mount_([[maybe_unused]] Heap* heap)
+void FileDeviceMgr::mount_(Heap* heap)
 {
-#ifdef cafe
-    FSInit();
-    FSAddClient(&client, FS_RET_NO_ERROR);
-
-    FSStateChangeParams changeParams = {
-        .userCallback = stateChangeCallback_, .userContext = NULL, .ioMsgQueue = NULL};
-
-    FSSetStateChangeNotification(&client, &changeParams);
-    SAVEInit();
-    _17A4[0] = 0;
-    _1824 = 0;
-#elif defined(NNSDK)
-    // For release builds, only content is mounted using the regular nn::fs::MountRom.
-    // For debug builds, content is mounted using nn::fs::MountRom or by mounting
-    // SEAD_NIN_CONTENT_DIR on the host computer and the host root and SD are also mounted.
-#ifdef SEAD_DEBUG
-    const auto mount_host_result = nn::fs::MountHostRoot();
-    if (mount_host_result.IsFailure())
-    {
-        SEAD_WARN("nn::fs::MountHostRoot() failed. module = %d desc = %d innervalue = 0x%08x",
-                  mount_host_result.GetModule(), mount_host_result.GetDescription(),
-                  mount_host_result.GetInnerValueForDebug());
-        mMountedHost = false;
-    }
-    else
-    {
-        mMountedHost = true;
-    }
-#endif  // SEAD_DEBUG
-
-#ifdef SEAD_DEBUG
-    if (nn::fs::CanMountRomForDebug())
-#endif
-    {
-        u64 cache_size = 0;
-        const auto query_result = nn::fs::QueryMountRomCacheSize(&cache_size);
-        SEAD_ASSERT_MSG(query_result.IsSuccess(),
-                        "nn::fs::QueryMountRomCacheSize() failed. module = %d desc = %d "
-                        "innervalue = 0x%08x",
-                        query_result.GetModule(), query_result.GetDescription(),
-                        query_result.GetInnerValueForDebug());
-
-        SEAD_DEBUG_PRINT("FileDeviceMgr: MountRom cache size => %zd\n", cache_size);
-        mRomCache = new (heap) u8[cache_size];
-
-        const auto result = nn::fs::MountRom("content", mRomCache, cache_size);
-        SEAD_ASSERT_MSG(result.IsSuccess(),
-                        "nn::fs::MountRom() failed. module = %d desc = %d innervalue = 0x%08x",
-                        result.GetModule(), result.GetDescription(),
-                        result.GetInnerValueForDebug());
-    }
-#ifdef SEAD_DEBUG
-    else
-    {
-        FixedSafeString<256> content_dir;
-        if (EnvUtil::getEnvironmentVariable(&content_dir, "SEAD_NIN_CONTENT_DIR") == -1)
-        {
-            SEAD_WARN("SEAD_NIN_CONTENT_DIR is not set.");
-        }
-        else
-        {
-            const auto result = nn::fs::MountHost("content", content_dir.cstr());
-            SEAD_ASSERT_MSG(result.IsSuccess(),
-                            "nn::fs::MountHost() failed. module = %d desc = %d innervalue = 0x%08x",
-                            result.GetModule(), result.GetDescription(),
-                            result.GetInnerValueForDebug());
-            system::Print("FileDeviceMgr: MountHost => %s\n", content_dir.cstr());
-        }
-    }
-
-    const auto sd_result = nn::fs::MountSdCardForDebug("sd");
-    mMountedSd = sd_result.IsSuccess();
-    if (sd_result.IsSuccess())
-        system::Print("FileDeviceMgr: mount SD card\n");
-    else if (nn::fs::ResultMountNameAlreadyExists().Includes(sd_result))
-        system::Print("FileDeviceMgr: SD card already mounted\n");
-    else if (nn::fs::ResultSdCardAccessFailed().Includes(sd_result))
-        system::Print("FileDeviceMgr: SD card is not ready\n");
-#endif  // SEAD_DEBUG
-#else
-#error "Unknown platform"
-#endif
+    nn::fs::Initialize();
+    int archive = nn::fs::GetRomRequiredMemorySize(16, 16, true);
+    SEAD_ASSERT_MIN_MSG(archive, "Cannot mount rom archive.(%d)", archive);
 }
 
 void FileDeviceMgr::unmount_()

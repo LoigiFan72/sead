@@ -2,10 +2,8 @@
 
 #include <gfx/seadCamera.h>
 #include <gfx/seadColor.h>
-#include <gfx/seadDrawContext.h>
 #include <gfx/seadProjection.h>
 #include <heap/seadDisposer.h>
-#include "nvn/nvn.h"
 #include "thread/seadAtomic.h"
 
 namespace sead

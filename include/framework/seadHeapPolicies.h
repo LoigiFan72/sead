@@ -20,6 +20,11 @@ public:
 
     Heap* getPrimaryHeap() const { return mHeaps[mPrimaryIndex]; }
 
+    s32 getPrimaryHeapIndex() const
+    {
+        return mPrimaryIndex;
+    }
+
     Heap* mHeaps[4];
     bool mAdjusted[4]{};
     s32 mPrimaryIndex{};
@@ -38,6 +43,53 @@ struct HeapPolicy
 
 struct HeapPolicies
 {
+    const HeapPolicy& operator[](s32 idx) const
+    {
+        if (idx >= HeapMgr::getRootHeapNum())
+        {
+            SEAD_ASSERT_MSG(false, "illegal idx: %d", idx);
+            return mPolicies[0];
+        }
+
+        return mPolicies[idx];
+    }
+    
+    void useOnly(s32 idx)
+    {
+        s32 rootHeapNum = HeapMgr::getRootHeapNum();
+        if (idx >= rootHeapNum)
+        {
+            SEAD_ASSERT_MSG(false, "illegal idx: %d", idx);
+            return;
+        }
+
+        for (s32 i = 0; i < rootHeapNum; i++)
+        {
+            mPolicies[i].dont_create = idx != i;
+        }
+
+        mPrimaryIndex = idx;
+    }
+    
+    void useOnlyPrimaryHeap()
+    {
+        useOnly(mPrimaryIndex);
+    }
+
+    s32 getPrimaryHeapIndex() const
+    {
+        return mPrimaryIndex;
+    }
+
+    void setAdjustAll(bool b)
+    {
+        s32 rootHeapNum = HeapMgr::getRootHeapNum();
+        for (s32 i = 0; i < rootHeapNum; i++)
+        {
+            mPolicies[i].adjust = b;
+        }
+    }
+
     HeapPolicy mPolicies[4];
     s32 mPrimaryIndex{};
 };

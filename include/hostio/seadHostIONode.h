@@ -3,7 +3,9 @@
 #include "container/seadTreeNode.h"
 #include "hostio/seadHostIOReflexible.h"
 
-namespace sead::hostio
+namespace sead
+{
+namespace hostio
 {
 class Node : public Reflexible
 {
@@ -48,4 +50,5 @@ private:
     TTreeNode<Node*> mTreeNode;
 #endif
 };
-}  // namespace sead::hostio
+}  // namespace hostio
+}  // namespace sead

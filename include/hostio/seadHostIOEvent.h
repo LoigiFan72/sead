@@ -1,0 +1,56 @@
+#pragma once
+
+#include <hostio/seadHostIODefine.h>
+
+namespace sead { 
+namespace hostio {
+
+struct NodeEvent
+{
+    u32 eventListenerID;
+    NodeEventID id;
+    u32 localNodeID;
+    u32 extFlg;
+    SafeString extText;
+};
+
+struct GenEvent
+{
+};
+
+struct PropertyEvent
+{
+    u32 flag;
+    uintptr_t id;
+    u32 eventListenerID;
+    uintptr_t localNodeID;
+    u32 extFlg;
+    s32 dataSize;
+    const u8* data;
+};
+
+struct ExtensionFuncEvent
+{
+    u32 resultCode;
+    s32 dataSize;
+    const u8* data;
+};
+
+struct PaletteEventData
+{
+    u64 fileSize;
+    SafeString filePath;
+    u32 userEventID;
+    SafeString userEventText;
+};
+
+struct PaletteEvent
+{
+    PaletteEventType type;
+    SafeString paletteName;
+    s32 numData;
+    const PaletteEventData* data;
+};
+
+} // namespace hostio
+} // namespace sead

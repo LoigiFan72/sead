@@ -1,7 +1,7 @@
 #ifndef SEAD_ARCHIVE_RES_H_
 #define SEAD_ARCHIVE_RES_H_
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 #include <container/seadSafeArray.h>
 #include <filedevice/seadFileDevice.h>

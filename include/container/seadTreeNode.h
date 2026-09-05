@@ -55,6 +55,9 @@ public:
 
     // TODO: probably iterators
 
+    T& val() { return mData; }
+    const T& val() const { return mData; }
+
 protected:
     T mData;
 };

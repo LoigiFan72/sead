@@ -16,11 +16,6 @@ public:
 
     TList() : ListImpl() {}
 
-    void parent
-    {
-        
-    }
-
     void pushBack(TListNode<T>* item)
     {
         item->erase();
@@ -210,12 +205,30 @@ public:
 
     TListNode(T data) : ListNode(), mData(data), mList(nullptr) {}
 
+    void insertBack(TListNode* n)
+    {
+        SEAD_ASSERT(mList);
+        mList->insertAfter(this, n);
+    }
+
+    void insertFront(TListNode* n)
+    {
+        SEAD_ASSERT(mList);
+        mList->insertBefore(this, n);
+    }
+
     void erase()
     {
         TList<T>* list = mList;
         if (list != NULL)
             list->erase(this);
     }
+
+    T& val() { return mData; }
+    const T& val() const { return mData; }
+
+    TList<T>* list() { return mList; }
+    const TList<T>* list() const { return mList; }
 
     T mData;
     TList<T>* mList;

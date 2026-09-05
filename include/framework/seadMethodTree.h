@@ -31,23 +31,26 @@ public:
 
     using PauseEventDelegate = IDelegate2<MethodTreeNode*, PauseFlag>;
 
-    // NON_MATCHING: stores for mPauseFlag, mPauseEventDelegate, mUserID
-    explicit MethodTreeNode(CriticalSection* cs) : TTreeNode(this)
+    explicit MethodTreeNode(CriticalSection* cs) : 
+        TTreeNode(this), 
+        INamable(), 
+        IDisposer(), 
+        mDelegateHolder(),
+        mCriticalSection(cs),
+        mPauseFlag(cPause_None), 
+        mPauseEventDelegate(nullptr), 
+        mUserID(nullptr)
+
     {
-        mCriticalSection = cs;
-        mPauseEventDelegate = nullptr;
-        mUserID = nullptr;
-        mDelegateHolder.construct(sead::Delegate<MethodTreeNode>());
-        setPauseFlag(cPause_Both);
     }
 
-    ~MethodTreeNode() override { detachAll(); }
+    virtual ~MethodTreeNode() { detachAll(); }
 
-    template <typename Delegate>
-    void bind(const Delegate& delegate, const char* name)
+    template <typename T>
+    void bind(T* object, typename Delegate<T>::PTMF method, const char* name)
     {
         lock_();
-        mDelegateHolder.construct(delegate);
+        mDelegateHolder.bind(object, method);
         unlock_();
 
         if (name)
@@ -77,7 +80,7 @@ private:
 
     StorageFor<sead::AnyDelegate> mDelegateHolder;
     mutable CriticalSection* mCriticalSection;
-    [[maybe_unused]] u32 mPriority;
+    u32 mPriority;
     BitFlag32 mPauseFlag;
     PauseEventDelegate* mPauseEventDelegate;
     void* mUserID;

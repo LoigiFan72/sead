@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math/seadVectorCalcCtr.h>
+#include <math/ctr/seadVectorCalcCtr.h>
 #ifndef SEAD_MATH_VECTOR_H_
 #include <math/seadVector.h>
 #endif
@@ -51,6 +51,11 @@ inline void Vector2<T>::set(const Vector2<T>& other) {
 template <typename T>
 inline void Vector2<T>::set(T x_, T y_) {
     Vector2CalcCtr<T>::set(*this, x_, y_);
+}
+
+template <typename T>
+inline void Vector2<T>::setAdd(const Vector2& x, const Vector2& y) {
+    Vector2CalcCommon<T>::add(x, y);
 }
 
 template <typename T>

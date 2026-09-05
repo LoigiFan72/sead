@@ -11,18 +11,19 @@ Thread::Thread(const SafeString& name, Heap* heap, s32 priority, MessageQueue::B
     INamable(name),
     mMessageQueue(),
     mStackSize(stack_size),
+    mListNode(this),
     mCurrentHeap(nullptr),
+    mFindContainHeapCache(),
     mBlockType(block_type), 
     mQuitMsg(quit_msg),
     mId(0),
     mState(State::cInitialized),
     mPriority(priority)
 {
-    mListNode.mData = this;
     mMessageQueue.allocate(message_queue_size, heap);
     mStackTop = new (heap, 0x1000) u8[stack_size];
 
-    mThread = new(heap) nn::os::Thread();
+    mThreadInner = new(heap) nn::os::Thread();
 
     initStackCheck_();
     if (ThreadMgr::instance())
@@ -32,12 +33,18 @@ Thread::Thread(const SafeString& name, Heap* heap, s32 priority, MessageQueue::B
 }
 
 Thread::Thread(Heap* heap, nn::os::Thread* pThread, u32 thread_id): 
-    INamable("sead::MainThread"), 
-    mBlockType(MessageQueue::BlockType::NonBlocking), mQuitMsg(0x7FFFFFFF), mId(thread_id),
-    mState(State::cRunning), 
-    mThread()
+    IDisposer(),
+    INamable("sead::MainThread"),
+    mMessageQueue(),
+    mStackSize(0),
+    mListNode(this),
+    mCurrentHeap(nullptr),
+    mFindContainHeapCache(),
+    mBlockType(MessageQueue::BlockType::NonBlocking), 
+    mQuitMsg(0),
+    mId(thread_id),
+    mState(State::cInitialized)
 {
-    mListNode.mData = this;
     mMessageQueue.allocate(32, heap);
     pThread->GetPriority();
 
@@ -70,10 +77,10 @@ Thread::~Thread()
             waitDone();
         }
 
-        mThread->Finalize();
+        mThreadInner->Finalize();
 
-        if(mThread)
-            delete(mThread);
+        if(mThreadInner)
+            delete(mThreadInner);
 
         if (mStackTop)
             delete[] static_cast<u8*>(mStackTop);
@@ -90,7 +97,7 @@ bool Thread::start()
         return false;
     }
 
-    mThread->TryStart(ctrThreadFunc_, reinterpret_cast<uptr>(this), *this, mPriority);
+    mThreadInner->TryStart(ctrThreadFunc_, reinterpret_cast<uptr>(this), *this, mPriority);
 
     if (state == State::cInitialized)
         mState = State::cRunning;
@@ -103,7 +110,7 @@ void Thread::waitDone()
     if ((mState.value() | State::cReleased) == State::cReleased)
         return;
 
-    mThread->Join();
+    mThreadInner->Join();
     SEAD_ASSERT_MSG(mState == State::cTerminated, "Join failed?");
     mState = State::cReleased;
 }
@@ -120,7 +127,7 @@ void Thread::setPriority(s32 prio)
         }
         else
         {
-            mThread->ChangePriority(prio)
+            mThreadInner->ChangePriority(prio)
         }
     }
 }
@@ -132,12 +139,12 @@ s32 Thread::getPriority() const
 
 void Thread::yield()
 {
-    mThread->Yield();
+    mThreadInner->Yield();
 }
 
 void Thread::sleep(TickSpan howLong)
 {
-    mThread->Sleep(howLong.toS64());
+    mThreadInner->Sleep(howLong.toS64());
 }
 
 uintptr_t Thread::getStackCheckStartAddress_() const
@@ -145,20 +152,18 @@ uintptr_t Thread::getStackCheckStartAddress_() const
     return uintptr_t(mStackTopForCheck);
 }
 
-#ifdef CTRSDK
 void Thread::ctrThreadFunc_(uptr arg)
 {
     sead::Thread* self = static_cast<Thread*>(arg);
 
-    ThreadMgr::instance()->mTls.setValue(uintptr_t(self));
+    ThreadMgr::instance()->mTlsSlot.setValue(reinterpret_cast<uintptr_t>(self));
 
-    const u32 id = self->mThread->GetThreadId();
+    const u32 id = self->mThreadInner->GetThreadId();
     self->mState = State::cRunning;
     self->mId = id;
     self->run_();
     self->mState = State::cTerminated;
 }
-#endif
 
 /* sead::ThreadMgr */
 

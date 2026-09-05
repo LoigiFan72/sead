@@ -2,7 +2,7 @@
 #define SEAD_DISPOSER_H_
 
 #include <basis/seadNew.h>
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 #include <container/seadListImpl.h>
 

@@ -1,12 +1,13 @@
 #pragma once
 
 #include <array>
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include "basis/seadTypes.h"
 #include "math/seadVector.h"
 
-namespace sead::hostio
+namespace sead
 {
+namespace hostio{
 class ICurve
 {
 public:
@@ -14,7 +15,7 @@ public:
     virtual Vector2f interpolateToVec2f(f32 t) = 0;
 };
 
-enum class CurveType
+enum CurveType
 {
     Linear = 0,
     Hermit = 1,
@@ -164,4 +165,5 @@ inline Vector2f Curve<f32>::interpolateToVec2f(f32 t)
 {
     return sCurveFunctionTbl_Vec2f[u8(mInfo.curveType)](t, &mInfo, mFloats);
 }
-}  // namespace sead::hostio
+}  // namespace hostio
+}  // namespace sead

@@ -3,32 +3,33 @@
 // Project: StandardEAD C++ Library for CTR
 
 #include "framework/seadDualScreenTask.h"
+#include "framework/seadDualScreenMethodTreeMgr.h"
 #include "framework/seadFramework.h"
 
 namespace sead
 {
 DualScreenTask::DualScreenTask(const TaskConstructArg& arg):
-    TaskBase(arg), mBothNode(NULL), mTopNode(NULL),mBtmNode(NULL)
+    TaskBase(arg), mCalcNode(NULL), mTopNode(NULL),mBtmNode(NULL)
 {
-    mBothNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
+    mCalcNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
 
-    mBothNode.bind(this, "Task");
-    mTopNode.bind(this, "Task");
-    mBtmNode.bind(this, "Task");
+    mCalcNode.bind(this, &DualScreenTask::calc, "Task");
+    mTopNode.bind(this, &DualScreenTask::drawTop, "Task");
+    mBtmNode.bind(this, &DualScreenTask::drawBtm,"Task");
 }
 
 DualScreenTask::DualScreenTask(const TaskConstructArg& arg, const char* name):
-    TaskBase(arg, name), mBothNode(NULL), mTopNode(NULL),mBtmNode(NULL)
+    TaskBase(arg, name), mCalcNode(NULL), mTopNode(NULL),mBtmNode(NULL)
 {
-    mBothNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
+    mCalcNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
 
-    mBothNode.bind(this, name);
-    mTopNode.bind(this, name);
-    mBtmNode.bind(this, name);
+    mCalcNode.bind(this, &DualScreenTask::calc, name);
+    mTopNode.bind(this, &DualScreenTask::drawTop, name);
+    mBtmNode.bind(this, &DualScreenTask::drawBtm, name);
 }
 
 DualScreenTask::~DualScreenTask()
@@ -37,53 +38,39 @@ DualScreenTask::~DualScreenTask()
 
 void DualScreenTask::pauseCalc(bool b)
 {
-    if(b == false)
+    if(b)
     {
-        mBothNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
+        mCalcNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Self);
     }
     else
     {
-        mBothNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Self);
+        mCalcNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     }
 }
 
 void DualScreenTask::pauseDraw(bool b)
 {
-    if(b == false)
-    {
-        mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
-        mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
-    }
-    else
+    if(b)
     {
         mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Self);
         mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Self);
+    }
+    else
+    {
+        mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
+        mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     }
 }
 
 void DualScreenTask::pauseCalcRec(bool b)
 {
-    if(b == false)
+    if(b)
     {
-        mBothNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
+        mCalcNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Both);
     }
     else
     {
-        mBothNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Both);
-    }
-}
-
-void DualScreenTask::pauseDraw(bool b)
-{
-    if(b == false)
-    {
-        mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
-        mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
-    }
-    else
-    {
-        mTopNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Both);
-        mBtmNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_Both);
+        mCalcNode.setPauseFlag(MethodTreeNode::PauseFlag::cPause_None);
     }
 }
 
@@ -91,31 +78,28 @@ void DualScreenTask::attachCalcImpl()
 {
     ScopedLock<CriticalSection> lock(getMethodTreeMgr()->getTreeCriticalSection());
 
-    TaskBase* parentTask = nullptr;
-    if (parent() != nullptr)
-        parentTask = *parent()->val();
+    TaskBase* p = parent() ? parent()->val() : nullptr;
 
-    if (getTag() == cSystem)
+    switch(getTag())
     {
-        attachMethodWithCheck(cMethodType_SystemCalc, &mBothNode);
-    }
-    else
-    {
-        SEAD_ASSERT_MSG(getTag() == cApp, "Undefined Tag(%d).", mTag);
-
-        if (parentTask == nullptr)
+    case Tag::cSystem:
+        attachMethodWithCheck(0, &mCalcNode);
+        break;
+    default:
+        SEAD_ASSERT_MSG(false, "Undefined Tag(%d).", getTag());
+        //! Fallthrough
+    case Tag::cApp:
+        if (!p)
         {
-            attachMethodWithCheck(cMethodType_AppCalc, &mBothNode);
+            attachMethodWithCheck(1, &mCalcNode);
         }
         else
         {
-            SEAD_ASSERT_MSG(parentTask->isConnectable(this),
-                             "illigal parent ( MethodTreeMgr matching failed ) .");
+            SEAD_ASSERT_MSG(p->isConnectable(this), "illigal parent ( MethodTreeMgr matching failed ).");
 
-            MethodTreeNode* calcNode = parentTask->getMethodTreeNode(cMethodType_AppCalc);
+            MethodTreeNode* calcNode = p->getMethodTreeNode(1);
             SEAD_ASSERT(calcNode);
-
-            calcNode->pushBackChild(&mBothNode);
+            calcNode->pushBackChild(&mCalcNode);
         }
     }
 }
@@ -124,43 +108,41 @@ void DualScreenTask::attachDrawImpl()
 {
     ScopedLock<CriticalSection> lock(getMethodTreeMgr()->getTreeCriticalSection());
 
-    TaskBase* parentTask = nullptr;
-    if (parent() != nullptr)
-        parentTask = *parent()->val();
+    TaskBase* p = parent() ? parent()->val() : nullptr;
 
-    if (getTag() == cSystem)
+    switch(getTag())
     {
-        attachMethodWithCheck(cMethodType_SystemDrawTop, &mTopNode);
-        attachMethodWithCheck(cMethodType_SystemDrawBtm, &mBtmNode);
-    }
-    else
-    {
-        SEAD_ASSERT_MSG(mTag == cApp, "Undefined Tag(%d).", mTag);
-
-        if (parentTask == nullptr)
+    case Tag::cSystem:
+        attachMethodWithCheck(5, &mTopNode);
+        attachMethodWithCheck(8, &mBtmNode);
+        break;
+    default:
+        SEAD_ASSERT_MSG(false, "Undefined Tag(%d).", getTag());
+        //! Fallthrough
+    case Tag::cApp:
+        if (!p)
         {
-            attachMethodWithCheck(cMethodType_AppDrawTop, &mTopNode);
-            attachMethodWithCheck(cMethodType_AppDrawBtm, &mBtmNode);
+            attachMethodWithCheck(6, &mTopNode);
+            attachMethodWithCheck(9, &mBtmNode);
         }
         else
         {
-            SEAD_ASSERT_MSG(parentTask->isConnectable(this),
-                             "illigal parent ( MethodTreeMgr matching failed ) .");
+            SEAD_ASSERT_MSG(p->isConnectable(this), "illigal parent ( MethodTreeMgr matching failed ).");
 
-            MethodTreeNode* topDraw = parentTask->getMethodTreeNode(cMethodType_AppDrawTop);
+            MethodTreeNode* topDraw = p->getMethodTreeNode(6);
             SEAD_ASSERT(topDraw);
-            topDraw->pushFrontChild(&mTopNode);
+            topDraw->pushBackChild(&mTopNode);
 
-            MethodTreeNode* btmDraw = parentTask->getMethodTreeNode(cMethodType_AppDrawBtm);
+            MethodTreeNode* btmDraw = p->getMethodTreeNode(9);
             SEAD_ASSERT(btmDraw);
-            btmDraw->pushFrontChild(&mBtmNode);
+            btmDraw->pushBackChild(&mBtmNode);
         }
     }
 }
 
 void DualScreenTask::detachCalcImpl()
 {
-    mBothNode.detachAll();
+    mCalcNode.detachAll();
 }
 
 void DualScreenTask::detachDrawImpl()
@@ -169,6 +151,70 @@ void DualScreenTask::detachDrawImpl()
     mBtmNode.detachAll();
 }
 
+const RuntimeTypeInfo::Interface* DualScreenTask::getCorrespondingMethodTreeMgrTypeInfo() const
+{
+    return DualScreenMethodTreeMgr::getRuntimeTypeInfoStatic();
+}
 
+MethodTreeNode* DualScreenTask::getMethodTreeNode(s32 methodType)
+{
+    switch (methodType)
+    {
+        case 0:
+            return nullptr;
+
+        case 1:
+            return &mCalcNode;
+
+        case 2:
+        {
+            DualScreenMethodTreeMgr* tree = DynamicCast<DualScreenMethodTreeMgr>(getMethodTreeMgr());
+
+            SEAD_ASSERT(tree);
+
+            if (tree->getSysDrawScreen() == 0)
+                return &mCalcNode;
+            else
+                return &mTopNode;
+        }
+
+        case 3:
+            return nullptr;
+
+        case 4:
+        {
+            DualScreenMethodTreeMgr* tree = DynamicCast<DualScreenMethodTreeMgr>(getMethodTreeMgr());
+
+            SEAD_ASSERT(tree);
+
+            if (tree->getAppDrawScreen() == 0)
+                return &mCalcNode;
+            else
+                return &mTopNode;
+        }
+
+        case 5:
+            return nullptr;
+
+        case 6:
+            return nullptr;
+
+        case 7:
+            return &mCalcNode;
+
+        case 8:
+            return nullptr;
+
+        case 9:
+            return nullptr;
+
+        case 10:
+            return &mTopNode;
+
+        default:
+            SEAD_ASSERT_MSG(false, "Undefined method_type(%d).", methodType);
+            return nullptr;
+    }
+}
 
 }

@@ -1,4 +1,4 @@
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <container/seadSafeArray.h>
 #include <time/seadCalendarTime.h>
 #include <time/seadDateUtil.h>

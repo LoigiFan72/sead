@@ -1,5 +1,5 @@
 #include "hostio/seadHostIOEventListener.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
 #include "hostio/seadHostIOThreadLock.h"
 
 namespace sead::hostio

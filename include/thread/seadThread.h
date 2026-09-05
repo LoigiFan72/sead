@@ -5,13 +5,12 @@
     #include <nn/os.h>
 #endif
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <container/seadTList.h>
 #include <heap/seadDisposer.h>
 #include <heap/seadHeapMgr.h>
 #include <hostio/seadHostIONode.h>
 #include <hostio/seadHostIOReflexible.h>
-#include <mc/seadCoreInfo.h>
 #include <prim/seadEnum.h>
 #include <prim/seadNamable.h>
 #include <prim/seadSafeString.h>
@@ -35,10 +34,10 @@ public:
     Thread(const SafeString& name, Heap* heap, s32 priority, MessageQueue::BlockType block_type,
         MessageQueue::Element quit_msg, s32 stack_size, s32 message_queue_size);
     Thread(Heap* heap, nn::os::Thread* pThread, u32 thread_id);
-    ~Thread() override;
+    virtual ~Thread();
 
-    Thread(const Thread&) = delete;
-    Thread& operator=(const Thread&) = delete;
+    Thread(const Thread&){ };
+    Thread& operator=(const Thread&){ };
 
     virtual void destroy() { waitDone(); }
 
@@ -63,9 +62,6 @@ public:
     bool isDone() const { return mState == State::cTerminated || mState == State::cReleased; }
     bool isActive() const { return mState == State::cRunning || mState == State::cQuitting; }
 
-    const CoreIdMask& getAffinity() const { return mAffinity; }
-    void setAffinity(const CoreIdMask& affinity);
-
     static void yield();
     static void sleep(TickSpan howLong);
 
@@ -75,8 +71,8 @@ public:
     ThreadListNode* getThreadListNode() { return &mListNode; }
 
 #ifdef SEAD_DEBUG
-    void listenPropertyEvent(const hostio::PropertyEvent* event) override;
-    void genMessage(hostio::Context* context) override;
+    virtual void listenPropertyEvent(const hostio::PropertyEvent* event);
+    virtual void genMessage(hostio::Context* context);
 #endif
 
     bool isDefaultPriority() const { return getPriority() == cDefaultPriority; }
@@ -85,7 +81,13 @@ public:
     Heap* setCurrentHeap(Heap* heap) { return std::exchange(mCurrentHeap, heap); }
     FindContainHeapCache* getFindContainHeapCache() { return &mFindContainHeapCache; }
 
+    static const s32 cDefaultSeadPriority;
+
     static const s32 cDefaultPriority;
+
+    static const s32 cDefaultMsgQueueSize = 32;
+    static const s32 cDefaultStackSize = 0x1000;
+    static const s32 cDefaultQuitMsg = 0x7FFFFFFF;
 
 #ifdef SEAD_PLATFORM_CTR
     static void ctrThreadFunc_(uptr param);
@@ -100,21 +102,20 @@ protected:
 
 
     MessageQueue mMessageQueue;
-    s32 mStackSize = 0;
+    s32 mStackSize;
     ThreadListNode mListNode;
-    Heap* mCurrentHeap = nullptr;
+    Heap* mCurrentHeap;
     FindContainHeapCache mFindContainHeapCache;
-    MessageQueue::BlockType mBlockType = MessageQueue::BlockType::Blocking;
-    MessageQueue::Element mQuitMsg = 0;
-    u32 mId = 0;
-    State mState = State::cInitialized;
-    CoreIdMask mAffinity{CoreId::cMain};
+    MessageQueue::BlockType mBlockType;
+    MessageQueue::Element mQuitMsg;
+    u32 mId;
+    State mState;
 #ifdef CTRSDK
-    nn::os::Thread* mThread = nullptr;
+    nn::os::Thread* mThread;
 #endif
-    void* mStackTop = nullptr;
-    void* mStackTopForCheck = nullptr;
-    s32 mPriority = 0;
+    void* mStackTop ;
+    void* mStackTopForCheck;
+    s32 mPriority;
 };
 
 class ThreadMgr : public hostio::Node{
@@ -192,18 +193,18 @@ public:
         Thread(heap, nn_thread, thread_id)
     {}
 #endif
-    ~MainThread() override { mState = State::cTerminated; }
+    virtual ~MainThread() { mState = State::cTerminated; }
 
-    void destroy() override { SEAD_ASSERT_MSG(false, "Main thread can not destroy"); }
-    void quit(bool) override { SEAD_ASSERT_MSG(false, "Main thread can not quit"); }
-    void waitDone() override { SEAD_ASSERT_MSG(false, "Main thread can not waitDone"); }
-    void quitAndDestroySingleThread(bool) override{
+    virtual void destroy() { SEAD_ASSERT_MSG(false, "Main thread can not destroy"); }
+    virtual void quit(bool) { SEAD_ASSERT_MSG(false, "Main thread can not quit"); }
+    virtual void waitDone() { SEAD_ASSERT_MSG(false, "Main thread can not waitDone"); }
+    virtual void quitAndDestroySingleThread(bool){
         SEAD_ASSERT_MSG(false, "Main thread can not quit");
     }
-    void setPriority(s32) override { SEAD_ASSERT_MSG(false, "Main thread can not set priority"); }
+    virtual void setPriority(s32) { SEAD_ASSERT_MSG(false, "Main thread can not set priority"); }
 
 protected:
-    void calc_(MessageQueue::Element) override {}
+    virtual void calc_(MessageQueue::Element) {}
 };
 
 } // namespace sead

@@ -3,6 +3,7 @@
 // Project: StandardEAD C++ Library for CTR
 
 #include "devenv/seadAssertConfig.h"
+#include "devenv/ctr/seadExceptionScreenCtr.h"
 #include "prim/seadSafeString.h"
 #include "prim/seadMemUtil.h"
 
@@ -34,7 +35,17 @@ void HaltWithDetail(const char* file, int lineNo, const char* fmt, ...)
 
     MemUtil::fillZero(&tmp, sizeof(tmp));
 
-    s32 len = snprintf(tmp, sizeof(tmp), "\n//================= PROGRAM HALT ==================//\nSource File: %s\nLine Number: %d\nDescription: " file, lineNo);
+    s32 len = snprintf(
+        tmp,
+        sizeof(tmp),
+        "\n//================= PROGRAM HALT ==================//\n"
+        "Source File: %s\n"
+        "Line Number: %d\n"
+        "Description: %s",
+        file,
+        lineNo,
+        fmt
+    );
     if(len >= 0)
     {
         va_list args;
@@ -79,7 +90,7 @@ void HaltWithDetail(const char* file, int lineNo, const char* fmt, ...)
     PrintString(tmp, len);
 
     {
-        BufferedSafeStringBase<char> backtraceBuf(tmp + len, sizeof(tmp) - len);
+        BufferedSafeString backtraceBuf(tmp + len, sizeof(tmp) - len);
         ExceptionScreenCtr::putBackTraceString(&backtraceBuf, getStackPointer());
     }
 

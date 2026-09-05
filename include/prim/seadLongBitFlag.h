@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 #include <math/seadMathCalcCommon.h>
 #include <prim/seadBitFlag.h>

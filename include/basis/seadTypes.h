@@ -2,6 +2,7 @@
 #define SEAD_TYPES_H_
 
 #include <seadVersion.h>
+#include "basis/seadDefines.h"
 
 #include <cstddef>
 #include <cstdint>

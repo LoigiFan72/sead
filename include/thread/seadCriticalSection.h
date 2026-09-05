@@ -1,7 +1,7 @@
 #ifndef SEAD_CRITICAL_SECTION_H_
 #define SEAD_CRITICAL_SECTION_H_
 
-#if defined(CTRSDK)
+#ifdef CTRSDK
 #include <nn/os.h>
 #endif
 
@@ -25,8 +25,8 @@ public:
 #endif
     ~CriticalSection() SEAD_CRITIALSECTION_OVERRIDE_TOKEN;
 
-    CriticalSection(const CriticalSection&) = delete;
-    CriticalSection& operator=(const CriticalSection&) = delete;
+    CriticalSection(const CriticalSection&){ };
+    CriticalSection& operator=(const CriticalSection&){ };
 
     void lock();
     bool tryLock();
@@ -35,7 +35,7 @@ public:
     // For compatibility with the standard Lockable concept.
     bool try_lock() { return tryLock(); }
 
-#if defined(CTRSDK)
+#ifdef CTRSDK
     nn::os::CriticalSection mCriticalSectionInner;
 #else
 #error "Unknown platform"

@@ -117,7 +117,7 @@ template <typename T, typename PTMF, typename Base>
 class DelegateBase : public Base
 {
 public:
-    DelegateBase() = default;
+    DelegateBase(){ }
     DelegateBase(T* instance, PTMF fn) : mInstance(instance), mFunctionPtr(fn) {}
 
     T* instance() const { return mInstance; }
@@ -131,8 +131,8 @@ public:
     }
 
 protected:
-    T* mInstance = nullptr;
-    PTMF mFunctionPtr = nullptr;
+    T* mInstance;
+    PTMF mFunctionPtr;
 };
 
 /// Partial specialization of DelegateBase for regular function pointers
@@ -141,13 +141,13 @@ template <typename FunctionPointer, typename Base>
 class DelegateBase<void, FunctionPointer, Base> : public Base
 {
 public:
-    DelegateBase() = default;
+    DelegateBase(){ }
     explicit DelegateBase(FunctionPointer fn) : mFunctionPtr(fn) {}
 
     void setFunction(FunctionPointer fn) { mFunctionPtr = fn; }
 
 protected:
-    FunctionPointer mFunctionPtr = nullptr;
+    FunctionPointer mFunctionPtr;
 };
 
 /// Delegate for a member function with no argument.
@@ -156,7 +156,9 @@ template <typename T>
 class Delegate : public DelegateBase<T, void (T::*)(), IDelegate>
 {
 public:
-    using Base = DelegateBase<T, void (T::*)(), IDelegate>;
+    using PTMF = void (T::*)();
+    using Base = DelegateBase<T, PTMF, IDelegate>;
+    //using Base = DelegateBase<T, void (T::*)(), IDelegate>;
     using Base::Base;
     void invoke() override { operator()(); }
     void operator()() const
@@ -564,6 +566,16 @@ public:
         bool isNoDummy() const override { return false; }
 #endif
     };
+
+    template <typename T>
+    void bind(T* obj, typename Delegate<T>::PTMF method)
+    {
+        static_assert(sizeof(mStorage) >= sizeof(Delegate<T>));
+        static_assert(alignof(decltype(mStorage)) % alignof(Delegate<T>) == 0);
+
+        mDelegate = new(&mStorage) Delegate<T>(obj, method);
+    }
+
     using Base::Base;
     using Base::operator=;
 };

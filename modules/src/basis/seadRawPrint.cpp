@@ -11,14 +11,10 @@
 namespace sead { 
 namespace system {
 
-void PrintString(const char* str, s32 len)
-{
-    
-}
-
 void PrintStringImpl(const char* string, s32 len)
 {
-    if(0 < len){
+    if(0 < len)
+    {
         PutString(string);
     }
 }

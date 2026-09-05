@@ -1,9 +1,9 @@
 #ifndef SEAD_FILEDEVICEMGR_H_
 #define SEAD_FILEDEVICEMGR_H_
 
-#ifdef cafe
-#include <cafe.h>
-#endif  // cafe
+#ifdef CTRSDK
+#include <nn/fs.h>
+#endif
 
 #include <basis/seadTypes.h>
 #include <container/seadTList.h>
@@ -46,11 +46,6 @@ public:
     FileDevice* getMainFileDevice() const { return mMainFileDevice; }
     FileDevice* getDefaultFileDevice() const { return mDefaultFileDevice; }
     void setDefaultFileDevice(FileDevice* device) { mDefaultFileDevice = device; }
-
-#ifdef NNSDK
-    bool hasMountedHost() const { return mMountedHost; }
-    bool hasMountedSd() const { return mMountedSd; }
-#endif
 
 private:
     typedef TList<FileDevice*> DeviceList;

@@ -1,4 +1,4 @@
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <prim/seadEnum.h>
 #include <thread/seadCriticalSection.h>
 
@@ -42,10 +42,10 @@ CriticalSection* EnumUtil::getInitValueArrayCS_()
 void ParseFailed_([[maybe_unused]] char** text_ptr, [[maybe_unused]] int v)
 {
 #ifdef SEAD_DEBUG
-    system::Print("----------------------------------------\n");
+    SEAD_PRINT("----------------------------------------\n");
     for (int i = 0; i < v; ++i)
-        system::Print("  text[%d] \"%s\"\n", i, text_ptr[i]);
-    system::Print("----------------------------------------\n");
+        SEAD_PRINT("  text[%d] \"%s\"\n", i, text_ptr[i]);
+    SEAD_PRINT("----------------------------------------\n");
     SEAD_ASSERT_MSG(false, "SEAD_ENUM failed to parse text. Is number of comma correct?");
 #endif
 }

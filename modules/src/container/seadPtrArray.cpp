@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <basis/seadNew.h>
-#include <basis/seadRawPrint.h>
 #include <container/seadPtrArray.h>
 
 namespace sead

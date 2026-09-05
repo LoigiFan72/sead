@@ -3,7 +3,7 @@
 #include <array>
 #include <type_traits>
 
-#include <basis/seadRawPrint.h>
+#include <basis/seadAssert.h>
 #include <basis/seadTypes.h>
 #include <math/seadMathCalcCommon.h>
 

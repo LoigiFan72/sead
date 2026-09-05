@@ -1,5 +1,6 @@
 #include "thread/seadThread.h"
-#include "basis/seadRawPrint.h"
+#include "basis/seadAssert.h"
+#include "basis/seadWarning.h"
 #include "prim/seadBitUtil.h"
 #include "prim/seadPtrUtil.h"
 #include "prim/seadScopedLock.h"
@@ -39,7 +40,7 @@ MessageQueue::Element Thread::recvMessage(MessageQueue::BlockType block_type)
 void Thread::quit(bool is_jam)
 {
     if (isDone()){
-        SEAD_WARN("Thread is done. Can not quit.");
+        SEAD_WARNING("Thread is done. Can not quit.");
         return;
     }
 
@@ -68,16 +69,17 @@ static bool checkStackMagic(uintptr_t addr)
 // FIXME
 s32 Thread::calcStackUsedSizePeak() const
 {
-    s32 stackSize = getStackSize();
-    s32 offset = reinterpret_cast<s32>(PtrUtil::addOffset(mStackTop, mStackSize));
-    for(;;)
+    u32* stackCheck = reinterpret_cast<u32*>(getStackCheckStartAddress_());
+    if (stackCheck)
     {
-        if(offset <= stackSize)
-            return 0;
-        if(stackSize != 0x5ead5cec) break;
-        stackSize += 4;
+        u32* stackCheckEnd = static_cast<u32*>(PtrUtil::addOffset(mStackTop, mStackSize));
+        for (; stackCheck < stackCheckEnd; stackCheck++)
+        {
+            if (*stackCheck != cStackCanaryMagic)
+                return PtrUtil::diff(stackCheckEnd, stackCheck);
+        }
     }
-    return PtrUtil::diff(reinterpret_cast<void*>(offset), reinterpret_cast<void*>(stackSize));
+    return 0;
 }
 
 void Thread::checkStackOverFlow(const char* source_file, s32 source_line) const
@@ -116,17 +118,13 @@ void Thread::run_()
 // NON_MATCHING: the first loop gets unrolled and the loop counter is not negated
 void Thread::initStackCheck_()
 {
-    void* const start = reinterpret_cast<void*>(getStackCheckStartAddress_());
-    void* const end = PtrUtil::addOffset(mStackTopForCheck, mStackSize);
-    u32* addr = static_cast<u32*>(start);
+    u32* stackCheck = reinterpret_cast<u32*>(getStackCheckStartAddress_());
+    u32* stackCheckEnd = static_cast<u32*>(PtrUtil::addOffset(mStackTop, mStackSize));
 
-    if (start >= end)
-        return;
-
-    const size_t len = uintptr_t(end) + (-uintptr_t(start) - 1);
-
-    for (u32 i = 0; i < ((len / 4 + 1) % 8); i += 4)
-        *addr++ = cStackCanaryMagic;
+    for (; stackCheck < stackCheckEnd; stackCheck++)
+    {
+        *stackCheck = cStackCanaryMagic;
+    }
 }
 
 /* sead::ThreadMgr main */

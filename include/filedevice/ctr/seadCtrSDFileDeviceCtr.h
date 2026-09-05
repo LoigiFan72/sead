@@ -8,10 +8,12 @@ class CtrSDFileDevice : public CtrFileStreamFileDevice
 {
     SEAD_RTTI_OVERRIDE(CtrSDFileDevice, CtrFileStreamFileDevice)
 public:
-    CtrSDFileDevice(const SafeString& name){}
+    CtrSDFileDevice():
+        CtrFileStreamFileDevice("sd")
+    {
+    }
 protected:
-    virtual CtrSDFileDevice(){}
-
+    virtual ~CtrSDFileDevice(){ }
     virtual bool doIsExistFile_(bool* exists, const SafeString& path);
     virtual const char* getArchiveName_() const;
 };

@@ -4,13 +4,16 @@
 
 namespace sead
 {
-class CtrFileDevice : public FileDevice
+class CtrFileDevice : public CtrFileStreamFileDevice
 {
-    SEAD_RTTI_OVERRIDE(CtrFileDevice, FileDevice)
+    SEAD_RTTI_OVERRIDE(CtrFileDevice, CtrFileStreamFileDevice)
 public:
-    CtrFileDevice(){ }
+    CtrFileDevice::CtrFileDevice():
+        CtrFileStreamFileDevice("ctr")
+    {
+    }
 protected:
     virtual ~CtrFileDevice(){ }
     virtual const char* getArchiveName_() const;
-}
+};
 }

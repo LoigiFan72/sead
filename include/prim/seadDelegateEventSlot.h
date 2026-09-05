@@ -72,6 +72,12 @@ public:
         }
     }
 
+    DelegateEvent& operator+=(Slot& slot)
+    {
+        connect(slot);
+        return *this;
+    }
+    
     void connect(Slot& slot)
     {
         slot.release();

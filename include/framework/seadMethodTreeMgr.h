@@ -1,7 +1,6 @@
 #ifndef SEAD_METHODTREEMGR_H_
 #define SEAD_METHODTREEMGR_H_
 
-//#include <framework/seadMethodTree.h>
 #include <prim/seadRuntimeTypeInfo.h>
 #include <thread/seadCriticalSection.h>
 

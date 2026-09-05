@@ -17,9 +17,8 @@ class Camera
     SEAD_RTTI_BASE(Camera)
 
 public:
-    Camera() = default;
+    Camera(){ }
     virtual ~Camera();
-
     virtual void doUpdateMatrix(Matrix34f* dst) const = 0;
 
     void getWorldPosByMatrix(Vector3f* dst) const;
@@ -40,18 +39,17 @@ public:
     void updateViewMatrix() { doUpdateMatrix(&mMatrix); }
 
 private:
-    Matrix34f mMatrix = Matrix34f::ident;
+    Matrix34f mMatrix;
 };
 
 class LookAtCamera : public Camera
 {
     SEAD_RTTI_OVERRIDE(LookAtCamera, Camera)
 public:
-    LookAtCamera() = default;
+    LookAtCamera(){ };
     LookAtCamera(const Vector3f& pos, const Vector3f& at, const Vector3f& up);
-    ~LookAtCamera() override;
-
-    void doUpdateMatrix(Matrix34f* dst) const override;
+    virtual ~LookAtCamera();
+    virtual void doUpdateMatrix(Matrix34f* dst) const;
 
     const Vector3f& getPos() const { return mPos; }
     const Vector3f& getAt() const { return mAt; }
@@ -75,12 +73,11 @@ class DirectCamera : public Camera
 {
     SEAD_RTTI_OVERRIDE(DirectCamera, Camera)
 public:
-    ~DirectCamera() override;
-
-    void doUpdateMatrix(Matrix34f* dst) const override;
+    virtual ~DirectCamera();
+    virtual void doUpdateMatrix(Matrix34f* dst) const;
 
 private:
-    Matrix34f mDirectMatrix = Matrix34f::ident;
+    Matrix34f mDirectMatrix;
 };
 
 class OrthoCamera : public LookAtCamera
@@ -90,7 +87,7 @@ public:
     OrthoCamera();
     OrthoCamera(const Vector2f&, float);
     OrthoCamera(const OrthoProjection&);
-    ~OrthoCamera() override;
+    virtual ~OrthoCamera();
 
     void setByOrthoProjection(const OrthoProjection&);
     void setRotation(float rotation);

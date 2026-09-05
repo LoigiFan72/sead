@@ -1,5 +1,5 @@
 #include <basis/seadNew.h>
-#include <basis/seadRawPrint.h>
+#include <basis/seadWarning.h>
 #include <filedevice/seadFileDevice.h>
 #include <filedevice/seadFileDeviceMgr.h>
 #include <filedevice/seadPath.h>
