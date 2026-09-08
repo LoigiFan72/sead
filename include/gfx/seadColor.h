@@ -29,7 +29,7 @@ namespace sead
 class Color4f
 {
 public:
-    Color4f() = default;
+    Color4f(){ };
     Color4f(f32 r, f32 g, f32 b, f32 a) : r(r), g(g), b(b), a(a) {}
 
     static Color4f lerp(const Color4f& color1, const Color4f& color2, f32 t);
@@ -58,11 +58,6 @@ public:
     friend Color4f operator/(const Color4f& lhs, f32 x);
     friend bool operator==(const Color4f& lhs, const Color4f& rhs);
 
-    f32 r = cElementMin;
-    f32 g = cElementMin;
-    f32 b = cElementMin;
-    f32 a = cElementMax;
-
     static const f32 cElementMax;
     static const f32 cElementMin;
 
@@ -75,12 +70,28 @@ public:
     static const Color4f cYellow;
     static const Color4f cMagenta;
     static const Color4f cCyan;
+
+    union
+    {
+        struct
+        {
+            f32 r;
+            f32 g;
+            f32 b;
+            f32 a;
+        };
+
+        struct
+        {
+            f32 c[4];
+        };
+    };
 };
 
 class Color4u8
 {
 public:
-    Color4u8() = default;
+    Color4u8(){ };
     Color4u8(u8 r, u8 g, u8 b, u8 a) : a(a), b(b), g(g), r(r) {}
 
     static Color4u8 lerp(const Color4u8& color1, const Color4u8& color2, f32 t);

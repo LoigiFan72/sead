@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef CTRSDK
-    #include <nn/os.h>
-#endif
+#include <nn/os.h>
 
 #include "heap/seadDisposer.h"
 #include "time/seadTickSpan.h"
@@ -20,7 +18,7 @@ public:
     Event(Heap* disposer_heap, bool manual_reset);
     Event(Heap* disposer_heap, IDisposer::HeapNullOption heap_null_option);
     Event(Heap* disposer_heap, IDisposer::HeapNullOption heap_null_option, bool manual_reset);
-    ~Event() override;
+    virtual ~Event();
 
     Event(const Event&) = delete;
     Event& operator=(const Event&) = delete;
@@ -32,21 +30,17 @@ public:
     void resetSignal();
 
 private:
-    void setInitialized([[maybe_unused]] bool initialized)
+    void setInitialized(bool initialized)
     {
 #ifdef SEAD_DEBUG
         mInitialized = initialized;
 #endif
     }
 
-#ifdef CTRSDK
     nn::os::Event mEventInner;
-#else
-#error "Unknown platform"
-#endif
 
 #ifdef SEAD_DEBUG
-    bool mInitialized = false;
+    bool mInitialized;
 #endif
 };
 }  // namespace sead

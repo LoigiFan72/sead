@@ -9,6 +9,8 @@
 namespace sead
 {
 class Heap;
+const size_t cPtrSize = sizeof(void*);
+const s32 cDefaultAlignment = __STDCPP_DEFAULT_NEW_ALIGNMENT__;
 
 void AllocFailAssert(Heap* heap, size_t size, u32 alignment);
 

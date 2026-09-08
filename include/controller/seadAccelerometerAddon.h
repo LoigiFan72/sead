@@ -18,7 +18,7 @@ public:
         mId = ControllerDefine::cAddon_Accelerometer;
     }
 
-    ~AccelerometerAddon() override = default;
+    virtual ~AccelerometerAddon() {};
 
     bool isEnable() const { return mIsEnable; }
     const Vector3f& getAcceleration() const { return mAcceleration; }
@@ -27,8 +27,5 @@ protected:
     bool mIsEnable;
     Vector3f mAcceleration;
 };
-#ifdef cafe
-static_assert(sizeof(AccelerometerAddon) == 0x24, "sead::AccelerometerAddon size mismatch");
-#endif  // cafe
 
 }  // namespace sead

@@ -96,6 +96,43 @@ public:
 
     void uniq(CompareCallback cmp) { ListImpl::uniq(mOffset, cmp); }
 
+    class constIterator
+    {
+    public:
+        constIterator(const T* ptr, s32 offset)
+            : mPtr(ptr)
+            , mOffset(offset)
+        {
+        }
+
+        constIterator(const iterator& it)
+            : mPtr(it.mPtr)
+            , mOffset(it.mOffset)
+        {
+        }
+
+        constIterator& operator++()
+        {
+            const ListNode* next = static_cast<const ListNode*>(PtrUtil::addOffset(mPtr, mOffset))->next();
+            mPtr = static_cast<const T*>(PtrUtil::addOffset(next, -mOffset));
+            return *this;
+        }
+
+        const T& operator*() const { return *mPtr; }
+        const T* operator->() const { return mPtr; }
+
+        friend bool operator==(const constIterator& lhs, const constIterator& rhs) { return lhs.mPtr == rhs.mPtr; }
+        friend bool operator!=(const constIterator& lhs, const constIterator& rhs) { return lhs.mPtr != rhs.mPtr; }
+
+    protected:
+        const T* mPtr;
+        s32 mOffset;
+    };
+
+    constIterator constBegin() const { return constIterator(listNodeToObj(mStartEnd.next()), mOffset); }
+    constIterator constEnd() const { return constIterator(listNodeToObj(&mStartEnd), mOffset); }
+    constIterator toConstIterator(const T* obj) const { return constIterator(obj, mOffset); }
+
     class iterator {
     public:
         iterator(T* ptr, s32 offset) : mPtr(ptr), mOffset(offset) {}

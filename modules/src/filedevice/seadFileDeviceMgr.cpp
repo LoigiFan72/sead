@@ -49,51 +49,32 @@ void FileDeviceMgr::mount_(Heap* heap)
 
 void FileDeviceMgr::unmount_()
 {
-#ifdef cafe
-    FSDelClient(&client, FS_RET_NO_ERROR);
-    SAVEShutdown();
-    FSShutdown();
-#elif defined(NNSDK)
-#ifdef SEAD_DEBUG
-    if (mMountedHost)
-        nn::fs::UnmountHostRoot();
-#endif
-
-    nn::fs::Unmount("content");
-    if (mRomCache)
-        delete[] mRomCache;
-
-#ifdef SEAD_DEBUG
-    if (mMountedSd)
-        nn::fs::Unmount("sd");
-#endif
-#else
-#error "Unknown platform"
-#endif
+    Result ret = nn::fs::Unmount("rom");
+    SEAD_ASSERT(ret.IsSuccess());
 }
 
 void FileDeviceMgr::traceFilePath(const SafeString& path) const
 {
-    SEAD_DEBUG_PRINT("[FileDeviceMgr] %s\n", path.cstr());
+    SEAD_PRINT("[FileDeviceMgr] %s\n", path.cstr());
     FixedSafeString<256> pathNoDrive;
     FileDevice* device = findDeviceFromPath(path, &pathNoDrive);
 
     if (device != NULL)
         device->traceFilePath(pathNoDrive);
     else
-        SEAD_WARN("FileDevice not found: %s", path.cstr());
+        SEAD_WARNING("FileDevice not found: %s", path.cstr());
 }
 
 void FileDeviceMgr::traceDirectoryPath(const SafeString& path) const
 {
-    SEAD_DEBUG_PRINT("[FileDeviceMgr] %s\n", path.cstr());
+    SEAD_PRINT("[FileDeviceMgr] %s\n", path.cstr());
     FixedSafeString<256> pathNoDrive;
     FileDevice* device = findDeviceFromPath(path, &pathNoDrive);
 
     if (device != NULL)
         device->traceDirectoryPath(pathNoDrive);
     else
-        SEAD_WARN("FileDevice not found: %s", path.cstr());
+        SEAD_WARNING("FileDevice not found: %s", path.cstr());
 }
 
 void FileDeviceMgr::resolveFilePath(BufferedSafeString* out, const SafeString& path) const
@@ -104,7 +85,7 @@ void FileDeviceMgr::resolveFilePath(BufferedSafeString* out, const SafeString& p
     if (device != NULL)
         device->resolveFilePath(out, pathNoDrive);
     else
-        SEAD_WARN("FileDevice not found: %s", path.cstr());
+        SEAD_WARNING("FileDevice not found: %s", path.cstr());
 }
 
 void FileDeviceMgr::resolveDirectoryPath(BufferedSafeString* out, const SafeString& path) const
@@ -115,7 +96,7 @@ void FileDeviceMgr::resolveDirectoryPath(BufferedSafeString* out, const SafeStri
     if (device != NULL)
         device->resolveDirectoryPath(out, pathNoDrive);
     else
-        SEAD_WARN("FileDevice not found: %s", path.cstr());
+        SEAD_WARNING("FileDevice not found: %s", path.cstr());
 }
 
 void FileDeviceMgr::mount(FileDevice* device, const SafeString& name)

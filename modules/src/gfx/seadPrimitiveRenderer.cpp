@@ -15,8 +15,8 @@ PrimitiveRenderer::PrimitiveRenderer()
 
 void PrimitiveRenderer::doPrepare_(Heap* heap)
 {
-#ifdef cafe
-    mRendererImpl = new (heap) PrimitiveRendererCafe(heap);
+#ifdef CTRSDK
+    mRendererImpl = new (heap) PrimitiveRendererCtr(heap);
 #else
 #error "Unknown platform"
 #endif  // cafe

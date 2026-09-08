@@ -61,10 +61,16 @@ add_library(libms OBJECT
 add_library(sead OBJECT
   target_link_libraries(sead PUBLIC libms)
 
+  include/basis/seadAssert.h
+  include/basis/seadDefines.h
   include/basis/seadNew.h
   include/basis/seadRawPrint.h
   include/basis/seadTypes.h
+  include/basos/seadWarning.h
+  modules/src/basis/seadAssert.cpp
   modules/src/basis/seadNew.cpp
+  modules/src/basis/seadRawPrint.cpp
+  modules/src/basis/seadWarning.cpp
 
   include/codec/seadBase64.h
   include/codec/seadHashCRC16.h
@@ -138,7 +144,7 @@ add_library(sead OBJECT
   include/framework/seadMethodTreeMgr.h
   include/framework/seadProcessMeter.h
   include/framework/seadProcessMeterBar.h
-  include/framework/seadSingleScreenMethodTreeMgr.cpp
+  include/framework/seadSingleScreenMethodTreeMgr.h
   include/framework/seadTask.h
   include/framework/seadTaskBase.h
   include/framework/seadTaskID.h
@@ -151,6 +157,7 @@ add_library(sead OBJECT
   modules/src/framework/seadMethodTree.cpp
   modules/src/framework/seadProcessMeterBar.cpp
   modules/src/framework/seadSingleScreenMethodTreeMgr.cpp
+  modules/src/framework/seadTask.cpp
   modules/src/framework/seadTaskBase.cpp
   modules/src/framework/seadTaskID.cpp
   modules/src/framework/seadTaskMgr.cpp
@@ -210,17 +217,6 @@ add_library(sead OBJECT
   modules/src/math/seadMatrix.cpp
   modules/src/math/seadQuat.cpp
   modules/src/math/seadVector.cpp
-
-  include/mc/seadCoreInfo.h
-  include/mc/seadJob.h
-  include/mc/seadJobQueue.h
-  include/mc/seadWorker.h
-  include/mc/seadWorkerMgr.h
-  modules/src/mc/seadCoreInfo.cpp
-  modules/src/mc/seadJob.cpp
-  modules/src/mc/seadJobQueue.cpp
-  modules/src/mc/seadWorker.cpp
-  modules/src/mc/seadWorkerMgr.cpp
 
   include/message/seadMessageSet.h
   modules/src/message/seadMessageSet.cpp
@@ -325,17 +321,26 @@ target_sources(sead PRIVATE
 )
 if(SEAD_DEBUG)
   target_sources(sead PRIVATE
+    include/hostio/seadHostIOConfig.h
     include/hostio/seadHostIOContext.h
+    include/hostio/seadHostIOCurve.h
     include/hostio/seadHostIODefine.h
     include/hostio/seadHostIOEventListener.h
+    include/hostio/seadHostIOFramework.h
     include/hostio/seadHostIOMgr.h
     include/hostio/seadHostIONode.h
     include/hostio/seadHostIOPortBase.h
     include/hostio/seadHostIOReflexible.h
+    include/hostio/seadHostIORoot.h
+    include/hostio/seadHostIOServer.h
     include/hostio/seadHostIOThreadLock.h
+    modules/src/hostio/seadHostIOContext.cpp
+    modules/src/hostio/seadHostIOCurve.cpp
     modules/src/hostio/seadHostIOEventListener.cpp
+    modules/src/hostio/seadHostIOFramework.cpp
     modules/src/hostio/seadHostIONode.cpp
     modules/src/hostio/seadHostIOReflexible.cpp
+    modules/src/hostio/seadHostIOServer.cpp
     modules/src/hostio/seadHostIOThreadLock.cpp
   )
 endif()
@@ -348,6 +353,21 @@ if(SEAD_PLATFORM STREQUAL "ctr")
   target_link_libraries(sead PUBLIC CTRSDK)
 
   target_sources(sead PRIVATE
+    include/controller/ctr/seadCtrAccelerometerAddon.h
+    include/controller/ctr/seadCtrController.h
+    include/controller/ctr/seadCtrDebugController.h
+    include/controller/ctr/seadCtrHidDevice.h
+    modules/src/controller/ctr/seadCtrAccelerometerAddon.cpp
+    modules/src/controller/ctr/seadCtrController.cpp
+    modules/src/controller/ctr/seadCtrDebugController.cpp
+    modules/src/controller/ctr/seadCtrHidDevice.cpp
+
+    include/devenv/ctr/seadDirectPrintCtr.h
+    include/devenv/ctr/seadExceptionScreenCtr.h
+    modules/src/devenv/ctr/seadAssertCtr.cpp
+    modules/src/devenv/ctr/seadDirectPrintCtr.cpp
+    modules/src/devenv/ctr/seadExceptionScreenCtr.cpp
+
     include/filedevice/ctr/seadCtrFileStreamFileDeviceCtr.h
     include/filedevice/ctr/seadCtrFileDevice.h
     include/filedevice/ctr/seadCtrBackupFileDevice.h
@@ -363,14 +383,24 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     include/framework/seadDualScreenTask.h
     include/framework/seadUlcdMethodTreeMgr.h
     include/framework/seadUlcdTask.h
-    modules/src/framework/seadDualScreenMethodTreeMgr.h
+    include/framework/ctr_nw4c/seadGameFrameworkCtrNw4c.h
+    modules/src/framework/seadDualScreenMethodTreeMgr.cpp
     modules/src/framework/seadDualScreenTask.cpp
     modules/src/framework/seadUlcdMethodTreeMgr.cpp
     modules/src/framework/seadUlcdTask.cpp
+    modules/src//framework/ctr_nw4c/seadGameFrameworkCtrNw4c.cpp
+
+    include/gfx/ctr/seadFrameBufferCtr.h
+    include/gfx/ctr/seadGfxMemoryMgrCtr.h
+    modules/src/gfx/ctr/seadFrameBufferCtr.cpp
+    modules/src/gfx/ctr/seadGfxMemoryMgrCtr.cpp
 
     modules/src/heap/seadArenaCtr.cpp
 
     include/prim/ctr/seadMemUtilCtr.hpp
+
+    include/stream/seadMemoryMapCtr.h
+    include/stream/seadMemoryMapCtr.hpp
 
     include/thread/ctr/seadThreadLocalStorage.hpp
     modules/src/thread/ctr/seadCriticalSectionCtr.cpp

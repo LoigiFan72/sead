@@ -13,6 +13,8 @@ protected:
     static Graphics* sInstance;
 
 public:
+    using LockFunc = void (*)(bool isLock);
+    
     enum DevicePosture
     {
         cDevicePosture_Same = 0,
@@ -34,50 +36,56 @@ public:
     enum class BlendFactor;
     enum class CullingMode;
 
+    Graphics();
     virtual ~Graphics();
 
+    void initialize(Heap* heap);
     void lockDrawContext();
     void unlockDrawContext();
     void initHostIO();
-    virtual void initializeDrawLockContext(Heap*);
-    virtual void initializeImpl(Heap*) = 0;
 
-    virtual void setViewportImpl(f32, f32, f32, f32) = 0;
-    virtual void setScissorImpl(f32, f32, f32, f32) = 0;
-    virtual void setDepthTestEnableImpl(bool) = 0;
-    virtual void setDepthWriteEnableImpl(bool) = 0;
-    virtual void setDepthFuncImpl(Graphics::DepthFunc) = 0;
-    virtual void setVBlankWaitIntervalImpl(u32) = 0;
-    virtual void setCullingModeImpl(Graphics::CullingMode) = 0;
-    virtual void setBlendEnableImpl(bool) = 0;
-    virtual void setBlendEnableMRTImpl(u32, bool) = 0;
-    virtual void setBlendFactorImpl(Graphics::BlendFactor, Graphics::BlendFactor,
-                                    Graphics::BlendFactor, Graphics::BlendFactor) = 0;
-    virtual void setBlendFactorMRTImpl(u32, Graphics::BlendFactor, Graphics::BlendFactor,
-                                       Graphics::BlendFactor, Graphics::BlendFactor) = 0;
-    virtual void setBlendEquationImpl(Graphics::BlendEquation, Graphics::BlendEquation) = 0;
-    virtual void setBlendEquationMRTImpl(u32, Graphics::BlendEquation, Graphics::BlendEquation) = 0;
-    virtual void setBlendConstantColorImpl(sead::Color4f const&) = 0;
+    virtual void initializeImpl(Heap* heap) = 0;
+    virtual void setViewportImpl(f32 x, f32 y, f32 w, f32 h) = 0;
+    virtual void setScissorImpl(f32 x, f32 y, f32 w, f32 h) = 0;
+    virtual void setDepthTestEnableImpl(bool enable) = 0;
+    virtual void setDepthWriteEnableImpl(bool enable) = 0;
+    virtual void setDepthFuncImpl(DepthFunc func) = 0;
+    virtual bool setVBlankWaitIntervalImpl(u32 interval) = 0;
+    virtual void setCullingModeImpl(CullingMode mode) = 0;
+    virtual void setBlendEnableImpl(bool enable) = 0;
+    virtual void setBlendEnableMRTImpl(u32 target, bool enable) = 0;
+    virtual void setBlendFactorImpl(BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA) = 0;
+    virtual void setBlendFactorMRTImpl(u32 target, BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA) = 0;
+    virtual void setBlendEquationImpl(BlendEquation equationRgb, BlendEquation equationA) = 0;
+    virtual void setBlendEquationMRTImpl(u32 target, BlendEquation equationRgb, BlendEquation equationA) = 0;
+    virtual void setBlendConstantColorImpl(const Color4f& color) = 0;
+    virtual void lockDrawContextImpl();
+    virtual void unlockDrawContextImpl();
     virtual void waitForVBlankImpl() = 0;
-    virtual void setColorMaskImpl(bool, bool, bool, bool) = 0;
-    virtual void setColorMaskMRTImpl(u32, bool, bool, bool, bool) = 0;
-    virtual void setAlphaTestEnableImpl(bool) = 0;
-    virtual void setAlphaTestFuncImpl(Graphics::AlphaFunc, f32) = 0;
-    virtual void setStencilTestEnableImpl(bool) = 0;
-    virtual void setStencilTestFuncImpl(Graphics::StencilFunc, s32, u32) = 0;
-    virtual void setStencilTestOpImpl(Graphics::StencilOp, Graphics::StencilOp,
-                                      Graphics::StencilOp) = 0;
-    virtual void setPolygonModeImpl(Graphics::PolygonMode, Graphics::PolygonMode) = 0;
-    virtual void setPolygonOffsetEnableImpl(bool, bool, bool) = 0;
+    virtual void setColorMaskImpl(bool r, bool g, bool b, bool a) = 0;
+    virtual void setColorMaskMRTImpl(u32 target, bool r, bool g, bool b, bool a) = 0;
+    virtual void setAlphaTestEnableImpl(bool enable) = 0;
+    virtual void setAlphaTestFuncImpl(AlphaFunc func, f32 ref) = 0;
+    virtual void setStencilTestEnableImpl(bool enable) = 0;
+    virtual void setStencilTestFuncImpl(StencilFunc func, s32 ref, u32 mask) = 0;
+    virtual void setStencilTestOpImpl(StencilOp fail, StencilOp zfail, StencilOp zpass) = 0;
+    virtual void setPolygonModeImpl(PolygonMode front, PolygonMode back) = 0;
+    virtual void setPolygonOffsetEnableImpl(bool fillFrontEnable, bool fillBackEnable, bool pointLineEnable) = 0;
 
-    static Graphics* instance() { return sInstance; }
+    void clear(u32 colorIdx, Color4f const& color, f32, u32);
+
+    static Graphics* instance(){ return sInstance; }
+
+    static void setInstance(Graphics* inst){ sInstance = inst; }
+
+    void waitForVBlank(){ waitForVBlankImpl(); }
+private:
+    LockFunc mContextLockFunc;
+    DrawLockContext* mDrawLockContext;
+
     static DevicePosture sDefaultDevicePosture;
     static f32 sDefaultDeviceZScale;
     static f32 sDefaultDeviceZOffset;
-
-private:
-    UnknownCallback _20;
-    DrawLockContext* mDrawLockContext;
 };
 
 }  // namespace sead

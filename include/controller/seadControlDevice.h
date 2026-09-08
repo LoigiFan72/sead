@@ -13,10 +13,12 @@ class ControlDevice
     SEAD_RTTI_BASE(ControlDevice)
 
 public:
+#ifdef CTRSDK
+    explicit ControlDevice(ControllerMgr* mgr) : mId(ControllerDefine::cDevice_CtrHid), mMgr(mgr) {}
+#else
     explicit ControlDevice(ControllerMgr* mgr) : mId(ControllerDefine::cDevice_Null), mMgr(mgr) {}
-
-    virtual ~ControlDevice() = default;
-
+#endif
+    virtual ~ControlDevice(){};
     virtual void calc() = 0;
 
     ControllerDefine::DeviceId getId() const { return mId; }

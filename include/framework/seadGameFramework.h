@@ -1,19 +1,29 @@
 #pragma once
 
 #include <framework/seadFramework.h>
-#include <heap/seadHeap.h>
-#include <prim/seadRuntimeTypeInfo.h>
-#include <prim/seadSafeString.h>
+#include <framework/seadProcessMeterBar.h>
+#include <gfx/seadGraphics.h>
 
 #include <nw/ut.h>
 
 namespace sead
 {
+class InfLoopCheckerThread;
+
 class GameFramework : public Framework
 {
     SEAD_RTTI_OVERRIDE(GameFramework, Framework);
 
 public:
+    enum DisplayState
+    {
+        cHide = 0,
+        cReady,
+        cShow
+    };
+
+    using ProcDrawCallback = void (*)(bool);
+
     static void initialize(const Framework::InitializeArg&);
 
     GameFramework();
@@ -37,8 +47,13 @@ public:
     void lockFrameDrawContext();
     void unlockFrameDrawContext();
 
-private:
-    int mDisplayState;
+    DisplayState getDisplayState() const { return mDisplayState; }
+    MultiProcessMeterBar<32>& getCalcMeter() { return mCalcMeter; }
+    MultiProcessMeterBar<32>& getDrawMeter() { return mDrawMeter; }
+    MultiProcessMeterBar<32>& getGPUMeter() { return mGPUMeter; }
+
+protected:
+    DisplayState mDisplayState;
     MultiProcessMeterBar<32> mCalcMeter;
     MultiProcessMeterBar<32> mDrawMeter;
     MultiProcessMeterBar<32> mGPUMeter;
@@ -46,4 +61,5 @@ private:
     Graphics::LockFunc mFrameLockFunc;
     ProcDrawCallback mProcDrawCallback;
 };
+
 }  // namespace sead

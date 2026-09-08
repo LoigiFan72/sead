@@ -1,2 +1,147 @@
 #pragma once
 
+#include "framework/seadGameFramework.h"
+#include "gfx/ctr/seadGfxMemoryMgrCtr.h"
+#include "gfx/ctr/seadFrameBufferCtr.h"
+
+#include <nn/gr.h>
+#include <nn/gx.h>
+
+namespace sead
+{
+class FileHandle;
+#ifdef SEAD_DEBUG
+#define SEAD_ASSERT_GL()                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        GLenum error = glGetError();                                                               \
+        if (error != GL_NO_ERROR)                                                                  \
+        {                                                                                          \
+            sead::system::HaltWithDetail(__FILE__, __LINE__, "GL_ERROR 0x%x", error);              \
+        }                                                                                          \
+    } while (0)
+#else
+#define SEAD_ASSERT_GL()                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        if (false)                                                                                 \
+        {                                                                                          \
+            sead::system::HaltWithDetail(nullptr, 0, nullptr);                                     \
+        }                                                                                          \
+    } while (0)
+#endif
+
+class GameFrameworkCtrNw4c : public GameFramework
+{
+    SEAD_RTTI_OVERRIDE(GameFrameworkCtrNw4c, GameFramework)
+public:
+    struct ScreenShotBuffer
+    {
+        s32 mScreenShotNo;
+        const char* mScreenshotPath;
+    };
+    struct CreateArg
+    {
+        ~CreateArg()
+        {
+        }
+        s32 widthA;
+        s32 heightA;
+        s32 widthB;
+        s32 heightB;
+        f32 physH_A;
+        f32 physW_A;
+        f32 physH_B;
+        f32 physW_B;
+        u32 wait_vblank;
+        Color4f clearColor;
+        u32 cmdBufSize;
+        u32 cmdBufRequest;
+        DefaultGfxMemoryMgrCtr* mMemoryMgrCtr;
+        u32 cmdMemSize;
+        GLenum format;
+        u32* _48;
+        u32 mScreenShotBuff;
+        s32 vsync_buf;
+    };
+
+public:
+    static const int cMaxScreenShotPathLength = 256;
+
+    static void initialize(const Framework::InitializeArg& arg);
+    void initializeGraphicsSystem(Heap* heap, const Vector2f& virtualFbSize, const Vector2f&);
+
+    explicit GameFrameworkCtrNw4c(const CreateArg& arg);
+
+    virtual ~GameFrameworkCtrNw4c();
+    virtual FrameBuffer* getMethodFrameBuffer(s32 methodType) const;
+    virtual void initRun_(Heap*);
+    virtual void runImpl_();
+    virtual MethodTreeMgr* createMethodTreeMgr_(Heap*);
+    virtual float calcFps();
+    virtual void saveScreenShot(const SafeString& filename);
+    virtual bool isScreenShotBusy() const{ return mScreenShotNo != nullptr; }
+    virtual void setCaption(SafeString const& caption);
+
+    static GLvoid* allocate(GLenum area, GLenum alignment, GLuint size, GLsizei);
+    static void deallocate(GLenum area, GLenum alignment, GLuint size, GLvoid* ptr);
+
+    static GfxMemoryMgrCtr* sMemoryMgr;
+protected:
+    virtual void mainLoop_();
+    virtual void procFrame_();
+    virtual void procDraw_();
+    virtual void procCalc_();
+    virtual void presentTop_();
+    virtual void presentBtm_();
+    virtual void swapBuffer_();
+    virtual void clearFrameBuffers_(s32 buffer);
+    virtual void doScreenShot(const char* shot);
+    virtual void doScreenShotImpl_(const char* shot);
+
+    GLsizei createCmdlist_(GLsizei bufsize, GLsizei requestcount);
+    u32 createDisplayBuffers_(u32* dst, u32 num, u32 disp, GLenum format, s32 width, s32 height, u32 buffer);
+    void createFramebuffer_(nn::gr::CTR::FrameBuffer* buffer, s32 width, s32 height, u32 vram_a, PicaDataColor color_area, u32 vram_b, PicaDataDepth depth_area);
+    void initNngx_(GfxMemoryMgrCtr* memMgr);
+    void waitForVBlank_();
+    void saveScreenShotToFileHandle_(FileHandle* handle, void*, int width, int height, u32);
+    void requestTransferRenderImage_(u32 displayBuffer, nn::gr::CTR::FrameBuffer* frameBuffer, s32 x, s32 y, f32 scaleX, f32 scaleY);
+private:
+    CreateArg mGameArg;
+    u32 mVblinkBuf;
+    TickSpan mLastUpdateTime;
+    TickTime mFrameNow;
+    TickTime mLastDiffTime;
+    GLsizei mBufferSizeA;
+    u32 mDispBufA;
+    GLsizei mBufferSizeB;
+    u32* mDispBufB;
+    nn::gr::CTR::FrameBuffer mBuffer;
+    FrameBufferCtr* mTopFrameBuffer;
+    FrameBufferCtr* mBtmFrameBuffer;
+    s32 mScreenShotNo;
+    char* mScreenshotBuf;
+    Heap* mRunningHeap;
+//#ifdef SEAD_DEBUG
+    ExceptionScreenCtr* mExceptionScreen;
+//#endif
+    GLint* mGLDispParam;
+};
+
+inline float GameFrameworkCtrNw4c::calcFps()
+{
+    TickSpan sec_span = TickSpan::makeFromSeconds(1);
+    return static_cast<f32>(sec_span.toS64()) / static_cast<f32>(mLastUpdateTime.toS64());
+}
+
+inline void GameFrameworkCtrNw4c::saveScreenShot(const SafeString& filename)
+{
+    SEAD_ASSERT(filename.calcLength() <= cMaxScreenShotPathLength);
+    mScreenshotBuf = filename.cstr();
+}
+
+inline void setCaption(SafeString const& caption)
+{
+    SEAD_PRINT("%s\n", caption.cstr());
+}
+}

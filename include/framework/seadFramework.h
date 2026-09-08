@@ -62,6 +62,8 @@ public:
     };
 
 public:
+    typedef DelegateEvent<void*> ResetEvent;
+    
     static void initialize(const InitializeArg&);
 
     Framework();
@@ -70,18 +72,49 @@ public:
     virtual void run(Heap*, const TaskBase::CreateArg&, const RunArg&);
     virtual void createSystemTasks(TaskBase*, const CreateSystemTaskArg&);
     virtual FrameBuffer* getMethodFrameBuffer(s32) const = 0;
-    virtual LogicalFrameBuffer* getMethodLogicalFrameBuffer(s32) const;
+    virtual LogicalFrameBuffer* getMethodLogicalFrameBuffer(s32 methodType) const{ { return getMethodFrameBuffer(methodType); } }
     virtual bool setProcessPriority(ProcessPriority);
     virtual void reserveReset(void*);
-    virtual void initRun_(Heap*);
-    virtual void quitRun_(Heap*);
-    virtual void runImpl_();
-    virtual MethodTreeMgr* createMethodTreeMgr_(Heap*) = 0;
-    virtual void procReset_();
 
     MethodTreeMgr* getMethodTreeMgr() const { return mMethodTreeMgr; }
 
-    typedef DelegateEvent<void*> ResetEvent;
+    virtual bool setProcessPriority(ProcessPriority priority)
+    {
+        SEAD_UNUSED(priority);
+        return false;
+    }
+
+    virtual void reserveReset(void* param)
+    {
+        mReserveReset = true;
+        mResetParameter = param;
+    }
+
+    TaskMgr* getTaskMgr()
+    {
+        return mTaskMgr;
+    }
+
+    MethodTreeMgr* getMethodTreeMgr()
+    {
+        return mMethodTreeMgr;
+    }
+
+    void registerResetEvent(ResetEvent::Slot& slot)
+    {
+        mResetEvent.connect(slot);
+    }
+
+    void unregisterResetEvent(ResetEvent::Slot& slot)
+    {
+        mResetEvent.disconnect(slot);
+    }
+
+protected:
+    virtual void initRun_(Heap*){ }
+    virtual void runImpl_(){ }
+    virtual MethodTreeMgr* createMethodTreeMgr_(Heap*) = 0;
+    virtual void procReset_();
 
     bool mReserveReset;
     void* mResetParameter;

@@ -2,14 +2,20 @@
 
 namespace sead
 {
-LogicalFrameBuffer::~LogicalFrameBuffer() = default;
-
-FrameBuffer::~FrameBuffer() = default;
-
-void FrameBuffer::clearMRT(DrawContext*, u32, const Color4f&) const {}
-
-void FrameBuffer::bind(DrawContext* draw_context) const
+LogicalFrameBuffer::~LogicalFrameBuffer()
 {
-    bindImpl_(draw_context);
+};
+
+FrameBuffer::~FrameBuffer()
+{ 
+};
+
+void FrameBuffer::clearMRT(u32, const Color4f&) const 
+{
+}
+
+void FrameBuffer::bind() const
+{
+    bindImpl_();
 }
 }  // namespace sead

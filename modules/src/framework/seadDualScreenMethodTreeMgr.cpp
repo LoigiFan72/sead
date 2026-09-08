@@ -73,11 +73,11 @@ void DualScreenMethodTreeMgr::attachMethod(s32 methodType, MethodTreeNode* node)
             break;
 
         case 2:
-            if (mIsSysBtmScreen == false)
+            if (mIsSysScreen == false)
             {
                 mTopSysDrawNode.pushFrontChild(node);
             }
-            else if (mIsSysBtmScreen == true)
+            else if (mIsSysScreen == true)
             {
                 mBtmSysDrawNode.pushFrontChild(node);
             }
@@ -88,11 +88,11 @@ void DualScreenMethodTreeMgr::attachMethod(s32 methodType, MethodTreeNode* node)
             break;
 
         case 3:
-            if (mIsAppBtmScreen == false)
+            if (mIsAppScreen == false)
             {
                 mTopAppDrawNode.pushFrontChild(node);
             }
-            else if (mIsAppBtmScreen == true)
+            else if (mIsAppScreen == true)
             {
                 mBtmAppDrawNode.pushFrontChild(node);
             }
@@ -103,11 +103,11 @@ void DualScreenMethodTreeMgr::attachMethod(s32 methodType, MethodTreeNode* node)
             break;
 
         case 4:
-            if (mIsAppBtmScreen == false)
+            if (mIsAppScreen == false)
             {
                 mTopAppDrawFinalNode.pushFrontChild(node);
             }
-            else if (mIsAppBtmScreen == true)
+            else if (mIsAppScreen == true)
             {
                 mBtmAppDrawFinalNode.pushFrontChild(node);
             }
@@ -158,9 +158,9 @@ MethodTreeNode* DualScreenMethodTreeMgr::getRootMethodTreeNode(s32 methodType)
             return &mAppCalcNode;
 
         case 2:
-            if (mIsSysBtmScreen == false)
+            if (mIsSysScreen == false)
                 return &mTopSysDrawNode;
-            else if (mIsSysBtmScreen == true)
+            else if (mIsSysScreen == true)
                 return &mBtmSysDrawNode;
             else
             {
@@ -169,9 +169,9 @@ MethodTreeNode* DualScreenMethodTreeMgr::getRootMethodTreeNode(s32 methodType)
             }
 
         case 3:
-            if (mIsAppBtmScreen == false)
+            if (mIsAppScreen == false)
                 return &mTopSysDrawNode;
-            else if (mIsAppBtmScreen == true)
+            else if (mIsAppScreen == true)
                 return &mBtmAppDrawNode;
             else
             {
@@ -180,9 +180,9 @@ MethodTreeNode* DualScreenMethodTreeMgr::getRootMethodTreeNode(s32 methodType)
             }
 
         case 4:
-            if (mIsAppBtmScreen == false)
+            if (mIsAppScreen == false)
                 return &mTopAppDrawFinalNode;
-            else if (mIsAppBtmScreen == true)
+            else if (mIsAppScreen == true)
                 return &mBtmAppDrawFinalNode;
             else
             {

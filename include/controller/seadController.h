@@ -47,7 +47,7 @@ public:
     };
 
     explicit Controller(ControllerMgr* mgr);
-    virtual ~Controller() = default;
+    virtual ~Controller(){ };
 
     virtual void calc();
     virtual bool isConnected() const { return true; }

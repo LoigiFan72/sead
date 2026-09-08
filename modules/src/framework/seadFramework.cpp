@@ -103,8 +103,6 @@ void Framework::run(Heap* heap, const TaskBase::CreateArg& rootCreateArg, const 
     mTaskMgr = TaskMgr::initialize(arg);
 
     runImpl_();
-
-    quitRun_(heap);
 }
 
 void Framework::createSystemTasks(TaskBase*, const CreateSystemTaskArg&)

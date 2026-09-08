@@ -1,18 +1,17 @@
 #pragma once
 
-#include <controller/seadController.h>
-#include <nn/hid.h>
+#include <controller/ctr/seadCtrHidDeviceCtr.h>
 
-namespace sead{
-
+namespace sead
+{
 class CtrController : public Controller{
     SEAD_RTTI_OVERRIDE(CtrController, Controller);
 public:
-    CtrController();
+    CtrController(ControllerMgr* mgr);
     virtual ~CtrController(){ }
     virtual void calcImpl_();
     
-    void setStickClampMode(nn::hid::CTR::AnalogStickClamper::ClampMode stickMode);
+    void setStickClampMode(PadReader::StickClampMode stickMode);
 };
 
 }

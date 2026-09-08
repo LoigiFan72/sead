@@ -19,7 +19,7 @@ void MemoryMapCtr::Stream::bufferAll(Heap* heap)
     if (mMapBuffer != nullptr && *mMapBuffer != mHandleBuffer[0])
         return;
 
-    mMapBuffer = new(heap, mFileSize)[];
+    mMapBuffer = new char[mFileSize];
 
     FileHandle::seek(0, cSeekOrigin_Begin);
 

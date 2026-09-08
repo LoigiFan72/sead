@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef CTRSDK
-    #include <nn/os.h>
-#endif
+#include <nn/os.h>
 
 namespace sead
 {
@@ -11,12 +9,7 @@ class Heap;
 class MessageQueue
 {
 public:
-#ifdef CTRSDK
     using Element = s64;
-#else
-#error "Unknown platform"
-    using Element = u64;
-#endif
 
     enum class BlockType
     {
@@ -37,11 +30,7 @@ public:
     static constexpr Element cNullElement = 0;
 
 private:
-#ifdef CTRSDK
     nn::os::BlockingQueue mMessageQueueInner;
-    Element* mBuffer = nullptr;
-#else
-#error "Unknown platform"
-#endif
+    Element* mBuffer;
 };
 }  // namespace sead

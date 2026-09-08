@@ -11,6 +11,7 @@
 #include <framework/seadTaskBase.h>
 #include <framework/seadTaskMgr.h>
 #include <heap/seadExpHeap.h>
+#include <heap/seadHeapMgr.h>
 #include <hostio/seadHostIOFramework.h>
 #include <hostio/seadHostIORoot.h>
 #include <resource/seadResourceMgr.h>
@@ -36,7 +37,7 @@ namespace sead {
 
 GameFramework::GameFramework(): 
     Framework(), 
-    mDisplayState(DisplayState::eHide),
+    mDisplayState(DisplayState::cHide),
     mCalcMeter("calc", Color4f::cRed), 
     mDrawMeter("draw", Color4f::cGreen), 
     mGPUMeter("waitGPU", Color4f::cMagenta), 
@@ -67,7 +68,7 @@ void GameFramework::initialize(const InitializeArg& arg)
     {
         ExpHeap* mgrHeap = ExpHeap::create(heap->getMaxAllocatableSize(), "sead::ResourceMgr", heap);
 
-        CurrentHeapSetter chs(mgrHeap);
+        ScopedCurrentHeapSetter chs(mgrHeap);
         ResourceMgr::createInstance(mgrHeap);
 
         mgrHeap->adjust();
@@ -76,7 +77,7 @@ void GameFramework::initialize(const InitializeArg& arg)
     {
         ExpHeap* mgrHeap = ExpHeap::create(heap->getMaxAllocatableSize(), "sead::FileDeviceMgr", heap);
 
-        CurrentHeapSetter chs(mgrHeap);
+        ScopedCurrentHeapSetter chs(mgrHeap);
         FileDeviceMgr::createInstance(mgrHeap);
 
         mgrHeap->adjust();
@@ -106,8 +107,8 @@ void GameFramework::initialize(const InitializeArg& arg)
 
 void GameFramework::startDisplay()
 {
-    if (mDisplayState == DisplayState::eHide)
-        mDisplayState = DisplayState::eReady;
+    if (mDisplayState == DisplayState::cHide)
+        mDisplayState = DisplayState::cReady;
 }
 
 void GameFramework::lockFrameDrawContext()
@@ -129,7 +130,7 @@ void GameFramework::createSystemTasks(TaskBase* rootTask, const CreateSystemTask
     createControllerMgr(rootTask);
     createProcessMeter(rootTask);
     createSeadMenuMgr(rootTask);
-    createHostIOMgr(rootTask, arg.hostio_parameter, arg.hostio_task_heap);
+    createHostIOMgr(rootTask, arg.hostio_parameter, arg.heap);
     createInfLoopChecker(rootTask, arg.infloop_detection_span, arg.infloop_thread_stack_size);
 }
 
@@ -138,7 +139,7 @@ void GameFramework::createControllerMgr(TaskBase* rootTask)
     TaskBase::SystemMgrTaskArg arg(&TTaskFactory<ControllerMgr>);
     arg.parent = rootTask;
 
-    mTaskMgr->createSingletonTaskSync<ControllerMgr>(arg);
+    getTaskMgr()->createSingletonTaskSync<ControllerMgr>(arg);
 }
 
 void GameFramework::createHostIOMgr(TaskBase* rootTask, HostIOMgr::Parameter* parameter, Heap* heap)
@@ -217,7 +218,7 @@ void GameFramework::waitStartDisplayLoop_()
         getTaskMgr()->afterCalc();
         Graphics::instance()->unlockDrawContext();
 
-        if (getTaskMgr()->getRootTask() || mDisplayState != DisplayState::eHide)
+        if (getTaskMgr()->getRootTask() || mDisplayState != DisplayState::cHide)
             break;
 
         Thread::sleep(TickSpan::makeFromMilliSeconds(10));

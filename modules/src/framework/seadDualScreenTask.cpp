@@ -74,6 +74,17 @@ void DualScreenTask::pauseCalcRec(bool b)
     }
 }
 
+void DualScreenTask::detachCalcImpl()
+{
+    mCalcNode.detachAll();
+}
+
+void DualScreenTask::detachDrawImpl()
+{
+    mTopNode.detachAll();
+    mBtmNode.detachAll();
+}
+
 void DualScreenTask::attachCalcImpl()
 {
     ScopedLock<CriticalSection> lock(getMethodTreeMgr()->getTreeCriticalSection());
@@ -88,6 +99,7 @@ void DualScreenTask::attachCalcImpl()
     default:
         SEAD_ASSERT_MSG(false, "Undefined Tag(%d).", getTag());
         //! Fallthrough
+        
     case Tag::cApp:
         if (!p)
         {
@@ -138,17 +150,6 @@ void DualScreenTask::attachDrawImpl()
             btmDraw->pushBackChild(&mBtmNode);
         }
     }
-}
-
-void DualScreenTask::detachCalcImpl()
-{
-    mCalcNode.detachAll();
-}
-
-void DualScreenTask::detachDrawImpl()
-{
-    mTopNode.detachAll();
-    mBtmNode.detachAll();
 }
 
 const RuntimeTypeInfo::Interface* DualScreenTask::getCorrespondingMethodTreeMgrTypeInfo() const

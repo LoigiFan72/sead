@@ -1,9 +1,7 @@
 #pragma once
 
 #include <utility>
-#ifdef CTRSDK
-    #include <nn/os.h>
-#endif
+#include <nn/os.h>
 
 #include <basis/seadAssert.h>
 #include <container/seadTList.h>
@@ -89,9 +87,7 @@ public:
     static const s32 cDefaultStackSize = 0x1000;
     static const s32 cDefaultQuitMsg = 0x7FFFFFFF;
 
-#ifdef SEAD_PLATFORM_CTR
     static void ctrThreadFunc_(uptr param);
-#endif
 protected:
     virtual void run_();
     virtual void calc_(MessageQueue::Element msg) = 0;
@@ -110,10 +106,8 @@ protected:
     MessageQueue::Element mQuitMsg;
     u32 mId;
     State mState;
-#ifdef CTRSDK
-    nn::os::Thread* mThread;
-#endif
-    void* mStackTop ;
+    nn::os::Thread* mThreadInner;
+    void* mStackTop;
     void* mStackTopForCheck;
     s32 mPriority;
 };
@@ -188,11 +182,10 @@ private:
 class MainThread : public Thread
 {
 public:
-#ifdef NNSDK
     MainThread(Heap* heap, nn::os::Thread* nn_thread, u32 thread_id): 
         Thread(heap, nn_thread, thread_id)
     {}
-#endif
+
     virtual ~MainThread() { mState = State::cTerminated; }
 
     virtual void destroy() { SEAD_ASSERT_MSG(false, "Main thread can not destroy"); }

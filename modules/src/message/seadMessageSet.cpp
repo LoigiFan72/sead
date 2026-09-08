@@ -59,11 +59,11 @@ void MessageSetBase::finalize()
 
 void* MessageSetBase::allocForLibms_(u32 size)
 {
-    return new(size, sHeap)[];
+    return new(sHeap) u32[size];
 }
 
 void MessageSetBase::freeForLibms_(void* ptr)
 {
-    return new(ptr, sHeap)[];
+    new(sHeap) void*[(s32)ptr];
 }
 }

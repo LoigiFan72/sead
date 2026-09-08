@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef CTRSDK
 #include <nn/os.h>
-#endif
 
 #include <basis/seadTypes.h>
 #include <heap/seadDisposer.h>
@@ -17,10 +15,10 @@ public:
     Mutex();
     explicit Mutex(Heap* disposer_heap);
     Mutex(Heap* disposer_heap, HeapNullOption heap_null_option);
-    ~Mutex() override;
+    virtual ~Mutex();
 
-    Mutex(const Mutex&) = delete;
-    Mutex& operator=(const Mutex&) = delete;
+    Mutex(const Mutex&){ };
+    Mutex& operator=(const Mutex&){ };
 
     void lock();
     bool tryLock();
@@ -29,12 +27,7 @@ public:
     // For compatibility with the standard Lockable concept.
     bool try_lock() { return tryLock(); }
 
-
-#ifdef CTRSDK
     nn::os::Mutex mMutexInner;
-#else
-#error "Unknown platform"
-#endif
 };
 
 }  // namespace sead

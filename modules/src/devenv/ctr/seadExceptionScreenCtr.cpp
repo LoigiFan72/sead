@@ -16,11 +16,13 @@ namespace sead
 ExceptionScreenCtr* ExceptionScreenCtr::sExceptionScreenCtr = NULL;
 const char* ExceptionScreenCtr::sMapFilePath = NULL;
 
-ExceptionScreenCtr::ExceptionScreenCtr()
+ExceptionScreenCtr::ExceptionScreenCtr():
+    mPrinter(),
+    mEvent()
 {
     sExceptionScreenCtr = this;
 
-    nn::os::ARM::SetUserExceptionHandler(exceptionHandler, reinterpret_cast<uptr>(mExceptionStack.addOffset(mInstance, 0)));
+    nn::os::ARM::SetUserExceptionHandler(exceptionHandler, reinterpret_cast<uptr>(mExceptionStack.addOffset(mEvent.instance(), 0)));
 }
 
 ExceptionScreenCtr::~ExceptionScreenCtr()
@@ -147,7 +149,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
     Vector2<int> bufPos = Vector2<int>::zero;
 
     putHaltMessage_(bufPos, msg);
-    flush();
+    mPrinter.flush();
 
     TickTime start;
 
@@ -172,7 +174,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
         {
             putHaltMessage_(Vector2<int>(bufPos.x, bufPos.y + yOffset), msg);
 
-            flush();
+            mPrinter.flush();
         }
 
         redraw = false;
@@ -221,17 +223,17 @@ int ExceptionScreenCtr::putHaltMessage_(Vector2<int> const& pos, char const* msg
 {
 {
     SafeString string(msg);
-    putString(pos, string);
+    mPrinter.putString(pos, string);
 }
-    f32 lastY = getLastCursorPos().y;
-    return lastY < getBoundBox().getSizeY();
+    f32 lastY = mPrinter.getLastCursorPos().y;
+    return lastY < mPrinter.getBoundBox().getSizeY();
 }
 
 void ExceptionScreenCtr::clearMessage_(Vector2<int> const& bufSize, const char* msg)
 {
-    Color4u8 color = getCharColor();
-    setCharColor(getBGColor());
+    Color4u8 color = mPrinter.getCharColor();
+    mPrinter.setCharColor(mPrinter.getBGColor());
     putHaltMessage_(bufSize, msg);
-    setCharColor(color);
+    mPrinter.setCharColor(color);
 }
 }

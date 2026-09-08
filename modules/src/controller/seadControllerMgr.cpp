@@ -1,6 +1,6 @@
 #include "controller/seadControllerMgr.h"
 #include "basis/seadNew.h"
-//#include "controller/nin/seadNinJoyNpadDevice.h"
+#include "controller/ctr/seadCtrHidDeviceCtr.h"
 #include "controller/seadControlDevice.h"
 #include "framework/seadTaskID.h"
 #include "prim/seadDelegate.h"
@@ -11,7 +11,8 @@ namespace sead
 SEAD_TASK_SINGLETON_IMPL(ControllerMgr)
 
 // NON_MATCHING: storing too much 00s into stack (for ConstructArg)
-ControllerMgr::ControllerMgr() : CalculateTask(ConstructArg(), "sead::ControllerMgr")
+ControllerMgr::ControllerMgr(): 
+    CalculateTask(ConstructArg(), "sead::ControllerMgr")
 {
     mDevices.initOffset(offsetof(ControlDevice, mListNode));
 }

@@ -8,15 +8,27 @@ const f32 ControllerBase::cStickReleaseThresholdDefault = 0.25f;
 const Vector2f ControllerBase::cInvalidPointer(Mathf::minNumber(), Mathf::minNumber());
 const Vector2i ControllerBase::cInvalidPointerS32(Mathi::minNumber(), Mathi::minNumber());
 
-ControllerBase::ControllerBase(s32 padBitMax, s32 leftStickCrossStartBit,
-                               s32 rightStickCrossStartBit, s32 touchKeyBit)
-    : mPadTrig(), mPadRelease(), mPadRepeat(), mPointerFlag(), mPointerS32(cInvalidPointerS32),
-      mPointerBound(), mLeftStickHoldThreshold(0.5f), mRightStickHoldThreshold(0.5f),
-      mLeftStickReleaseThreshold(0.25f), mRightStickReleaseThreshold(0.25f), mPadBitMax(padBitMax),
-      mLeftStickCrossStartBit(leftStickCrossStartBit),
-      mRightStickCrossStartBit(rightStickCrossStartBit), mTouchKeyBit(touchKeyBit), mIdleFrame(0),
-      mPadHold(), mPointer(cInvalidPointer), mLeftStick(0.0f, 0.0f), mRightStick(0.0f, 0.0f),
-      mLeftAnalogTrigger(0.0f), mRightAnalogTrigger(0.0f)
+ControllerBase::ControllerBase(s32 padBitMax, s32 leftStickCrossStartBit,vs32 rightStickCrossStartBit, s32 touchKeyBit): 
+    mPadTrig(), mPadRelease(), 
+    mPadRepeat(), 
+    mPointerFlag(), 
+    mPointerS32(cInvalidPointerS32), 
+    mPointerBound(), 
+    mLeftStickHoldThreshold(0.5f), 
+    mRightStickHoldThreshold(0.5f),
+    mLeftStickReleaseThreshold(0.25f), 
+    mRightStickReleaseThreshold(0.25f), 
+    mPadBitMax(padBitMax),
+    mLeftStickCrossStartBit(leftStickCrossStartBit),
+    mRightStickCrossStartBit(rightStickCrossStartBit), 
+    mTouchKeyBit(touchKeyBit), 
+    mIdleFrame(0), 
+    mPadHold(), 
+    mPointer(cInvalidPointer), 
+    mLeftStick(0.0f, 0.0f), 
+    mRightStick(0.0f, 0.0f), 
+    mLeftAnalogTrigger(0.0f), 
+    mRightAnalogTrigger(0.0f)
 {
     if (cPadIdx_MaxBase < padBitMax)
     {
@@ -74,6 +86,39 @@ void ControllerBase::setPointerWithBound_(bool is_on, bool touchkey_hold, const 
     }
 }
 
+void ControllerBase::setPadRepeat(u32 mask, u8 delay_frame, u8 pulse_frame)
+{
+    BitFlag32 pad_to_set(mask);
+
+    for (s32 i = 0; i < mPadBitMax; i++)
+    {
+        if (pad_to_set.isOnBit(i))
+        {
+            mPadRepeatDelays[i] = delay_frame;
+            mPadRepeatPulses[i] = pulse_frame;
+        }
+    }
+}
+
+bool ControllerBase::isIdleBase_()
+{
+    return getHoldMask() == 0 && mPointerFlag.isOff(1) && mLeftStick.isZero() &&
+           mRightStick.isZero() && 
+           mLeftAnalogTrigger == 0.0f && mRightAnalogTrigger == 0.0f;
+}
+
+void ControllerBase::setPointerBound(const BoundBox2f& bound)
+{
+    mPointerBound.set(bound.getMin(), bound.getMax());
+    mPointerFlag.set(cPointerUnkFlag3);
+}
+
+u32 ControllerBase::getPadHoldCount(s32 bit) const
+{
+    SEAD_ASSERT(bit < mPadBitMax);
+    return mPadHoldCounts[bit];
+}
+
 void ControllerBase::updateDerivativeParams_(u32 prev_hold, bool prev_pointer_on)
 {
     u32 stick_hold = 0;
@@ -127,26 +172,6 @@ void ControllerBase::updateDerivativeParams_(u32 prev_hold, bool prev_pointer_on
     mPointerS32.y = (s32)mPointer.y;
 }
 
-u32 ControllerBase::getPadHoldCount(s32 bit) const
-{
-    SEAD_ASSERT(bit < mPadBitMax);
-    return mPadHoldCounts[bit];
-}
-
-void ControllerBase::setPadRepeat(u32 mask, u8 delay_frame, u8 pulse_frame)
-{
-    BitFlag32 pad_to_set(mask);
-
-    for (s32 i = 0; i < mPadBitMax; i++)
-    {
-        if (pad_to_set.isOnBit(i))
-        {
-            mPadRepeatDelays[i] = delay_frame;
-            mPadRepeatPulses[i] = pulse_frame;
-        }
-    }
-}
-
 void ControllerBase::setLeftStickCrossThreshold(f32 hold, f32 release)
 {
     if (hold >= release)
@@ -173,12 +198,6 @@ void ControllerBase::setRightStickCrossThreshold(f32 hold, f32 release)
         SEAD_ASSERT_MSG(false, "hold[%f] must be larger than or equal to release[%f].", hold,
                         release);
     }
-}
-
-void ControllerBase::setPointerBound(const BoundBox2f& bound)
-{
-    mPointerBound.set(bound.getMin(), bound.getMax());
-    mPointerFlag.set(cPointerUnkFlag3);
 }
 
 u32 ControllerBase::getStickHold_(u32 prev_hold, const Vector2f& stick, f32 hold_threshold,
@@ -234,12 +253,6 @@ u32 ControllerBase::getStickHold_(u32 prev_hold, const Vector2f& stick, f32 hold
             return 1 << (start_bit + cCrossRight);
         }
     }
-}
-
-bool ControllerBase::isIdleBase_()
-{
-    return getHoldMask() == 0 && mPointerFlag.isOff(1) && mLeftStick.isZero() &&
-           mRightStick.isZero() && mLeftAnalogTrigger == 0.0f && mRightAnalogTrigger == 0.0f;
 }
 
 void ControllerBase::setIdleBase_()

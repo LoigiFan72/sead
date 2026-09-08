@@ -15,20 +15,20 @@ class LogicalFrameBuffer
     SEAD_RTTI_BASE(LogicalFrameBuffer)
 
 public:
-    LogicalFrameBuffer(const Vector2f& virtual_size, const BoundBox2f& physical_area)
-        : mVirtualSize(virtual_size), mPhysicalArea(physical_area)
+    LogicalFrameBuffer(const Vector2f& virtual_size, const BoundBox2f& physical_area): 
+        mVirtualSize(virtual_size), mPhysicalArea(physical_area)
     {
     }
     LogicalFrameBuffer(const Vector2f& virtual_size, f32 physical_x, f32 physical_y, f32 physical_w,
-                       f32 physical_h)
-        : mVirtualSize(virtual_size),
-          mPhysicalArea(physical_x, physical_y, physical_x + physical_w, physical_y + physical_h)
+                       f32 physical_h): 
+        mVirtualSize(virtual_size),
+        mPhysicalArea(physical_x, physical_y, physical_x + physical_w, physical_y + physical_h)
     {
     }
     LogicalFrameBuffer(const Vector2f& virtual_size, f32 physical_x, f32 physical_y, u32 physical_w,
-                       u32 physical_h)
-        : mVirtualSize(virtual_size),
-          mPhysicalArea(physical_x, physical_y, physical_x + physical_w, physical_y + physical_h)
+                       u32 physical_h): 
+        mVirtualSize(virtual_size),
+        mPhysicalArea(physical_x, physical_y, physical_x + physical_w, physical_y + physical_h)
     {
     }
     virtual ~LogicalFrameBuffer();
@@ -77,22 +77,16 @@ public:
         : LogicalFrameBuffer(virtual_size, physical_x, physical_y, physical_w, physical_h)
     {
     }
-    ~FrameBuffer() override;
+    virtual ~FrameBuffer();
 
-#if SEAD_FRAMEBUFFER_BINDCLEAR_UNBIND
-    virtual void bindClear_(DrawContext* draw_context) const;
-    virtual void unbindImpl_(DrawContext* draw_context) const;
-#endif
-    virtual void copyToDisplayBuffer([[maybe_unused]] DrawContext* draw_context,
-                                     [[maybe_unused]] const DisplayBuffer* display_buffer) const
+    virtual void copyToDisplayBuffer(const DisplayBuffer* display_buffer) const
     {
     }
-    virtual void clear(DrawContext* draw_context, u32 clr_flag, const Color4f& color, f32 depth,
-                       u32 stencil) const = 0;
-    virtual void clearMRT(DrawContext* draw_context, u32 target, const Color4f& color) const;
-    virtual void bindImpl_(DrawContext* draw_context) const = 0;
+    virtual void clear(u32 clr_flag, const Color4f& color, f32 depth, u32 stencil) const = 0;
+    virtual void clearMRT(u32 target, const Color4f& color) const;
+    virtual void bindImpl_() const = 0;
 
-    void bind(DrawContext* draw_context) const;
+    void bind() const;
 };
 
 }  // namespace sead

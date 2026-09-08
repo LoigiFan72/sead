@@ -37,9 +37,9 @@ public:
 #ifdef SEAD_DEBUG
     Reflexible();
     Reflexible(Heap* heap, IDisposer::HeapNullOption heap_null_option);
-    ~Reflexible() override { disposeHostIOImpl_(); }
+    virtual ~Reflexible() { disposeHostIOImpl_(); }
 
-    void listenNodeEvent([[maybe_unused]] const NodeEvent* event) override {}
+    virtual void listenNodeEvent([[maybe_unused]] const NodeEvent* event) {}
     virtual void genMessage([[maybe_unused]] Context* context) {}
     virtual SafeString getMetaFilename() { return SafeString::cEmptyString; }
     virtual void genObjectInfo(const GenEvent* event, u32);

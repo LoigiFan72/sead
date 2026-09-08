@@ -56,6 +56,13 @@ struct Vector2 : public Policies<T>::Vec2Base {
 
     void setAdd(const Vector2& x, const Vector2& y);
 
+    T length() const;
+
+    bool isZero() const
+    {
+        return *this == zero;
+    }
+
     static const Vector2 zero;
     static const Vector2 ex;
     static const Vector2 ey;

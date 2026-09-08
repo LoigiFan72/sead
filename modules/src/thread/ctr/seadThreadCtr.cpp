@@ -3,6 +3,7 @@
 // Project: StandardEAD C++ Library for CTR
 
 #include "thread/seadThread.h"
+#include "basis/seadWarning.h"
 
 namespace sead
 {
@@ -21,9 +22,7 @@ Thread::Thread(const SafeString& name, Heap* heap, s32 priority, MessageQueue::B
     mPriority(priority)
 {
     mMessageQueue.allocate(message_queue_size, heap);
-    mStackTop = new (heap, 0x1000) u8[stack_size];
-
-    mThreadInner = new(heap) nn::os::Thread();
+    mStackTop = new u8[stack_size];
 
     initStackCheck_();
     if (ThreadMgr::instance())
@@ -45,10 +44,8 @@ Thread::Thread(Heap* heap, nn::os::Thread* pThread, u32 thread_id):
     mId(thread_id),
     mState(State::cInitialized)
 {
-    mMessageQueue.allocate(32, heap);
     pThread->GetPriority();
-
-    setAffinity(mAffinity);
+    mMessageQueue.allocate(32, heap);
 }
 
 Thread::~Thread()
@@ -93,13 +90,13 @@ bool Thread::start()
 {
     if (mState)
     {
-        SEAD_WARN("Thread is running or done. Can not start.\n");
+        SEAD_WARNING("Thread is running or done. Can not start.\n");
         return false;
     }
 
     mThreadInner->TryStart(ctrThreadFunc_, reinterpret_cast<uptr>(this), *this, mPriority);
 
-    if (state == State::cInitialized)
+    if (mState == State::cInitialized)
         mState = State::cRunning;
 
     return true;
@@ -127,7 +124,7 @@ void Thread::setPriority(s32 prio)
         }
         else
         {
-            mThreadInner->ChangePriority(prio)
+            mThreadInner->ChangePriority(prio);
         }
     }
 }
@@ -154,7 +151,7 @@ uintptr_t Thread::getStackCheckStartAddress_() const
 
 void Thread::ctrThreadFunc_(uptr arg)
 {
-    sead::Thread* self = static_cast<Thread*>(arg);
+    sead::Thread* self = static_cast<sead::Thread*>(arg);
 
     ThreadMgr::instance()->mTlsSlot.setValue(reinterpret_cast<uintptr_t>(self));
 

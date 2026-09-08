@@ -17,8 +17,8 @@ public:
     virtual void pauseAll(bool p);
     virtual void pauseAppCalc(bool p);
 
-    bool getSysDrawScreen() const { return mIsSysBtmScreen; }
-    bool getAppDrawScreen() const { return mIsAppBtmScreen; }
+    bool getSysDrawScreen() const { return mIsSysScreen; }
+    bool getAppDrawScreen() const { return mIsAppScreen; }
 
     void calc();
     void drawTop();
@@ -36,8 +36,8 @@ protected:
     MethodTreeNode mBtmSysDrawNode;
     MethodTreeNode mBtmAppDrawNode;
     MethodTreeNode mBtmAppDrawFinalNode;
-    bool mIsSysBtmScreen;
-    bool mIsAppBtmScreen;
+    bool mIsSysScreen;
+    bool mIsAppScreen;
 };
 
 } // namespace sead

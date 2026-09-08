@@ -3,6 +3,7 @@
 // Project: StandardEAD C++ Library for CTR
 
 #include "thread/seadMessageQueue.h"
+#include "basis/seadAssert.h"
 
 namespace sead
 {

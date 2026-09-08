@@ -18,10 +18,12 @@ public:
     {
     }
 
-    virtual ~ControllerAddon() = default;
+    virtual ~ControllerAddon(){};
 
     virtual bool calc() = 0;
 
+    ControllerDefine::AddonId getId() const { return mId; }
+    Controller* getController() const { return mController; }
 protected:
     ListNode mListNode;
     ControllerDefine::AddonId mId;
@@ -29,8 +31,5 @@ protected:
 
     friend class Controller;
 };
-#ifdef cafe
-static_assert(sizeof(ControllerAddon) == 0x14, "sead::ControllerAddon size mismatch");
-#endif  // cafe
 
 }  // namespace sead

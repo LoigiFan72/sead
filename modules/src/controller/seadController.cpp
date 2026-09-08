@@ -5,7 +5,8 @@
 #include "controller/seadControllerMgr.h"
 #include "controller/seadControllerWrapperBase.h"
 
-namespace sead{
+namespace sead
+{
 Controller::Controller(ControllerMgr* mgr): 
     ControllerBase(cPadIdx_Max, cPadIdx_LeftStickUp, cPadIdx_RightStickUp, cPadIdx_Touch),
       mId(ControllerDefine::cController_Null), mMgr(mgr)
