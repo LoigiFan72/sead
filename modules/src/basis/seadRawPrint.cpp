@@ -1,22 +1,15 @@
-// Filename: seadRawPrint.cpp
-//
-// Project: StandardEAD C++ Library for CTR
-
 #include <basis/seadRawPrint.h>
-#include "devenv/seadAssertConfig.h"
-#include <nn/svc.h>
-#include <nn/dbg.h>
+#include "devenv/seadPrintConfig.h"
+
 #include <stdio.h>
 
-namespace sead { 
-namespace system {
-
-void PrintStringImpl(const char* string, s32 len)
+namespace sead 
+{ 
+namespace system 
 {
-    if(0 < len)
-    {
-        PutString(string);
-    }
+void PutString(const char* fmt, s32 len)
+{
+    PrintConfig::execCallbacks(PrintConfig::PrintEventArg(fmt, len));
 }
 
 void Print(const char* format, ...)

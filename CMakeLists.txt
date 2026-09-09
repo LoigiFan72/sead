@@ -353,6 +353,8 @@ if(SEAD_PLATFORM STREQUAL "ctr")
   target_link_libraries(sead PUBLIC CTRSDK)
 
   target_sources(sead PRIVATE
+    modules/src/basis/seadRawPrintCtr.cpp
+
     include/controller/ctr/seadCtrAccelerometerAddon.h
     include/controller/ctr/seadCtrController.h
     include/controller/ctr/seadCtrDebugController.h
@@ -384,11 +386,15 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     include/framework/seadUlcdMethodTreeMgr.h
     include/framework/seadUlcdTask.h
     include/framework/ctr_nw4c/seadGameFrameworkCtrNw4c.h
+    include/framework/ctr_nw4c/seadDoubleCmdGameFrameworkCtrNw4c.h
+    include/framework/ctr_nw4c/seadUlcdDoubleCmdGameFrameworkCtrNw4c.h
     modules/src/framework/seadDualScreenMethodTreeMgr.cpp
     modules/src/framework/seadDualScreenTask.cpp
     modules/src/framework/seadUlcdMethodTreeMgr.cpp
     modules/src/framework/seadUlcdTask.cpp
-    modules/src//framework/ctr_nw4c/seadGameFrameworkCtrNw4c.cpp
+    modules/src/framework/ctr_nw4c/seadGameFrameworkCtrNw4c.cpp
+    modules/src/framework/ctr_nw4c/seadDoubleCmdFrameworkCtrNw4c.cpp
+    modules/src/framework/ctr_nw4c/seadUlcdDoubleCmdFrameworkCtrNw4c.cpp
 
     include/gfx/ctr/seadFrameBufferCtr.h
     include/gfx/ctr/seadGfxMemoryMgrCtr.h
@@ -398,9 +404,13 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     modules/src/heap/seadArenaCtr.cpp
 
     include/prim/ctr/seadMemUtilCtr.hpp
+    modules/src/prim/ctr/seadMemUtilCtr.cpp
 
     include/stream/seadMemoryMapCtr.h
     include/stream/seadMemoryMapCtr.hpp
+
+    include/tentative/seadBitmapBuilder.h
+    modules/src/tentative/seadBitmapBuilder.cpp
 
     include/thread/ctr/seadThreadLocalStorage.hpp
     modules/src/thread/ctr/seadCriticalSectionCtr.cpp

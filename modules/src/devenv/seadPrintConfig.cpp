@@ -1,35 +1,39 @@
-#include "devenv/seadPrintConfig.h"
+#include <devenv/seadPrintConfig.h>
 
-namespace sead
+#include <basis/seadRawPrint.h>
+
+namespace sead 
 {
-PrintConfig::PrintEventArg PrintConfig::sPrintEvent{};
+    
+bool PrintConfig::sIsPrintEventUsed = false;
+PrintConfig::PrintEvent PrintConfig::sPrintEvent;
 IDelegate1<const PrintConfig::PrintEventArg&>* PrintConfig::sFinalCallback = nullptr;
 
-void PrintConfig::registerCallback(PrintEventArg::Slot& slot)
+void PrintConfig::registerCallback(PrintEvent::Slot& slot)
 {
     sPrintEvent.connect(slot);
+    sIsPrintEventUsed = true;
 }
 
-void PrintConfig::unregisterCallback(PrintEventArg::Slot& slot)
+void PrintConfig::unregisterCallback(PrintEvent::Slot& slot)
 {
     sPrintEvent.disconnect(slot);
 }
 
-void PrintConfig::registerFinalCallback(IDelegate1<const PrintEventArg&>* cb)
+void PrintConfig::registerFinalCallback(IDelegate1<const PrintEventArg&>* callback)
 {
-    sFinalCallback = cb;
+    sFinalCallback = callback;
 }
 
-void PrintConfig::execCallbacks(const PrintEventArg& assertMessage)
+void PrintConfig::execCallbacks(const PrintEventArg& arg)
 {
-    sPrintEvent.fire(assertMessage);
+    if (sIsPrintEventUsed)
+        sPrintEvent.fire(arg);
+
     if (sFinalCallback)
-    {
-        sFinalCallback->invoke(assertMessage);
-    }
+        sFinalCallback->invoke(arg);
     else
-    {
-        system::PrintStringImpl(assertMessage);
-    }
+        system::PrintStringImpl(arg.str, arg.len);
 }
-}  // namespace sead
+
+} // namespace sead

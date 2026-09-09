@@ -117,6 +117,35 @@ public:
         TListNode<T>* mPtr;
     };
 
+    class constIterator
+    {
+    public:
+        explicit constIterator(const TListNode<T>* ptr)
+            : mPtr(ptr)
+        {
+        }
+
+        constIterator(const iterator& it)
+            : mPtr(it.mPtr)
+        {
+        }
+
+        constIterator& operator++()
+        {
+            mPtr = static_cast<const TListNode<T>*>(mPtr->next());
+            return *this;
+        }
+
+        const T& operator*() const { return mPtr->mData; }
+        const T* operator->() const { return &mPtr->mData; }
+
+        friend bool operator==(const constIterator& lhs, const constIterator& rhs) { return lhs.mPtr == rhs.mPtr; }
+        friend bool operator!=(const constIterator& lhs, const constIterator& rhs) { return lhs.mPtr != rhs.mPtr; }
+
+    protected:
+        const TListNode<T>* mPtr;
+    };
+
     iterator begin() const { return iterator(static_cast<TListNode<T>*>(mStartEnd.next())); }
 
     iterator end() const
@@ -181,6 +210,9 @@ public:
         const TList& mList;
     };
     RobustRange robustRange() const { return {*this}; }
+
+    constIterator constBegin() const { return constIterator(static_cast<TListNode<T>*>(mStartEnd.next())); }
+    constIterator constEnd() const { return constIterator(static_cast<TListNode<T>*>(const_cast<ListNode*>(&mStartEnd))); }
 
 private:
     static int compareT(const T* a, const T* b)

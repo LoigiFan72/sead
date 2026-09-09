@@ -1,9 +1,7 @@
 #ifndef SEAD_FILEDEVICEMGR_H_
 #define SEAD_FILEDEVICEMGR_H_
 
-#ifdef CTRSDK
 #include <nn/fs.h>
-#endif
 
 #include <basis/seadTypes.h>
 #include <container/seadTList.h>
@@ -25,6 +23,8 @@ public:
     void traceDirectoryPath(const SafeString& path) const;
     void resolveFilePath(BufferedSafeString* out, const SafeString& path) const;
     void resolveDirectoryPath(BufferedSafeString* out, const SafeString& path) const;
+
+    FileDevice* open(FileHandle* handle, const SafeString& filename, FileDevice::FileOpenFlag flag, u32 divNum);
 
     void mount(FileDevice* device, const SafeString& name = SafeString::cEmptyString);
     void unmount(FileDevice* device);
@@ -70,6 +70,13 @@ private:
     bool mMountedSd = false;
 #endif
 };
+
+inline FileDevice* FileDeviceMgr::open(FileHandle* handle, const SafeString& filename, FileDevice::FileOpenFlag flag, u32 divNum)
+{
+    FileDevice* ret = tryOpen(handle, filename, flag, divNum);
+    SEAD_ASSERT_MSG(ret, "open failed. [%s]", filename.cstr());
+    return ret;
+}
 
 }  // namespace sead
 

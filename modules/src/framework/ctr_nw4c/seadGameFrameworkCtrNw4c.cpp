@@ -2,12 +2,14 @@
 //
 // Project: StandardEAD C++ Library for CTR
 
+#include "framework/ctr_nw4c/seadGameFrameworkCtrNw4c.h"
 #include "basis/seadWarning.h"
 #include "devenv/ctr/seadExceptionScreenCtr.h"
-#include "framework/ctr_nw4c/seadGameFrameworkCtrNw4c.h"
 #include "framework/seadDualScreenMethodTreeMgr.h"
+#include "framework/seadInfLoopChecker.h"
 #include "framework/seadProcessMeter.h"
 #include "filedevice/seadFileDevice.h"
+#include "filedevice/seadFileDeviceMgr.h"
 #include "gfx/ctr/seadGraphicsCtr.h"
 #include "heap/seadExpHeap.h"
 #include "stream/seadFileDeviceStream.h"
@@ -90,19 +92,17 @@ GameFrameworkCtrNw4c::GameFrameworkCtrNw4c(CreateArg const& arg):
     mLastUpdateTime(),
     mFrameNow(),
     mLastDiffTime(),
-    mBufferSizeA(0),
-    mDispBufA(0),
-    mBufferSizeB(0),
-    mDispBufB(0),
     mBuffer(),
     mTopFrameBuffer(nullptr),
     mBtmFrameBuffer(nullptr),
-    mScreenShotNo(0),
-    mScreenshotBuf(nullptr)
-{
-}
+    mFrameBufferNo(),
+    mScreenshotBuf(nullptr),
+    mCurrentScreenshot(mGameArg.mScreenShotBuff),
 
-GameFrameworkCtrNw4c::~GameFrameworkCtrNw4c()
+#ifdef SEAD_DEBUG
+    mExceptionScreen(nullptr),
+#endif
+    mGLDispParam(nullptr)
 {
 }
 
@@ -112,13 +112,12 @@ void GameFrameworkCtrNw4c::initialize(const Framework::InitializeArg& arg)
 }
 
 // FIX ME
-void GameFrameworkCtrNw4c::initializeGraphicsSystem(Heap* heap, const Vector2f& virtualFbSize, const Vector2f&)
+void GameFrameworkCtrNw4c::initializeGraphicsSystem(Heap* heap, const Vector2f& topFbSize, const Vector2f& btmFbSize)
 {
     if(mGameArg.mMemoryMgrCtr == NULL)
     {
         {
             ExpHeap* gfxHeap = ExpHeap::create(mGameArg.cmdMemSize, "sead::DefaultGfxMemoryMgrCtr", heap);
-            ScopedCurrentHeapSetter chs(gfxHeap);
 
             GfxMemoryMgrCtr* mem = new(gfxHeap) DefaultGfxMemoryMgrCtr();
             mem->setInitialize(true);
@@ -132,31 +131,34 @@ void GameFrameworkCtrNw4c::initializeGraphicsSystem(Heap* heap, const Vector2f& 
         initNngx_(mGameArg.mMemoryMgrCtr);
         mGameArg.mMemoryMgrCtr->setInitialize(false);
     }
-    mBufferSizeA = createCmdlist_(mGameArg.cmdBufSize, mGameArg.cmdBufRequest);
+    mGameArg.cmdBufSize = createCmdlist_(mGameArg.cmdBufSize, mGameArg.cmdBufRequest);
 
-    createDisplayBuffers_(&mDispBufA, 2, NN_GX_DISPLAY0, mGameArg.format, mGameArg.widthA, mGameArg.heightA, NN_GX_MEM_FCRAM);
-    createDisplayBuffers_(mDispBufB, 2, NN_GX_DISPLAY1, mGameArg.format, mGameArg.widthB, mGameArg.heightB, NN_GX_MEM_FCRAM);
+    createDisplayBuffers_(mBufferSizeTop, 2, NN_GX_DISPLAY0, mGameArg.format, mGameArg.widthTop, mGameArg.heightTop, NN_GX_MEM_FCRAM);
+    createDisplayBuffers_(mBufferSizeBtm, 2, NN_GX_DISPLAY1, mGameArg.format, mGameArg.widthTop, mGameArg.heightTop, NN_GX_MEM_FCRAM);
     nngxActiveDisplay(NN_GX_DISPLAY1);
 
     for(int disp = 0; disp < 2; disp++)
     {
-        nngxBindDisplaybuffer(mDispBufB[disp]);
+        nngxBindDisplaybuffer(mBufferSizeBtm[disp]);
         GLint p;
         nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &p);
         mGLDispParam[disp] = p;
     }
-{
-    Vector2i bufSize;
-    createFramebuffer_(&mBuffer, MathCalcCommon<int>::max(mGameArg.widthA, mGameArg.widthB), MathCalcCommon<int>::max(mGameArg.heightA, mGameArg.heightB),
-                        NN_GX_MEM_VRAMA, PICA_DATA_COLOR_RGBA8_OES, NN_GX_MEM_VRAMB, PICA_DATA_DEPTH24_STENCIL8_EXT);
-{}
-    mTopFrameBuffer = new(heap) FrameBufferCtr(nn::gr::CTR::FrameBuffer(mBuffer), Vector2f(virtualFbSize.x, virtualFbSize.y), virtualFbSize.x, virtualFbSize.y, mGameArg.physH_A, mGameArg.physW_A);
-    SEAD_ASSERT(mTopFrameBuffer);
-    mBtmFrameBuffer = new(heap) FrameBufferCtr(nn::gr::CTR::FrameBuffer(mBuffer), Vector2f(virtualFbSize.x, virtualFbSize.y), virtualFbSize.x, virtualFbSize.y, mGameArg.physH_B, mGameArg.physW_B);
-}
-    SEAD_ASSERT(mBtmFrameBuffer);
+    
+    {
+        Vector2i bufSize;
+        createFramebuffer_(&mBuffer, MathCalcCommon<int>::max(mGameArg.widthTop, mGameArg.widthTop), MathCalcCommon<int>::max(mGameArg.heightTop, mGameArg.heightTop),
+                            NN_GX_MEM_VRAMA, PICA_DATA_COLOR_RGBA8_OES, NN_GX_MEM_VRAMB, PICA_DATA_DEPTH24_STENCIL8_EXT);
 
-    mTopFrameBuffer->bind();
+
+        mTopFrameBuffer = new(heap) FrameBufferCtr(nn::gr::CTR::FrameBuffer(mBuffer), Vector2f(topFbSize.x, topFbSize.y), topFbSize.x, topFbSize.y, mGameArg.physH_Top, mGameArg.physW_Top);
+        SEAD_ASSERT(mTopFrameBuffer);
+        mTopFrameBuffer->bind();
+        
+        mBtmFrameBuffer = new(heap) FrameBufferCtr(nn::gr::CTR::FrameBuffer(mBuffer), Vector2f(btmFbSize.x, btmFbSize.y), btmFbSize.x, btmFbSize.y, mGameArg.physH_Btm, mGameArg.physW_Btm);
+        SEAD_ASSERT(mBtmFrameBuffer);
+        mTopFrameBuffer->bind();
+    }
 
     {
         Graphics* graphics = new (heap) GraphicsCtr();
@@ -246,7 +248,6 @@ void GameFrameworkCtrNw4c::initRun_(Heap* heap)
     {
         {
             ExpHeap* ssHeap = ExpHeap::create(0, "sead::ScreenShotBuffer", heap);
-            ScopedCurrentHeapSetter chs(ssHeap);
 
             mScreenshotBuf = new (ssHeap) char[mGameArg.mScreenShotBuff];
             ssHeap->adjust();
@@ -256,7 +257,6 @@ void GameFrameworkCtrNw4c::initRun_(Heap* heap)
     {
         {
             ExpHeap* exceptionHeap = ExpHeap::create(0, "sead::ExceptionScreenCtr", heap);
-            ScopedCurrentHeapSetter chs(exceptionHeap);
 
             mExceptionScreen = new (exceptionHeap) ExceptionScreenCtr();
             ssHeap->adjust();
@@ -271,8 +271,7 @@ void GameFrameworkCtrNw4c::initRun_(Heap* heap)
 
 void GameFrameworkCtrNw4c::mainLoop_()
 {
-    mGameArg.vsync_buf = nngxCheckVSync(NN_GX_DISPLAY_BOTH);
-    
+    mVblinkBuf = nngxCheckVSync(NN_GX_DISPLAY_BOTH);
     mFrameNow.setNow();
     mLastDiffTime.setNow();
 
@@ -299,7 +298,7 @@ void GameFrameworkCtrNw4c::saveScreenShotToFileHandle_(FileHandle* handle, void*
     }
 
     FileDeviceWriteStream fileStream(handle, false);
-    BufferWriteStream bufferStream(static_cast<WriteStream*>(&fileStream), mScreenshotBuf, mGameArg.mScreenShotBuff);
+    BufferWriteStream bufferStream(static_cast<WriteStream*>(&fileStream), mCurrentScreenshot, reinterpret_cast<u32>(mGameArg.mScreenShotBuff));
 
     BitmapBuilder bitmap(&bufferStream, width, height);
 
@@ -432,51 +431,46 @@ void GameFrameworkCtrNw4c::procCalc_()
     mCalcMeter.measureEnd();
 }
 
-
-
-void GameFrameworkCtrNw4c::requestTransferRenderImage_(u32 displayBuffer, nn::gr::CTR::FrameBuffer* frameBuffer,
-    s32 x, s32 y, f32 scaleX, f32 scaleY)
+void GameFrameworkCtrNw4c::presentTop_()
 {
-    nngxBindDisplaybuffer(displayBuffer);
+    nngxActiveDisplay(NN_GX_DISPLAY0);
+    requestTransferRenderImage_(mFrameBufferNo[mBufferSizeTop[0]], &mBuffer, 0, 0, 0, NN_GX_ANTIALIASE_NOT_USED);
+    nngxActiveDisplay(NN_GX_DISPLAY0);
+    nngxBindDisplaybuffer(mFrameBufferNo[mBufferSizeTop[0]]);
+}
 
-    s32 addr;
-    s32 form;
-    s32 nnWidth;
-    s32 nnHeight;
+void GameFrameworkCtrNw4c::presentBtm_()
+{
+    nngxActiveDisplay(NN_GX_DISPLAY1);
+    requestTransferRenderImage_(mFrameBufferNo[mBufferSizeBtm[0]], &mBuffer, 0, 0, 0, NN_GX_ANTIALIASE_NOT_USED);
+    nngxActiveDisplay(NN_GX_DISPLAY1);
+    nngxBindDisplaybuffer(mFrameBufferNo[mBufferSizeBtm[0]]);
+}
 
-    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &addr);
-    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_FORMAT, &form);
-    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_WIDTH, &nnWidth);
-    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_HEIGHT, &nnHeight);
+void GameFrameworkCtrNw4c::swapBuffer_()
+{
+    nngxRunCmdlist();
+    mGPUMeter.measureBegin();
+    GLint listParam;
+    nngxGetCmdlistParameteri(NN_GX_CMDLIST_IS_RUNNING, &listParam);
+    if(listParam)
+        nngxWaitCmdlistDone();
+    mGPUMeter.measureEnd();
 
-    PicaDataColor colorFormat = frameBuffer->colorBuffer.format;
-
-    u32 colorSize = getPicaDataColorSize_(colorFormat);
-
-    const u32 transferAddress = frameBuffer->colorBuffer.virtualAddr + frameBuffer->colorBuffer.width * 
-    (frameBuffer->colorBuffer.height - nnWidth - y) * colorSize + x;
-
-    nngxFlush3DCommand();
-
-    nn::gr::CTR::FrameBuffer::BlockSize blockSize = frameBuffer->colorBuffer.blockSize;
-
-    u32 blockSizeBytes = blockSize == nn::gr::CTR::FrameBuffer::BLOCK_SIZE8 ? 8 : 32;
-
-    u32 glFormat = picaDataColor2GLenum_(colorFormat);
-
-    nngxAddB2LTransferCommand(
-        reinterpret_cast<const GLvoid*>(transferAddress),
-        frameBuffer->colorBuffer.width,
-        frameBuffer->colorBuffer.height,
-        glFormat,
-        reinterpret_cast<GLvoid*>(addr),
-        form,
-        nnWidth,
-        nnHeight,
-        blockSize,
-        scaleX,
-        scaleY
-    );
+    nngxStopCmdlist();
+    nngxClearCmdlist();
+    mFrameBufferNo[0] = -mFrameBufferNo[0];
+#ifdef SEAD_DEBUG
+    if(mExceptionScreen)
+    {
+        mExceptionScreen->getDirectPrint()->changeDisplaybuffer();
+    }
+    if(mScreenshotBuf)
+    {
+        doScreenShot_(mScreenshotBuf);
+        mScreenshotBuf = nullptr;
+    }
+#endif
 }
 
 void GameFrameworkCtrNw4c::waitForVBlank_()
@@ -487,7 +481,7 @@ void GameFrameworkCtrNw4c::waitForVBlank_()
     TickSpan waitSpan;
     waitSpan.setMilliSeconds(10);
 
-    while (true)
+    for(;;)
     {
         const u32 vblank = nngxCheckVSync(NN_GX_DISPLAY_BOTH);
 
@@ -534,7 +528,112 @@ void GameFrameworkCtrNw4c::waitForVBlank_()
 void GameFrameworkCtrNw4c::clearFrameBuffers_(s32 method)
 {
     getMethodFrameBuffer(method)->bind();
-    Graphics::instance()->clear(7, mGameArg.clearColor, 1.0f, 0);
+    Graphics::instance()->clear(FrameBuffer::ClearFlag::cAll, mGameArg.clearColor, 1.0f, 0);
+}
+
+void GameFrameworkCtrNw4c::doScreenShot_(char const* shot)
+{
+    bool isEnable = false;
+    if(InfLoopChecker::instance())
+    {
+        isEnable = InfLoopChecker::instance()->isEnable();
+        InfLoopChecker::instance()->setEnable(false);
+    }
+    doScreenShotImpl_(shot);
+    if(InfLoopChecker::instance())
+    {
+        InfLoopChecker::instance()->setEnable(isEnable);
+    }
+}
+
+void GameFrameworkCtrNw4c::requestTransferRenderImage_(u32 displayBuffer, nn::gr::CTR::FrameBuffer* frameBuffer,
+    s32 x, s32 y, f32 scaleX, f32 scaleY)
+{
+    nngxBindDisplaybuffer(displayBuffer);
+
+    s32 addr;
+    s32 form;
+    s32 nnWidth;
+    s32 nnHeight;
+
+    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &addr);
+    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_FORMAT, &form);
+    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_WIDTH, &nnWidth);
+    nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_HEIGHT, &nnHeight);
+
+    PicaDataColor colorFormat = frameBuffer->colorBuffer.format;
+
+    u32 colorSize = getPicaDataColorSize_(colorFormat);
+
+    const u32 transferAddress = frameBuffer->colorBuffer.virtualAddr + frameBuffer->colorBuffer.width * 
+    (frameBuffer->colorBuffer.height - nnWidth - y) * colorSize + x;
+
+    nngxFlush3DCommand();
+
+    nn::gr::CTR::FrameBuffer::BlockSize blockSize = frameBuffer->colorBuffer.blockSize;
+
+    u32 blockSizeBytes = blockSize == nn::gr::CTR::FrameBuffer::BLOCK_SIZE8 ? 8 : 32;
+
+    u32 glFormat = picaDataColor2GLenum_(colorFormat);
+
+    nngxAddB2LTransferCommand(
+        reinterpret_cast<const GLvoid*>(transferAddress),
+        frameBuffer->colorBuffer.width,
+        frameBuffer->colorBuffer.height,
+        glFormat,
+        reinterpret_cast<GLvoid*>(addr),
+        form,
+        nnWidth,
+        nnHeight,
+        blockSize,
+        scaleX,
+        scaleY
+    );
+}
+
+void GameFrameworkCtrNw4c::doScreenShotImpl_(char const* shot)
+{
+    FileDeviceMgr* fMgr = FileDeviceMgr::instance();
+    FixedSafeString<264> str;
+    {
+        str.copy(shot);
+    }
+
+    {
+        str.append("_top.bmp");
+    }
+
+    {
+        FileHandle topHandle;
+        fMgr->open(&topHandle, str, FileDevice::cFileOpenFlag_WriteOnly, 0);
+        if(!topHandle.isOpened())
+        {
+            SEAD_WARNING("Can't open file handle(%s). Can't save screen-shot.\n", shot);
+        }
+        nngxBindDisplaybuffer(mFrameBufferNo[mBufferSizeTop[0]]);
+        GLint param;
+        nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &param);
+        saveScreenShotToFileHandle_(&topHandle, &param, mGameArg.widthTop, mGameArg.heightTop, mGameArg.format);
+    }
+        {
+            str.copy(shot);
+        }
+
+        {
+            str.append("_btm.bmp");
+        }
+    {
+        FileHandle btmHandle;
+        fMgr->open(&btmHandle, str, FileDevice::cFileOpenFlag_WriteOnly, 0);
+        if(!btmHandle.isOpened())
+        {
+            SEAD_WARNING("Can't open file handle(%s). Can't save screen-shot.\n", shot);
+        }
+        nngxBindDisplaybuffer(mFrameBufferNo[mBufferSizeBtm[0]]);
+        GLint param;
+        nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &param);
+        saveScreenShotToFileHandle_(&btmHandle, &param, mGameArg.widthBtm, mGameArg.heightBtm, mGameArg.format);
+    }
 }
 
 FrameBuffer* GameFrameworkCtrNw4c::getMethodFrameBuffer(s32 methodType) const
@@ -546,7 +645,9 @@ FrameBuffer* GameFrameworkCtrNw4c::getMethodFrameBuffer(s32 methodType) const
         DualScreenMethodTreeMgr* mgr = DynamicCast<DualScreenMethodTreeMgr>(static_cast<MethodTreeMgr*>(getMethodTreeMgr()));
 
         if (mgr->getSysDrawScreen() == false)
+        {
             return mTopFrameBuffer;
+        }
         return mBtmFrameBuffer;
     }
     case 3:
@@ -559,7 +660,9 @@ FrameBuffer* GameFrameworkCtrNw4c::getMethodFrameBuffer(s32 methodType) const
         DualScreenMethodTreeMgr* mgr = DynamicCast<DualScreenMethodTreeMgr>(static_cast<MethodTreeMgr*>(getMethodTreeMgr()));
 
         if (mgr->getAppDrawScreen() == false)
+        {
             return mTopFrameBuffer;
+        }
         return mBtmFrameBuffer;
     }
 

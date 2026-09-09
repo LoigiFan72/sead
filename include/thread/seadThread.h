@@ -60,6 +60,8 @@ public:
     bool isDone() const { return mState == State::cTerminated || mState == State::cReleased; }
     bool isActive() const { return mState == State::cRunning || mState == State::cQuitting; }
 
+    void* GetStackBottom() const { return PtrUtil::addOffset(mStackTop, mStackSize); }
+
     static void yield();
     static void sleep(TickSpan howLong);
 
@@ -122,6 +124,9 @@ public:
 
     void initialize(Heap* heap);
     void destroy();
+
+    ThreadList::constIterator constBegin() const { return mList.constBegin(); }
+    ThreadList::constIterator constEnd() const { return mList.constEnd(); }
 
     bool isMainThread() const;
     Thread* getMainThread() const { return mMainThread; }

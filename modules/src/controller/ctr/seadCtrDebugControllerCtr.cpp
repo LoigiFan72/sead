@@ -1,4 +1,4 @@
-// Filename: seadDebugCtrController.cpp
+// Filename: seadDebugCtrControllerCtr.cpp
 //
 // Project: StandardEAD C++ Library for CTR
 

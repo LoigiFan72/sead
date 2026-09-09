@@ -17,11 +17,7 @@ public:
 
     u64 toTicks() const { return mTick; }
 
-#ifdef CTRSDK
-    void setNow() { mTick = nn::os::Tick::GetSystemTick(); }
-#else
-    void setNow();
-#endif
+    void setNow() { mTick = nn::os::Tick::GetSystemCurrent(); }
 
     TickSpan diff(const TickTime& other) const { return s64(mTick - other.mTick); }
     TickSpan diffToNow() const;

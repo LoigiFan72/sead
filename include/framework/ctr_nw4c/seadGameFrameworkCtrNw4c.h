@@ -45,14 +45,14 @@ public:
         ~CreateArg()
         {
         }
-        s32 widthA;
-        s32 heightA;
-        s32 widthB;
-        s32 heightB;
-        f32 physH_A;
-        f32 physW_A;
-        f32 physH_B;
-        f32 physW_B;
+        s32 widthTop;
+        s32 heightTop;
+        s32 widthBtm;
+        s32 heightBtm;
+        f32 physH_Top;
+        f32 physW_Top;
+        f32 physH_Btm;
+        f32 physW_Btm;
         u32 wait_vblank;
         Color4f clearColor;
         u32 cmdBufSize;
@@ -61,7 +61,7 @@ public:
         u32 cmdMemSize;
         GLenum format;
         u32* _48;
-        u32 mScreenShotBuff;
+        void* mScreenShotBuff;
         s32 vsync_buf;
     };
 
@@ -69,21 +69,23 @@ public:
     static const int cMaxScreenShotPathLength = 256;
 
     static void initialize(const Framework::InitializeArg& arg);
-    void initializeGraphicsSystem(Heap* heap, const Vector2f& virtualFbSize, const Vector2f&);
+    void initializeGraphicsSystem(Heap* heap, const Vector2f& topFbSize, const Vector2f& btmFbSize);
 
     explicit GameFrameworkCtrNw4c(const CreateArg& arg);
 
-    virtual ~GameFrameworkCtrNw4c();
+    virtual ~GameFrameworkCtrNw4c()
+    {
+    }
     virtual FrameBuffer* getMethodFrameBuffer(s32 methodType) const;
     virtual void initRun_(Heap*);
     virtual void runImpl_();
     virtual MethodTreeMgr* createMethodTreeMgr_(Heap*);
     virtual float calcFps();
     virtual void saveScreenShot(const SafeString& filename);
-    virtual bool isScreenShotBusy() const{ return mScreenShotNo != nullptr; }
+    virtual bool isScreenShotBusy() const{ return mScreenshotBuf != nullptr; }
     virtual void setCaption(SafeString const& caption);
 
-    static GLvoid* allocate(GLenum area, GLenum alignment, GLuint size, GLsizei);
+    static GLvoid* allocate(GLenum area, GLenum alignment, GLuint size, GLsizei heap);
     static void deallocate(GLenum area, GLenum alignment, GLuint size, GLvoid* ptr);
 
     static GfxMemoryMgrCtr* sMemoryMgr;
@@ -96,7 +98,7 @@ protected:
     virtual void presentBtm_();
     virtual void swapBuffer_();
     virtual void clearFrameBuffers_(s32 buffer);
-    virtual void doScreenShot(const char* shot);
+    virtual void doScreenShot_(const char* shot);
     virtual void doScreenShotImpl_(const char* shot);
 
     GLsizei createCmdlist_(GLsizei bufsize, GLsizei requestcount);
@@ -106,26 +108,27 @@ protected:
     void waitForVBlank_();
     void saveScreenShotToFileHandle_(FileHandle* handle, void*, int width, int height, u32);
     void requestTransferRenderImage_(u32 displayBuffer, nn::gr::CTR::FrameBuffer* frameBuffer, s32 x, s32 y, f32 scaleX, f32 scaleY);
-private:
-    CreateArg mGameArg;
-    u32 mVblinkBuf;
-    TickSpan mLastUpdateTime;
-    TickTime mFrameNow;
-    TickTime mLastDiffTime;
-    GLsizei mBufferSizeA;
-    u32 mDispBufA;
-    GLsizei mBufferSizeB;
-    u32* mDispBufB;
-    nn::gr::CTR::FrameBuffer mBuffer;
-    FrameBufferCtr* mTopFrameBuffer;
-    FrameBufferCtr* mBtmFrameBuffer;
-    s32 mScreenShotNo;
-    char* mScreenshotBuf;
-    Heap* mRunningHeap;
-//#ifdef SEAD_DEBUG
-    ExceptionScreenCtr* mExceptionScreen;
-//#endif
-    GLint* mGLDispParam;
+protected:
+// this struct is BIG, so i label offsets
+    CreateArg mGameArg; // 0x1F94
+    u32 mVblinkBuf; // 0x1FD4
+    TickSpan mLastUpdateTime; // 0x1FD8
+    TickTime mFrameNow; // 0x1FE0
+    TickTime mLastDiffTime; //0x1FE8
+    GLuint* mBufferSizeTop; // 0x1FF4
+    u32 mDispBufA; // 0x1FF8
+    GLuint* mBufferSizeBtm; // 0x1FFC
+    u32 mDispBufB; // 0x2000
+    nn::gr::CTR::FrameBuffer mBuffer; // 0x2004
+    FrameBufferCtr* mTopFrameBuffer; // 0x204C
+    FrameBufferCtr* mBtmFrameBuffer; // 0x2050
+    u32 mFrameBufferNo[1]; // 0x2054
+    const char* mScreenshotBuf; // 0x2058
+    void* mCurrentScreenshot; // 0x205C
+#ifdef SEAD_DEBUG
+    ExceptionScreenCtr* mExceptionScreen; // 0x2060
+#endif
+    GLint* mGLDispParam; // 0x2064
 };
 
 inline float GameFrameworkCtrNw4c::calcFps()
