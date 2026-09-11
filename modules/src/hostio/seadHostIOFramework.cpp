@@ -5,8 +5,10 @@
 #include <hostio/seadHostIOServer.h>
 #include <hostio/seadHostIOThreadLock.h>
 
-namespace sead { 
-namespace hostio {
+namespace sead 
+{ 
+namespace hostio 
+{
 
 #if defined(SEAD_DEBUG)
 TmpContext::TmpContext(Command command)

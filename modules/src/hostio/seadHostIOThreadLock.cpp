@@ -1,7 +1,9 @@
 #include "hostio/seadHostIOThreadLock.h"
 #include "thread/seadCriticalSection.h"
 
-namespace sead::hostio
+namespace sead
+{
+namespace hostio
 {
 Atomic<u32> ThreadLock::sLockCnt{0u};
 
@@ -32,4 +34,5 @@ CriticalSection& ThreadLock::getCS()
     static CriticalSection sCS;
     return sCS;
 }
-}  // namespace sead::hostio
+}  // namespace hostio
+}  // namespace sead

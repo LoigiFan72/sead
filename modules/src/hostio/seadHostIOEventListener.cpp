@@ -1,34 +1,72 @@
-#include "hostio/seadHostIOEventListener.h"
-#include "basis/seadAssert.h"
-#include "hostio/seadHostIOThreadLock.h"
+#include <hostio/seadHostIOEventListener.h>
 
-namespace sead::hostio
+#include <hostio/seadHostIOThreadLock.h>
+
+namespace sead
 {
+namespace hostio
+{
+#ifdef SEAD_DEBUG
 u32 LifeCheckable::sCurrentCreateID = 1;
 LifeCheckable* LifeCheckable::sTopInstance = nullptr;
+
+LifeCheckable::DisposeHostIOCaller::~DisposeHostIOCaller()
+{
+    if (mInstance)
+    {
+        mInstance->disposeHostIO();
+        mInstance = nullptr;
+    }
+}
 
 LifeCheckable* LifeCheckable::searchInstanceFromCreateID(u32 createID)
 {
     ThreadLock lock;
-    for (auto instance = sTopInstance; instance; instance = instance->mNext)
+
+    for (LifeCheckable* instance = sTopInstance; instance; instance = instance->mNext)
     {
-        if (instance->getCreateID() == createID)
+        if (instance->mCreateID == createID)
+        {
             return instance;
+        }
     }
+
     return nullptr;
 }
 
-// NON_MATCHING: regalloc
+void LifeCheckable::initialize_()
+{
+    ThreadLock lock;
+
+    mCreateID = sCurrentCreateID;
+
+    sCurrentCreateID++;
+    if (sCurrentCreateID == 0)
+    {
+        sCurrentCreateID = 1;
+    }
+
+    if (sTopInstance)
+    {
+        mNext = sTopInstance;
+        sTopInstance->mPrev = this;
+    }
+
+    sTopInstance = this;
+}
+
 void LifeCheckable::disposeHostIOImpl_()
 {
     ThreadLock lock;
+
     if (sTopInstance == this)
     {
         SEAD_ASSERT(mPrev == nullptr);
+
         if (mNext)
         {
             sTopInstance = mNext;
-            mNext->mPrev = nullptr;
+            sTopInstance->mPrev = nullptr;
         }
         else
         {
@@ -39,6 +77,7 @@ void LifeCheckable::disposeHostIOImpl_()
     {
         SEAD_ASSERT(mPrev != nullptr);
         mPrev->mNext = mNext;
+
         if (mNext)
         {
             SEAD_ASSERT(mNext->mPrev == this);
@@ -46,27 +85,6 @@ void LifeCheckable::disposeHostIOImpl_()
         }
     }
 }
-
-void LifeCheckable::initialize_()
-{
-    ThreadLock lock;
-    mCreateID = sCurrentCreateID;
-    // NON_MATCHING: weird increment code
-    sCurrentCreateID += sCurrentCreateID == 0xffffffff ? 2 : 1;
-
-    if (sTopInstance)
-    {
-        mNext = sTopInstance;
-        sTopInstance->mPrev = this;
-    }
-    sTopInstance = this;
-}
-
-LifeCheckable::DisposeHostIOCaller::~DisposeHostIOCaller()
-{
-    if (!mInstance)
-        return;
-    mInstance->disposeHostIO();
-    mInstance = nullptr;
-}
-}  // namespace sead::hostio
+#endif
+}  // namespace hostio
+}  // namespace sead

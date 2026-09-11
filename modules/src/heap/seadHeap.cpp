@@ -4,7 +4,9 @@
 
 namespace sead
 {
-Heap::~Heap() = default;
+Heap::~Heap()
+{
+}
 
 void Heap::appendDisposer_(IDisposer* disposer)
 {

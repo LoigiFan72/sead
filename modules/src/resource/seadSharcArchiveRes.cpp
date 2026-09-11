@@ -1,3 +1,4 @@
+#include <basis/seadWarning.h>
 #include <container/seadBuffer.h>
 #include <prim/seadPtrUtil.h>
 #include <prim/seadSafeString.h>
@@ -18,12 +19,8 @@ u32 calcHash32(const sead::SafeString& str, u32 key)
     return result;
 }
 
-#ifdef NNSDK
-s32 binarySearch_(u32 hash, const sead::SharcArchiveRes::FATEntry* buffer, s32 start, s32 end,
-                  sead::Endian::Types endian)
-#else
+
 s32 binarySearch_(u32 hash, const sead::SharcArchiveRes::FATEntry* buffer, s32 start, s32 end)
-#endif
 {
     s32 middle;
 
@@ -31,11 +28,7 @@ s32 binarySearch_(u32 hash, const sead::SharcArchiveRes::FATEntry* buffer, s32 s
     {
         middle = (start + end) / 2;
 
-#ifdef NNSDK
-        u32 entryHash = sead::Endian::toHostU32(endian, buffer[middle].hash);
-#else
         u32 entryHash = buffer[middle].hash;
-#endif
         if (entryHash == hash)
             return middle;
 
@@ -74,16 +67,10 @@ static SharcArchiveRes::HandleInner* getHandleInner_(HandleBuffer* handle, bool 
     return reinterpret_cast<SharcArchiveRes::HandleInner*>(handle);
 }
 
-SharcArchiveRes::SharcArchiveRes()
-    : ArchiveRes(), mArchiveBlockHeader(NULL), mFATBlockHeader(NULL), mFNTBlock(NULL),
-      mDataBlock(NULL)
-#ifdef cafe
-      ,
-      mEndianType(Endian::cBig)
-#else
-      ,
-      mEndianType(Endian::cLittle)
-#endif
+SharcArchiveRes::SharcArchiveRes(): 
+    ArchiveRes(), mArchiveBlockHeader(NULL), mFATBlockHeader(NULL), mFNTBlock(NULL),
+    mDataBlock(NULL),
+    mEndianType(Endian::cLittle)
 {
 }
 
@@ -130,11 +117,8 @@ s32 SharcArchiveRes::convertPathToEntryIDImpl_(const SafeString& file_path)
     s32 start = 0;
     s32 end = mFATEntrys.size();
 
-#ifdef NNSDK
-    s32 id = binarySearch_(hash, mFATEntrys.getBufferPtr(), start, end, mEndianType);
-#else
     s32 id = binarySearch_(hash, mFATEntrys.getBufferPtr(), start, end);
-#endif
+
     if (id == -1)
         return -1;
 
@@ -185,7 +169,7 @@ bool SharcArchiveRes::openDirectoryImpl_(HandleBuffer* handle,
         return true;
     }
 
-    SEAD_WARN("dir_path[%s] is not allowed to open sharc directory. must be root.", path.cstr());
+    SEAD_WARNING("dir_path[%s] is not allowed to open sharc directory. must be root.", path.cstr());
     return false;
 }
 
@@ -208,7 +192,7 @@ u32 SharcArchiveRes::readDirectoryImpl_(HandleBuffer* handle_, DirectoryEntry* e
         {
             if (reinterpret_cast<const u8*>(mFNTBlock + (offset & 0xffffff)) > mDataBlock)
             {
-                SEAD_WARN("Invalid data start offset");
+                SEAD_WARNING("Invalid data start offset");
                 entry[count].name.clear();
             }
             else
@@ -316,11 +300,8 @@ bool SharcArchiveRes::isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_C
 {
     const u32 hash = calcHash32(path, Endian::toHostU32(mEndianType, mFATBlockHeader->hash_key));
     const u32 size = mFATEntrys.size();
-#ifdef NNSDK
-    const s32 id = binarySearch_(hash, mFATEntrys.getBufferPtr(), 0, size, mEndianType);
-#else
+
     const s32 id = binarySearch_(hash, mFATEntrys.getBufferPtr(), 0, size);
-#endif
     return id != -1;
 }
 #endif

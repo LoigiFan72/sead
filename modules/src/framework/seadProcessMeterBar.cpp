@@ -1,17 +1,28 @@
-#include "framework/seadProcessMeterBar.h"
-#include "basis/seadRawPrint.h"
-#include "framework/seadProcessMeter.h"
+#include <framework/seadProcessMeterBar.h>
 
-namespace sead
+#include <framework/seadProcessMeter.h>
+
+namespace sead {
+
+ProcessMeterBarBase::ProcessMeterBarBase(Section* buffer, s32 sectionNum, const SafeString& name, const Color4f& color)
+    : IDisposer()
+    , INamable(name)
+    , mListNode()
+    , mParent(nullptr)
+    , mColor(color)
+    , mSectionList()
+    , mFinalEnd()
+    , mSectionNum()
+    , mCurBuffer(0)
+    , mTopSection(-1)
+    , mOverNum(0)
+    , mMesureEnable(false)
 {
-ProcessMeterBarBase::ProcessMeterBarBase(ProcessMeterBarBase::Section* sections, s32 num_sections,
-                                         const SafeString& name, const Color4f& color)
-    : INamable(name), mColor(color)
-{
-    mSectionList(0).setBuffer(num_sections, sections);
-    _88(0) = 0;
-    mSectionList(1).setBuffer(num_sections, sections + num_sections);
-    _88(1) = 0;
+    mSectionList[0].setBuffer(sectionNum, buffer);
+    mSectionNum[0] = 0;
+
+    mSectionList[1].setBuffer(sectionNum, buffer + sectionNum);
+    mSectionNum[1] = 0;
 }
 
 ProcessMeterBarBase::~ProcessMeterBarBase()
@@ -22,130 +33,143 @@ ProcessMeterBarBase::~ProcessMeterBarBase()
 
 void ProcessMeterBarBase::measureBegin()
 {
-    if (mEnabled)
-        measureBeginImpl_(TickTime(), mColor);
+    if (mMesureEnable)
+    {
+        TickTime t;
+        measureBeginImpl_(t, mColor);
+    }
 }
 
-void ProcessMeterBarBase::measureBegin(const TickTime& start_time)
+void ProcessMeterBarBase::measureBegin(const TickTime& t)
 {
-    if (mEnabled)
-        measureBeginImpl_(start_time, mColor);
+    if (mMesureEnable)
+        measureBeginImpl_(t, mColor);
 }
 
-void ProcessMeterBarBase::measureBegin(const Color4f& color)
+void ProcessMeterBarBase::measureBegin(const Color4f& c)
 {
-    if (mEnabled)
-        measureBeginImpl_(TickTime(), color);
+    if (mMesureEnable)
+    {
+        TickTime t;
+        measureBeginImpl_(t, c);
+    }
 }
 
-void ProcessMeterBarBase::measureBegin(const TickTime& start_time, const Color4f& color)
+void ProcessMeterBarBase::measureBegin(const TickTime& t, const Color4f& c)
 {
-    if (mEnabled)
-        measureBeginImpl_(start_time, color);
+    if (mMesureEnable)
+        measureBeginImpl_(t, c);
 }
 
 void ProcessMeterBarBase::measureEnd()
 {
-    if (mEnabled)
-        measureEndImpl_(TickTime());
+    if (mMesureEnable)
+    {
+        TickTime t;
+        measureEndImpl_(t);
+    }
 }
 
-void ProcessMeterBarBase::measureEnd(const TickTime& end_time)
+void ProcessMeterBarBase::measureEnd(const TickTime& arg)
 {
-    if (mEnabled)
-        measureEndImpl_(end_time);
+    if (mMesureEnable)
+        measureEndImpl_(arg);
 }
 
-const ProcessMeterBarBase::Section* ProcessMeterBarBase::getLastFirstBegin() const
+const TickTime& ProcessMeterBarBase::getLastFirstBegin() const
 {
-    return mSectionList[1 - mActiveBufferIdx].get(0);
+    return mSectionList[1 - mCurBuffer].get(0)->begin;
 }
 
 TickSpan ProcessMeterBarBase::getLastTotalSpan() const
 {
-    TickSpan total = 0;
-    for (s32 i = 0; i < _88[1 - mActiveBufferIdx]; ++i)
+    TickSpan ret(0);
+
+    for (s32 i = 0; i < mSectionNum[1 - mCurBuffer]; i++)
     {
-        if (mSectionList[1 - mActiveBufferIdx].get(i)->parent == -1)
-            total += mSectionList[1 - mActiveBufferIdx].get(i)->span;
+        if (mSectionList[1 - mCurBuffer].get(i)->parent == -1)
+            ret += mSectionList[1 - mCurBuffer].get(i)->span;
     }
-    return total;
+
+    return ret;
 }
 
 void ProcessMeterBarBase::onEndFrame()
 {
     SEAD_ASSERT(mTopSection == -1);
     SEAD_ASSERT(mOverNum == 0);
-    mActiveBufferIdx = 1 - mActiveBufferIdx;
+
+    mCurBuffer = 1 - mCurBuffer;
     mTopSection = -1;
     mOverNum = 0;
-    _88[mActiveBufferIdx] = 0;
-    mEnabled = mParent != nullptr;
+    mSectionNum[mCurBuffer] = 0;
+    mMesureEnable = mParent != nullptr;
 }
 
 void ProcessMeterBarBase::setParentProcessMeter(ProcessMeter* parent)
 {
     SEAD_ASSERT(mParent == nullptr || parent == nullptr);
+
     mParent = parent;
 }
 
-void ProcessMeterBarBase::measureBeginImpl_(const TickTime& start_time, Color4f color)
+void ProcessMeterBarBase::measureBeginImpl_(const TickTime& t, Color4f color)
 {
-    addSection_(start_time, color, mTopSection);
+    addSection_(t, color, mTopSection);
 }
 
-void ProcessMeterBarBase::measureEndImpl_(const TickTime& end_time)
+void ProcessMeterBarBase::measureEndImpl_(const TickTime& arg)
 {
-    TickTime new_time = end_time;
-    mTicks[mActiveBufferIdx] = new_time;
+    TickTime t = arg;
+    mFinalEnd[mCurBuffer] = t;
 
     if (mOverNum > 0)
     {
-        --mOverNum;
+        mOverNum--;
+        return;
     }
-    else
-    {
-        TickTime t = getCurSection_(mTopSection)->time;
-        if (new_time.diff(t).toS64() < 0)
-            new_time = t;
 
-        SEAD_ASSERT_MSG(mTopSection >= 0, "Unmatching measureBegin / measureEnd.");
-        endSection_(mTopSection, new_time);
-        mTopSection = getCurSection_(mTopSection)->parent;
-    }
+    Section* last = getCurSection_(mTopSection);
+    if (t - last->begin < 0)
+        t = last->begin;
+
+    SEAD_ASSERT_MSG(mTopSection >= 0, "Unmatching measureBegin / measureEnd.");
+    endSection_(mTopSection, t);
+    mTopSection = getCurSection_(mTopSection)->parent;
 }
 
-// NON_MATCHING: some stores are paired
-void ProcessMeterBarBase::addSection_(const TickTime& time, Color4f color, s32 parent)
+void ProcessMeterBarBase::addSection_(const TickTime& t, Color4f color, s32 parent)
 {
-    if (_88[mActiveBufferIdx] >= mSectionList[0].getSize())
+    if (mSectionNum[mCurBuffer] >= mSectionList[0].getSize())
     {
-        ++mOverNum;
+        mOverNum++;
+        return;
     }
-    else
-    {
-        Section* sec = getCurSection_(_88[mActiveBufferIdx]);
-        sec->time = time;
-        sec->span = -1;
-        sec->color = color;
-        sec->parent = parent;
 
-        mTopSection = _88[mActiveBufferIdx];
-        ++_88[mActiveBufferIdx];
-    }
+    Section* sec = getCurSection_(mSectionNum[mCurBuffer]);
+    sec->begin = t;
+    sec->span = -1;
+    sec->color = color;
+    sec->parent = parent;
+
+    mTopSection = mSectionNum[mCurBuffer];
+    mSectionNum[mCurBuffer]++;
+}
+
+void ProcessMeterBarBase::endSection_(s32 idx, const TickTime& t)
+{
+    SEAD_ASSERT(idx >= 0 && idx < mSectionList[0].getSize());
+
+    Section* sec = getCurSection_(idx);
+    SEAD_ASSERT(sec->span.toS64() == -1);
+
+    sec->span = t.diff(sec->begin);
 }
 
 ProcessMeterBarBase::Section* ProcessMeterBarBase::getCurSection_(s32 idx)
 {
     SEAD_ASSERT(idx >= 0 && idx < mSectionList[0].getSize());
-    return mSectionList[mActiveBufferIdx].get(idx);
+    return mSectionList[mCurBuffer].get(idx);
 }
 
-void ProcessMeterBarBase::endSection_(s32 idx, const TickTime& time)
-{
-    SEAD_ASSERT(idx >= 0 && idx < mSectionList[0].getSize());
-    Section* sec = getCurSection_(idx);
-    SEAD_ASSERT(sec->span.toS64() == -1);
-    sec->span = time.diff(sec->time);
-}
-}  // namespace sead
+} // namespace sead

@@ -7,9 +7,9 @@ namespace sead
 {
 Projection::Projection()
 {
-    mDevicePosture = Graphics::sDefaultDevicePosture;
-    mDeviceZScale = Graphics::sDefaultDeviceZScale;
-    mDeviceZOffset = Graphics::sDefaultDeviceZOffset;
+    mDevicePosture = Graphics::getDefaultDevicePosture();
+    mDeviceZScale = Graphics::getDefaultDeviceZScale();
+    mDeviceZOffset = Graphics::getDefaultDeviceZOffset();
 }
 
 void Projection::updateAttributesForDirectProjection() {}

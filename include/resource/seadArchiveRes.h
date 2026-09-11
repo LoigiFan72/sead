@@ -24,10 +24,12 @@ public:
 
 public:
     ArchiveRes() : DirectResource(), mEnable(false) {}
-    ~ArchiveRes() override = default;
+    virtual ~ArchiveRes()
+    {
+    }
 
-    s32 getLoadDataAlignment() const override { return 0x80; }
-    void doCreate_(u8* buf, u32, Heap*) override;
+    virtual s32 getLoadDataAlignment() const { return 0x80; }
+    virtual void doCreate_(u8* buf, u32, Heap*);
 
     const void* getFile(const SafeString& file_path,
                         FileInfo* info = nullptr) SEAD_ARCHIVERES_CONST_TOKEN

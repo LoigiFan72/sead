@@ -31,7 +31,7 @@ protected:
     virtual bool doReadDirectory_(u32* entriesRead, DirectoryHandle* handle, DirectoryEntry* entries,
                           u32 entriesToRead);
     virtual bool doMakeDirectory_(const SafeString& path, u32 u_32);
-    virtual s32 doGetLastRawError_() const { return nn_result.GetValue(); }
+    virtual s32 doGetLastRawError_() const;
     virtual void doResolvePath_(BufferedSafeString* out, const SafeString& path) const;
 
     nn::Result openDirectryImpl_(nn::fs::Directory* dir, SafeString const& pathInner, SafeString const& pathOutter);

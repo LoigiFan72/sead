@@ -212,7 +212,7 @@ u8* ArchiveFileDevice::doLoadWithEntryID_(s32 entry_id, LoadArg& arg)
     SEAD_ASSERT(arg.alignment == 0 || PtrUtil::isAligned(ret, Mathi::abs(arg.alignment)));
     if (arg.buffer_size_alignment && info.mLength % arg.buffer_size_alignment != 0)
     {
-        SEAD_WARN("archive file size[%u] is not multipe of arg.buffer_size_alignment[%u]",
+        SEAD_WARNING("archive file size[%u] is not multipe of arg.buffer_size_alignment[%u]",
                   info.mLength, arg.buffer_size_alignment);
         return nullptr;
     }
@@ -242,7 +242,7 @@ u8* ArchiveFileDevice::doLoad_(LoadArg& arg)
     SEAD_ASSERT(arg.alignment == 0 || PtrUtil::isAligned(ret, Mathi::abs(arg.alignment)));
     if (arg.buffer_size_alignment && info.mLength % arg.buffer_size_alignment != 0)
     {
-        SEAD_WARN("archive file size[%u] is not multipe of arg.buffer_size_alignment[%u]",
+        SEAD_WARNING("archive file size[%u] is not multipe of arg.buffer_size_alignment[%u]",
                   info.mLength, arg.buffer_size_alignment);
         return nullptr;
     }

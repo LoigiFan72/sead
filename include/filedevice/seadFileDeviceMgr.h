@@ -25,6 +25,9 @@ public:
     void resolveDirectoryPath(BufferedSafeString* out, const SafeString& path) const;
 
     FileDevice* open(FileHandle* handle, const SafeString& filename, FileDevice::FileOpenFlag flag, u32 divNum);
+    FileDevice* openDirectory(DirectoryHandle* handle, const SafeString& dirname);
+    u8* load(FileDevice::LoadArg& arg);
+    bool save(FileDevice::SaveArg& arg);
 
     void mount(FileDevice* device, const SafeString& name = SafeString::cEmptyString);
     void unmount(FileDevice* device);
@@ -53,22 +56,9 @@ private:
     void mount_(Heap* heap);
     void unmount_();
 
-    DeviceList mDeviceList{};
-    FileDevice* mDefaultFileDevice = nullptr;
-    MainFileDevice* mMainFileDevice = nullptr;
-
-#ifdef cafe
-    static void stateChangeCallback_(FSClient* client, FSVolumeState state, void* context);
-
-    FSClient client;
-    u8 _1724[128];
-    u8 _17A4[128];
-    u32 _1824;
-#elif defined(NNSDK)
-    u8* mRomCache = nullptr;
-    bool mMountedHost = false;
-    bool mMountedSd = false;
-#endif
+    DeviceList mDeviceList;
+    FileDevice* mDefaultFileDevice;
+    MainFileDevice* mMainFileDevice;
 };
 
 inline FileDevice* FileDeviceMgr::open(FileHandle* handle, const SafeString& filename, FileDevice::FileOpenFlag flag, u32 divNum)
@@ -76,6 +66,27 @@ inline FileDevice* FileDeviceMgr::open(FileHandle* handle, const SafeString& fil
     FileDevice* ret = tryOpen(handle, filename, flag, divNum);
     SEAD_ASSERT_MSG(ret, "open failed. [%s]", filename.cstr());
     return ret;
+}
+
+inline FileDevice* FileDeviceMgr::openDirectory(DirectoryHandle* handle, const SafeString& dirname)
+{
+    FileDevice* ret = tryOpenDirectory(handle, dirname);
+    SEAD_ASSERT_MSG(ret, "open directory failed. [%s]", dirname.cstr());
+    return ret;
+}
+
+inline u8* FileDeviceMgr::load(FileDevice::LoadArg& arg)
+{
+    u8* ret = tryLoad(arg);
+    SEAD_ASSERT_MSG(ret, "load failed. [%s]", arg.path.cstr());
+    return ret;
+}
+
+inline bool FileDeviceMgr::save(FileDevice::SaveArg& arg)
+{
+    bool success = trySave(arg);
+    SEAD_ASSERT_MSG(success, "save failed. [%s]", arg.path.cstr());
+    return success;
 }
 
 }  // namespace sead

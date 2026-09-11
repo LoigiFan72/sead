@@ -133,7 +133,6 @@ add_library(sead OBJECT
   modules/src/filedevice/seadMainFileDevice.cpp
   modules/src/filedevice/seadPath.cpp
 
-  include/framework/nx/seadGameFrameworkNx.h
   include/framework/seadCalculateTask.h
   include/framework/seadFaderTask.h
   include/framework/seadFramework.h
@@ -162,7 +161,6 @@ add_library(sead OBJECT
   modules/src/framework/seadTaskID.cpp
   modules/src/framework/seadTaskMgr.cpp
 
-  include/gfx/nvn/seadDebugFontMgrNvn.h
   include/gfx/seadCamera.h
   include/gfx/seadColor.h
   include/gfx/seadDrawContext.h
@@ -172,13 +170,17 @@ add_library(sead OBJECT
   include/gfx/seadPrimitiveRendererUtil.h
   include/gfx/seadProjection.h
   include/gfx/seadTexture.h
+  include/gfx/seadTextureUtil.h
+  include/gfx/seadViewport.h
   modules/src/gfx/seadCamera.cpp
   modules/src/gfx/seadColor.cpp
   modules/src/gfx/seadDrawLockContext.cpp
   modules/src/gfx/seadFrameBuffer.cpp
-  # modules/src/gfx/seadPrimitiveRenderer.cpp
-  # modules/src/gfx/seadPrimitiveRendererUtil.cpp
+  modules/src/gfx/seadPrimitiveRenderer.cpp
+  modules/src/gfx/seadPrimitiveRendererUtil.cpp
   modules/src/gfx/seadProjection.cpp
+  modules/src/gfx/seadTextureUtil.cpp
+  modules/src/gfx/seadViewport.cpp
 
   include/heap/seadArena.h
   include/heap/seadDisposer.h
@@ -259,7 +261,6 @@ add_library(sead OBJECT
 
   include/resource/seadArchiveRes.h
   include/resource/seadDecompressor.h
-  include/resource/seadParallelSZSDecompressor.h
   include/resource/seadResource.h
   include/resource/seadResourceMgr.h
   include/resource/seadSharcArchiveRes.h
@@ -288,15 +289,10 @@ add_library(sead OBJECT
   include/thread/seadEvent.h
   include/thread/seadMessageQueue.h
   include/thread/seadMutex.h
-  include/thread/seadReadWriteLock.h
-  include/thread/seadSemaphore.h
-  include/thread/seadSpinLock.h
   include/thread/seadThread.h
   include/thread/seadThreadLocalStorage.h
   include/thread/seadThreadUtil.h
   modules/src/thread/seadDelegateThread.cpp
-  modules/src/thread/seadReadWriteLock.cpp
-  modules/src/thread/seadSpinLock.cpp
   modules/src/thread/seadThread.cpp
   modules/src/thread/seadThreadUtil.cpp
 
@@ -310,7 +306,6 @@ add_library(sead OBJECT
   modules/src/time/seadCalendarTime.cpp
   modules/src/time/seadDateSpan.cpp
   modules/src/time/seadDateTime.cpp
-  modules/src/time/seadDateTimeUtc.cpp
   modules/src/time/seadDateUtil.cpp
   modules/src/time/seadTickSpan.cpp
 )
@@ -396,10 +391,24 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     modules/src/framework/ctr_nw4c/seadDoubleCmdFrameworkCtrNw4c.cpp
     modules/src/framework/ctr_nw4c/seadUlcdDoubleCmdFrameworkCtrNw4c.cpp
 
+    include/gfx/seadSteroCameraWrapper.h
+    include/gfx/seadSteroUtil.h
     include/gfx/ctr/seadFrameBufferCtr.h
     include/gfx/ctr/seadGfxMemoryMgrCtr.h
+    include/gfx/ctr/seadGraphicsCtr.h
+    include/gfx/ctr/seadStereoUtilCtr.h
+    include/gfx/ctr/seadTextureCtr.h
+    include/gfx/ctr/seadTextureCtrGL.h
+    include/gfx/ctr/seadTextureCtrGR.h
+    modules/src/gfx/seadSteroCameraWrapper.cpp
+    modules/src/gfx/seadSteroUtil.cpp
     modules/src/gfx/ctr/seadFrameBufferCtr.cpp
     modules/src/gfx/ctr/seadGfxMemoryMgrCtr.cpp
+    modules/src/gfx/ctr/seadGraphicsCtr.cpp
+    modules/src/gfx/ctr/seadStereoUtilCtr.cpp
+    modules/src/gfx/ctr/seadTextureCtr.cpp
+    modules/src/gfx/ctr/seadTextureCtrGL.cpp
+    modules/src/gfx/ctr/seadTextureCtrGR.cpp
 
     modules/src/heap/seadArenaCtr.cpp
 

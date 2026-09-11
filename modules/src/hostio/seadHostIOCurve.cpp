@@ -3,7 +3,9 @@
 #include "math/seadMathCalcCommon.h"
 #include "math/seadMathNumbers.h"
 
-namespace sead::hostio
+namespace sead
+{
+namespace hostio
 {
 template <typename T>
 constexpr CurveFunctionTable<T> makeTable_()
@@ -257,4 +259,5 @@ Vector2<T> curveHermit2DSmoothVec2_(f32 t, const CurveDataInfo* info, const T* f
 {
     return {t, curveHermit2DSmooth_(t, info, f)};
 }
-}  // namespace sead::hostio
+}  // namespace hostio
+}  // namespace sead

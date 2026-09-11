@@ -3,8 +3,10 @@
 #include <hostio/seadHostIOPortBase.h>
 #include <prim/seadFormatPrint.h>
 
-namespace sead { 
-namespace hostio {
+namespace sead 
+{ 
+namespace hostio 
+{
 
 #if defined(SEAD_DEBUG)
 void Context::ContextBufferAccessor::reset()
@@ -447,7 +449,7 @@ bool Context::checkCallTiming_(Command validCommand)
         return false;
     }
 }
-#endif // SEAD_TARGET_DEBUG
+#endif // SEAD_DEBUG
 
 } // namespace hostio
 } // namespace sead

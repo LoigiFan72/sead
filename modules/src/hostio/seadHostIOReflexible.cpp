@@ -4,7 +4,9 @@
 #include "heap/seadHeapMgr.h"
 #include "prim/seadMemUtil.h"
 
-namespace sead::hostio
+namespace sead
+{
+namespace hostio
 {
 namespace
 {
@@ -14,7 +16,7 @@ struct ReflexibleStringCopy
     char string_data;
 };
 }  // namespace
-
+#ifdef SEAD_DEBUG
 Reflexible::Reflexible()
 {
     setNodeName("");
@@ -103,4 +105,6 @@ void Reflexible::disposeHostIOImpl_()
     safeDelete_(AllocFlg::Name);
     safeDelete_(AllocFlg::Meta);
 }
-}  // namespace sead::hostio
+#endif
+}  // namespace hostio
+}  // namespace sead

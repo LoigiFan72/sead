@@ -227,7 +227,9 @@ private:
 public:
     Matrix44() {}
 
-    Matrix44(const Self& n) = default;
+    Matrix44(const Self& n)
+    {
+    }
 
     Matrix44(T _00, T _01, T _02, T _03, T _10, T _11, T _12, T _13, T _20, T _21, T _22, T _23,
              T _30, T _31, T _32, T _33);

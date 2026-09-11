@@ -19,7 +19,7 @@ DoubleCmdGameFrameworkCtrNw4c* DoubleCmdGameFrameworkCtrNw4c::sInstance = NULL;
 DoubleCmdGameFrameworkCtrNw4c::DoubleCmdGameFrameworkCtrNw4c(const CreateArg& arg):
     GameFrameworkCtrNw4c(arg),
     mDoubleDispBufList(0),
-    mDoubleDispBufState(0),
+    mDoubleDispBufState(cHide),
     mLastDoubleTick(),
     mProcessMeterBar(0),
     mWaitCmdlistDone(false),
@@ -242,7 +242,7 @@ void DoubleCmdGameFrameworkCtrNw4c::swapBuffer_()
     nngxBindCmdlist(mDoubleBuf[mDoubleDispBufList]);
 
     s32 param;
-    nngxGetCmdlistParameteri(0x201, &param);
+    nngxGetCmdlistParameteri(NN_GX_CMDLIST_IS_RUNNING, &param);
 
     if (param)
         nngxWaitCmdlistDone();
@@ -287,7 +287,7 @@ void DoubleCmdGameFrameworkCtrNw4c::waitForVBlank_()
     TickSpan span;
     span.setMilliSeconds(10);
 
-    if (mDoubleDispBufState > 0)
+    if (mDoubleDispBufState > cHide)
     {
         for(;;)
         {

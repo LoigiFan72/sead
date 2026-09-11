@@ -1,9 +1,7 @@
 #ifndef SEAD_CRITICAL_SECTION_H_
 #define SEAD_CRITICAL_SECTION_H_
 
-#ifdef CTRSDK
 #include <nn/os.h>
-#endif
 
 #include <basis/seadTypes.h>
 #include <heap/seadDisposer.h>
@@ -23,7 +21,7 @@ public:
 #if not SEAD_CRITICALSECTION_PURE
     CriticalSection(Heap* disposer_heap, HeapNullOption heap_null_option);
 #endif
-    ~CriticalSection() SEAD_CRITIALSECTION_OVERRIDE_TOKEN;
+    virtual ~CriticalSection();
 
     CriticalSection(const CriticalSection&){ };
     CriticalSection& operator=(const CriticalSection&){ };
@@ -32,14 +30,7 @@ public:
     bool tryLock();
     void unlock();
 
-    // For compatibility with the standard Lockable concept.
-    bool try_lock() { return tryLock(); }
-
-#ifdef CTRSDK
     nn::os::CriticalSection mCriticalSectionInner;
-#else
-#error "Unknown platform"
-#endif
 };
 
 }  // namespace sead

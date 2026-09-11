@@ -2,7 +2,9 @@
 
 namespace sead
 {
-FileDeviceStreamSrc::FileDeviceStreamSrc() = default;
+FileDeviceStreamSrc::FileDeviceStreamSrc()
+{
+}
 
 FileDeviceStreamSrc::FileDeviceStreamSrc(FileHandle* fileHandle)
     : mFileHandle(fileHandle), mStartingPos(fileHandle->getCurrentSeekPos()),

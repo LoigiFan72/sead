@@ -13,7 +13,9 @@ StreamFormat* Stream::BASIC_STREAM_FORMAT[2]{
     &sTextStreamInstance,
 };
 
-Stream::Stream() = default;
+Stream::Stream()
+{
+}
 
 Stream::Stream(StreamSrc* src, StreamFormat* format)
 {

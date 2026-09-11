@@ -21,12 +21,12 @@ public:
     class QuadArg
     {
     public:
-        QuadArg()
-            : mCenter(Vector3f::zero)
-            , mSize(Vector3f::ones)
-            , mColor0(Color4f::cWhite)
-            , mColor1(Color4f::cWhite)
-            , mHorizontal(false)
+        QuadArg(): 
+            mCenter(Vector3f::zero), 
+            mSize(Vector2f::ones), 
+            mColor0(Color4f::cWhite), 
+            mColor1(Color4f::cWhite), 
+            mHorizontal(false)
         {
         }
 

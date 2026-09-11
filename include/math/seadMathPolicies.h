@@ -17,7 +17,7 @@ public:
     typedef MTX22 Mtx22Base;
     typedef MTX33 Mtx33Base;
     typedef MTX34 Mtx34Base;
-    typedef MTX34 Mtx44Base;
+    typedef MTX44 Mtx44Base;
 };
 
 }  // namespace sead

@@ -1,15 +1,14 @@
 #pragma once
 
-#include "container/seadBuffer.h"
-#include "container/seadSafeArray.h"
-#include "gfx/seadColor.h"
-#include "heap/seadDisposer.h"
-#include "prim/seadNamable.h"
-#include "prim/seadSafeString.h"
-#include "time/seadTickTime.h"
+#include <container/seadBuffer.h>
+#include <container/seadSafeArray.h>
+#include <gfx/seadColor.h>
+#include <heap/seadDisposer.h>
+#include <prim/seadNamable.h>
+#include <time/seadTickTime.h>
 
-namespace sead
-{
+namespace sead {
+
 class ProcessMeter;
 
 class ProcessMeterBarBase : public IDisposer, public INamable
@@ -17,66 +16,93 @@ class ProcessMeterBarBase : public IDisposer, public INamable
 public:
     struct Section
     {
-        TickTime time;
+        TickTime begin;
         TickSpan span;
         Color4f color;
         s32 parent;
     };
 
-    ProcessMeterBarBase(Section* sections, s32 num_sections, const SafeString& name,
-                        const Color4f& color);
+public:
+    ProcessMeterBarBase(Section* buffer, s32 sectionNum, const SafeString& name, const Color4f& color);
     ~ProcessMeterBarBase() override;
 
     void measureBegin();
-    void measureBegin(const TickTime& start_time);
-    void measureBegin(const Color4f& color);
-    void measureBegin(const TickTime& start_time, const Color4f& color);
+    void measureBegin(const TickTime& t);
+    void measureBegin(const Color4f& c);
+    void measureBegin(const TickTime& t, const Color4f& c);
 
     void measureEnd();
-    void measureEnd(const TickTime& end_time);
+    void measureEnd(const TickTime& arg);
 
-    const Section* getLastFirstBegin() const;
+    const TickTime& getLastFirstBegin() const;
     TickSpan getLastTotalSpan() const;
 
-    void onEndFrame();
+    const TickTime& getLastFinalEnd() const
+    {
+        return mFinalEnd[1 - mCurBuffer];
+    }
 
-    ProcessMeter* getParentProcessMeter() const { return mParent; }
+    const Section& getLastResult(s32 idx) const
+    {
+        return *mSectionList[1 - mCurBuffer].get(idx);
+    }
+
+    s32 getLastSectionNum() const
+    {
+        return mSectionNum[1 - mCurBuffer];
+    }
+
+    void setColor(const Color4f& color)
+    {
+        mColor = color;
+    }
+
+    const Color4f& getColor() const
+    {
+        return mColor;
+    }
+
+    void onEndFrame();
     void setParentProcessMeter(ProcessMeter* parent);
 
-    void setColor(const Color4f& color) { mColor = color; }
+    static u32 getListNodeOffset() { return offsetof(ProcessMeterBarBase, mListNode); }
 
 protected:
-    void measureBeginImpl_(const TickTime& start_time, Color4f color);
-    void measureEndImpl_(const TickTime& end_time);
+    void measureBeginImpl_(const TickTime& t, Color4f color);
+    void measureEndImpl_(const TickTime& arg);
 
-    void addSection_(const TickTime& time, Color4f color, s32 parent);
+    void addSection_(const TickTime& t, Color4f color, s32 parent);
+    void endSection_(s32 idx, const TickTime& t);
+
     Section* getCurSection_(s32 idx);
-    void endSection_(s32 idx, const TickTime& time);
 
-    void* _30 = nullptr;
-    void* _38 = nullptr;
-    ProcessMeter* mParent = nullptr;
+protected:
+    ListNode mListNode;
+    ProcessMeter* mParent;
     Color4f mColor;
     SafeArray<Buffer<Section>, 2> mSectionList;
-    SafeArray<TickTime, 2> mTicks;
-    SafeArray<s32, 2> _88;
-    s32 mActiveBufferIdx = 0;
-    s32 mTopSection = -1;
-    s32 mOverNum = 0;
-    bool mEnabled = false;
+    SafeArray<TickTime, 2> mFinalEnd;
+    SafeArray<s32, 2> mSectionNum;
+    s32 mCurBuffer;
+    s32 mTopSection;
+    s32 mOverNum;
+    bool mMesureEnable;
+
+    friend class ProcessMeter;
 };
 
 template <s32 N>
 class MultiProcessMeterBar : public ProcessMeterBarBase
 {
 public:
-    MultiProcessMeterBar(const SafeString& name = SafeString::cEmptyString,
-                         const Color4f& color = Color4f::cRed)
-        : ProcessMeterBarBase(mSections, N, name, color)
+    MultiProcessMeterBar(const SafeString& name, const Color4f& color)
+        : ProcessMeterBarBase(mBuffer, N, name, color)
+        , mBuffer()
     {
     }
 
 private:
-    Section mSections[2 * N];
+    Section mBuffer[N * 2];
 };
-}  // namespace sead
+
+} // namespace sead

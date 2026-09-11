@@ -9,7 +9,9 @@ BufferReadStreamSrc::BufferReadStreamSrc(StreamSrc* src, void* buffer, u32 buffe
 {
 }
 
-BufferReadStreamSrc::~BufferReadStreamSrc() = default;
+BufferReadStreamSrc::~BufferReadStreamSrc()
+{
+}
 
 // NOTE: cannot take negative `offset`, but expects `mSrc->skip(X)` to work with negatives
 u32 BufferReadStreamSrc::read(void* data, u32 size)
@@ -88,9 +90,11 @@ BufferWriteStreamSrc::BufferWriteStreamSrc(StreamSrc* src, void* buffer, u32 buf
 {
 }
 
-BufferWriteStreamSrc::~BufferWriteStreamSrc() = default;
+BufferWriteStreamSrc::~BufferWriteStreamSrc()
+{
+};
 
-u32 BufferWriteStreamSrc::read([[maybe_unused]] void* data, [[maybe_unused]] u32 size)
+u32 BufferWriteStreamSrc::read(void* data, u32 size)
 {
     return 0;
 }

@@ -16,10 +16,10 @@ public:
     explicit MainFileDevice(Heap* heap);
     ~MainFileDevice() override;
 
-    void traceFilePath(const SafeString& path) const override;
-    void traceDirectoryPath(const SafeString& path) const override;
-    void resolveFilePath(BufferedSafeString* out, const SafeString& path) const override;
-    void resolveDirectoryPath(BufferedSafeString* out, const SafeString& path) const override;
+    virtual void traceFilePath(const SafeString& path) const;
+    virtual void traceDirectoryPath(const SafeString& path) const;
+    virtual void resolveFilePath(BufferedSafeString* out, const SafeString& path) const;
+    virtual void resolveDirectoryPath(BufferedSafeString* out, const SafeString& path) const;
 
 protected:
     virtual bool doIsAvailable_() const { return mFileDevice->isAvailable(); }

@@ -38,6 +38,16 @@ public:
 
     void updateViewMatrix() { doUpdateMatrix(&mMatrix); }
 
+    const Matrix34f& getViewMatrix() const
+    {
+        return mMatrix;
+    }
+
+    void updateMatrix()
+    {
+        doUpdateMatrix(&mMatrix);
+    }
+
 private:
     Matrix34f mMatrix;
 };
@@ -73,9 +83,19 @@ class DirectCamera : public Camera
 {
     SEAD_RTTI_OVERRIDE(DirectCamera, Camera)
 public:
+    DirectCamera(): 
+        Camera(), 
+        mDirectMatrix(Matrix34f::ident)
+    {
+    }
+
     virtual ~DirectCamera();
     virtual void doUpdateMatrix(Matrix34f* dst) const;
 
+    void setViewMatrix(const Matrix34f& matrix)
+    {
+        mDirectMatrix = matrix;
+    }
 private:
     Matrix34f mDirectMatrix;
 };

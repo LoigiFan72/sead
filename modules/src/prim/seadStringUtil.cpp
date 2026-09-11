@@ -1,6 +1,8 @@
 #include <prim/seadStringUtil.h>
 
-namespace sead::StringUtil
+namespace sead
+{
+namespace StringUtil
 {
 char16 replace(char16 c, const Buffer<const Char16Pair>& sorted_table)
 {
@@ -16,4 +18,5 @@ char16 replace(char16 c, const Buffer<const Char16Pair>& sorted_table)
 
     return sorted_table[idx].after;
 }
-}  // namespace sead::StringUtil
+}  // namespace StringUtil
+}  // namespace sead

@@ -7,7 +7,9 @@ RamStreamSrc::RamStreamSrc(void* buffer, u32 bufferSize)
 {
 }
 
-RamStreamSrc::~RamStreamSrc() = default;
+RamStreamSrc::~RamStreamSrc()
+{
+}
 
 u32 RamStreamSrc::read(void* data, u32 size)
 {

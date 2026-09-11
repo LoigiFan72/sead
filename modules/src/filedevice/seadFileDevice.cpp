@@ -694,13 +694,13 @@ u8* FileDevice::doLoad_(LoadArg& arg)
 {
     if (arg.buffer && arg.buffer_size == 0)
     {
-        SEAD_WARN("arg.buffer is specified, but arg.buffer_size is zero");
+        SEAD_WARNING("arg.buffer is specified, but arg.buffer_size is zero");
         return nullptr;
     }
 
     if (arg.buffer_size_alignment % cBufferMinAlignment != 0)
     {
-        SEAD_WARN(
+        SEAD_WARNING(
             "arg.buffer_size_alignment[%u] is not multipe of FileDevice::cBufferMinAlignment[%u]",
             arg.buffer_size_alignment, cBufferMinAlignment);
         return nullptr;
@@ -719,7 +719,7 @@ u8* FileDevice::doLoad_(LoadArg& arg)
 
         if (fileSize == 0)
         {
-            SEAD_WARN("file_size is zero.[%s]", arg.path.cstr());
+            SEAD_WARNING("file_size is zero.[%s]", arg.path.cstr());
             return nullptr;
         }
 
@@ -727,14 +727,14 @@ u8* FileDevice::doLoad_(LoadArg& arg)
         {
             if (bytesToRead < fileSize)
             {
-                SEAD_WARN("arg.buffer_size[%u] is smaller than file size[%u]", bytesToRead,
+                SEAD_WARNING("arg.buffer_size[%u] is smaller than file size[%u]", bytesToRead,
                           fileSize);
                 return nullptr;
             }
 
             if (arg.buffer_size_alignment && bytesToRead % arg.buffer_size_alignment != 0)
             {
-                SEAD_WARN("arg.buffer_size[%u] is not multipe of arg.buffer_size_alignment[%u]",
+                SEAD_WARNING("arg.buffer_size[%u] is not multipe of arg.buffer_size_alignment[%u]",
                           bytesToRead, arg.buffer_size_alignment);
                 return nullptr;
             }

@@ -309,6 +309,11 @@ bool CtrFileStreamFileDevice::doMakeDirectory_(const SafeString& path, u32 u_32)
     return nn_result.IsSuccess();
 }
 
+s32 CtrFileStreamFileDevice::doGetLastRawError_() const 
+{ 
+    return nn_result.GetValue(); 
+}
+
 bool CtrFileStreamFileDevice::doCloseDirectory_(DirectoryHandle* handle)
 {
     Directory* pDir = new(getNnFsDirectory_(handle)) Directory();

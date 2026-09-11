@@ -53,31 +53,31 @@ public:
 
 public:
     SharcArchiveRes();
-    ~SharcArchiveRes() override;
+    virtual ~SharcArchiveRes();
 
-    const void* getFileImpl_(const SafeString& file_path,
-                             FileInfo* file_info = NULL) SEAD_ARCHIVERES_CONST_TOKEN override;
-    const void* getFileFastImpl_(s32 entry_id,
-                                 FileInfo* file_info) SEAD_ARCHIVERES_CONST_TOKEN override;
+    virtual const void* getFileImpl_(const SafeString& file_path,
+                             FileInfo* file_info = NULL) SEAD_ARCHIVERES_CONST_TOKEN;
+    virtual const void* getFileFastImpl_(s32 entry_id,
+                                 FileInfo* file_info) SEAD_ARCHIVERES_CONST_TOKEN;
 #if SEAD_ARCHIVERES_TRYGETFILEPATH
-    bool tryGetFilePathImpl_(SafeString* out_file_path,
-                             s32 entry_id) SEAD_ARCHIVERES_CONST_TOKEN override;
+    virtual bool tryGetFilePathImpl_(SafeString* out_file_path,
+                             s32 entry_id) SEAD_ARCHIVERES_CONST_TOKEN;
 #endif
-    s32 convertPathToEntryIDImpl_(const SafeString& file_path) SEAD_ARCHIVERES_CONST_TOKEN override;
-    bool setCurrentDirectoryImpl_(const SafeString&) override;
-    bool openDirectoryImpl_(HandleBuffer* handle,
-                            const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN override;
-    bool
-    closeDirectoryImpl_([[maybe_unused]] HandleBuffer* handle) SEAD_ARCHIVERES_CONST_TOKEN override
+    virtual s32 convertPathToEntryIDImpl_(const SafeString& file_path) SEAD_ARCHIVERES_CONST_TOKEN;
+    virtual bool setCurrentDirectoryImpl_(const SafeString&);
+    virtual bool openDirectoryImpl_(HandleBuffer* handle,
+                            const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN;
+    virtual bool
+    closeDirectoryImpl_(HandleBuffer* handle) SEAD_ARCHIVERES_CONST_TOKEN
     {
         return true;
     }
-    u32 readDirectoryImpl_(HandleBuffer* handle, DirectoryEntry* entry,
-                           u32 num) SEAD_ARCHIVERES_CONST_TOKEN override;
+    virtual u32 readDirectoryImpl_(HandleBuffer* handle, DirectoryEntry* entry,
+                           u32 num) SEAD_ARCHIVERES_CONST_TOKEN;
 #if SEAD_ARCHIVERES_ISEXISTFILEIMPL
-    bool isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN override;
+    virtual bool isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN;
 #endif
-    bool prepareArchive_(const void* archive) override;
+    virtual bool prepareArchive_(const void* archive);
 
 protected:
     static const u32 cArchiveVersion = 0x100;

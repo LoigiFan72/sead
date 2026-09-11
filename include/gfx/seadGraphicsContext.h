@@ -2,10 +2,8 @@
 
 #include <gfx/seadGraphics.h>
 
-namespace sead {
-
-class DrawContext;
-
+namespace sead 
+{
 class GraphicsContext
 {
 public:
@@ -15,7 +13,7 @@ public:
     {
     }
 
-    void apply(DrawContext* drawContext) const;
+    void apply() const;
 
     void setDepthEnable(bool testEnable, bool writeEnable)
     {

@@ -7,16 +7,16 @@
 #include <hostio/seadHostIOReflexible.h>
 #include <prim/seadFormatPrint.h>
 
-#if defined(CTRSDK)
-#include <hostio/ctr/seadHostIOPortHIOCtr.h>
-#endif // CTRSDK
+//#include <hostio/ctr/seadHostIOPortHIOCtr.h>
 
 #include <basis/seadRawPrint.h>
 
 static const u32 MAX_SEND_BUFFER_SIZE = 0x800000;
 
-namespace sead { 
-namespace hostio {
+namespace sead 
+{ 
+namespace hostio 
+{
 
 #if defined(SEAD_TARGET_DEBUG)
 Server* Server::sInstance = nullptr;

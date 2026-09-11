@@ -10,26 +10,6 @@
 namespace sead
 {
 class FileHandle;
-#ifdef SEAD_DEBUG
-#define SEAD_ASSERT_GL()                                                                           \
-    do                                                                                             \
-    {                                                                                              \
-        GLenum error = glGetError();                                                               \
-        if (error != GL_NO_ERROR)                                                                  \
-        {                                                                                          \
-            sead::system::HaltWithDetail(__FILE__, __LINE__, "GL_ERROR 0x%x", error);              \
-        }                                                                                          \
-    } while (0)
-#else
-#define SEAD_ASSERT_GL()                                                                           \
-    do                                                                                             \
-    {                                                                                              \
-        if (false)                                                                                 \
-        {                                                                                          \
-            sead::system::HaltWithDetail(nullptr, 0, nullptr);                                     \
-        }                                                                                          \
-    } while (0)
-#endif
 
 class GameFrameworkCtrNw4c : public GameFramework
 {

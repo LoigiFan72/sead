@@ -1,40 +1,71 @@
 #pragma once
 
-#ifdef CTRSDK
-    #include <nn/os.h>
-#endif
-
-#include <basis/seadTypes.h>
 #include <time/seadTickSpan.h>
+#include <nn/os.h>
 
-namespace sead
-{
-/// A TickTime represents an instant in time.
+namespace sead {
+
 class TickTime
 {
 public:
-    TickTime() { setNow(); }
-
-    u64 toTicks() const { return mTick; }
-
-    void setNow() { mTick = nn::os::Tick::GetSystemCurrent(); }
-
-    TickSpan diff(const TickTime& other) const { return s64(mTick - other.mTick); }
-    TickSpan diffToNow() const;
-
-    TickTime& operator+=(const TickSpan& span)
+    TickTime()
     {
-        mTick += span.toS64();
+        setNow();
+    }
+
+    void setNow()
+    {
+        mTick = nn::os::Tick::GetSystemCurrent();
+    }
+
+    TickSpan diff(const TickTime& t) const
+    {
+        return mTick - t.mTick;
+    }
+
+    TickSpan diffToNow() const
+    {
+        return TickTime().diff(*this);
+    }
+
+    TickTime& operator+=(const TickSpan& rhs)
+    {
+        mTick += rhs.toS64();
         return *this;
     }
 
-    TickTime& operator-=(const TickSpan& span)
+    TickTime& operator-=(const TickSpan& rhs)
     {
-        mTick -= span.toS64();
+        mTick -= rhs.toS64();
         return *this;
+    }
+
+    u64 toU64() const
+    {
+        return mTick;
     }
 
 private:
     u64 mTick;
 };
-}  // namespace sead
+
+inline TickSpan operator-(TickTime lhs, TickTime rhs)
+{
+    return lhs.diff(rhs);
+}
+
+inline TickTime operator+(TickTime time, TickSpan span)
+{
+    TickTime t = time;
+    t += span;
+    return t;
+}
+
+inline TickTime operator-(TickTime time, TickSpan span)
+{
+    TickTime t = time;
+    t -= span;
+    return t;
+}
+
+} // namespace sead

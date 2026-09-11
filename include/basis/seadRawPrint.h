@@ -32,8 +32,10 @@
     } while (0)
 #endif // SEAD_DEBUG
 
-namespace sead { 
-namespace system {
+namespace sead 
+{ 
+namespace system 
+{
 
 void Print(const char* format, ...);
 void PrintV(const char* format, std::va_list list);

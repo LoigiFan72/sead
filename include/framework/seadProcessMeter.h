@@ -41,8 +41,8 @@ protected:
     f32 calcTimeLineWidth_(const Viewport& vp, u32 sectionNum, TickSpan t);
     u32 calcMaxSectionNum_();
 
-    void drawHorizontalMode_(const Viewport& viewport, PrimitiveDrawer* drawer, TextWriter* writer);
-    void drawVerticalMode_(const Viewport& viewport, PrimitiveDrawer* drawer, TextWriter* writer);
+    void drawHorizontalMode_(const Viewport& viewport);
+    void drawVerticalMode_(const Viewport& viewport);
 
 protected:
     Viewport mViewport;
@@ -51,6 +51,7 @@ protected:
     TickTime mFrameBegin;
     TickSpan mFrameSpan;
     TickTime mCurFrameBegin;
+    GraphicsContext mGraphicsContext;
     BarList mBarList;
     bool mVisible;
     bool mTextVisible;

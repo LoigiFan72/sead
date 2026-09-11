@@ -10,7 +10,6 @@ class Graphics : public IDisposer
 {
 protected:
     using UnknownCallback = void (*)(int);
-    static Graphics* sInstance;
 
 public:
     using LockFunc = void (*)(bool isLock);
@@ -27,6 +26,14 @@ public:
         cDevicePosture_Invalid = 4,
     };
 
+    enum CullingMode
+    {
+        cNone = 0xFFFFFFF0,
+        cAll = 0xFFFFFFF1,
+
+        cInvalid = 0xFFFFFFFF
+    };
+
     enum class AlphaFunc;
     enum class DepthFunc;
     enum class StencilFunc;
@@ -34,7 +41,6 @@ public:
     enum class PolygonMode;
     enum class BlendEquation;
     enum class BlendFactor;
-    enum class CullingMode;
 
     Graphics();
     virtual ~Graphics();
@@ -43,6 +49,12 @@ public:
     void lockDrawContext();
     void unlockDrawContext();
     void initHostIO();
+    
+    static DevicePosture getDefaultDevicePosture() { return sDefaultDevicePosture; }
+    static f32 getDefaultDeviceZScale() { return sDefaultDeviceZScale; }
+    static f32 getDefaultDeviceZOffset() { return sDefaultDeviceZOffset; }
+    static Graphics* instance(){ return sInstance; }
+    static void setInstance(Graphics* inst){ sInstance = inst; }
 
     virtual void initializeImpl(Heap* heap) = 0;
     virtual void setViewportImpl(f32 x, f32 y, f32 w, f32 h) = 0;
@@ -74,18 +86,17 @@ public:
 
     void clear(u32 colorIdx, Color4f const& color, f32, u32);
 
-    static Graphics* instance(){ return sInstance; }
-
-    static void setInstance(Graphics* inst){ sInstance = inst; }
-
     void waitForVBlank(){ waitForVBlankImpl(); }
-private:
-    LockFunc mContextLockFunc;
-    DrawLockContext* mDrawLockContext;
+
+protected:
+    static Graphics* sInstance;
 
     static DevicePosture sDefaultDevicePosture;
     static f32 sDefaultDeviceZScale;
     static f32 sDefaultDeviceZOffset;
+private:
+    LockFunc mContextLockFunc;
+    DrawLockContext* mDrawLockContext;
 };
 
 }  // namespace sead

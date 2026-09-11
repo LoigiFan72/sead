@@ -20,7 +20,9 @@ struct BoundBox2
     T getHalfSizeY() const { return (mMax.y - mMin.y) / 2.0f; }
 
     const Vector2& getMin() const { return mMin; }
+    Vector2& getMin() { return mMin; }
     const Vector2& getMax() const { return mMax; }
+    Vector2& getMax() { return mMax; }
 
     Vector2 getTL() const { return mMin; }
     Vector2 getTR() const { return Vector2(mMax.x, mMin.y); }
