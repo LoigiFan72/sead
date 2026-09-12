@@ -24,7 +24,7 @@ void CtrController::calcImpl_()
 
     const u32 buttons = ctrDevice->mPadStatus.hold;
 
-    mPadHold = 0;
+    mPadHold.makeAllZero();
 
     if (buttons & nn::hid::CTR::BUTTON_A)
         mPadHold.set(0x00000001);

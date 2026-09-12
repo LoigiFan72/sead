@@ -34,16 +34,14 @@ void CtrHidDevice::calc()
 {
     if (mPadReaderPtr != nullptr)
     {
-        mPadReaderPtr->ReadLatest(&mPadStatus);
-    }
-
-    if (mPadReaderPtr != nullptr)
-    {
-        mFlags |= nn::hid::CTR::BUTTON_A;
-    }
-    else
-    {
-        mFlags &= nn::hid::CTR::BUTTON_A;
+        if (mPadReaderPtr->ReadLatest(&mPadStatus))
+        {
+            mFlags |= nn::hid::CTR::BUTTON_A;
+        }
+        else
+        {
+            mFlags &= nn::hid::CTR::BUTTON_A;
+        }
     }
 
     if (mTouchPanelReaderPtr != nullptr)

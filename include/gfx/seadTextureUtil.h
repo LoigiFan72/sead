@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SEAD_TEXTURE_UTIL_H_
+#define SEAD_TEXTURE_UTIL_H_
 
 #include <nn/gx.h>
 #include "math/seadVector.h"
@@ -19,3 +20,5 @@ public:
 };
 
 }
+
+#endif

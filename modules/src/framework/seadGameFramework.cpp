@@ -211,7 +211,7 @@ void GameFramework::createInfLoopChecker(TaskBase* rootTask, const TickSpan& inf
 
 void GameFramework::waitStartDisplayLoop_()
 {
-    while (true)
+    for(;;)
     {
         Graphics::instance()->lockDrawContext();
         getTaskMgr()->beforeCalc();

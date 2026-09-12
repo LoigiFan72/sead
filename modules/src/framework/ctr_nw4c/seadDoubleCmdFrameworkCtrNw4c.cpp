@@ -148,22 +148,23 @@ void DoubleCmdGameFrameworkCtrNw4c::procFrame_()
     Graphics* pGraphics = Graphics::instance(); 
     
     pGraphics->lockDrawContext();
+    {
+        procCalc_();
+        procDraw_();
 
-    procCalc_();
-    procDraw_();
-
-    if (mWaitCmdlistDone != 0) 
-    { 
-        if (mProcessMeterBar == 0) 
+        if (mWaitCmdlistDone != 0) 
         { 
-            mGPUMeter.measureBegin(); 
-            mProcessMeterBar = 1; 
-        } 
-        nngxRunCmdlist(); 
-        mDoubleDispBufList = 1 - mDoubleDispBufList; 
-    }
+            if (mProcessMeterBar == 0) 
+            { 
+                mGPUMeter.measureBegin(); 
+                mProcessMeterBar = 1; 
+            } 
+            nngxRunCmdlist(); 
+            mDoubleDispBufList = 1 - mDoubleDispBufList; 
+        }
 
-    presentTop_();
+        presentTop_();
+    }
 
     pGraphics->unlockDrawContext();
 
@@ -190,21 +191,22 @@ void DoubleCmdGameFrameworkCtrNw4c::procFrame_()
     }
 
     pGraphics->lockDrawContext();
-
-    if (mWaitCmdlistDone == 0)
-    { 
-        if (mProcessMeterBar == 0) 
+    {
+        if (mWaitCmdlistDone == 0)
         { 
-            mGPUMeter.measureBegin(); 
-            mProcessMeterBar = 1; 
-        } 
-        nngxBindCmdlist(mDoubleDispBufList[mDoubleBuf]); 
-        nngxRunCmdlist(); 
-    }
+            if (mProcessMeterBar == 0) 
+            { 
+                mGPUMeter.measureBegin(); 
+                mProcessMeterBar = 1; 
+            } 
+            nngxBindCmdlist(mDoubleDispBufList[mDoubleBuf]); 
+            nngxRunCmdlist(); 
+        }
 
-    mWaitCmdlistDone = 1 - mWaitCmdlistDone; 
-    nngxBindCmdlist(mDoubleDispBufList[mDoubleBuf]); 
-    mDoubleDispBufList = (mDoubleDispBufList + 1) % 3; 
+        mWaitCmdlistDone = 1 - mWaitCmdlistDone; 
+        nngxBindCmdlist(mDoubleDispBufList[mDoubleBuf]); 
+        mDoubleDispBufList = (mDoubleDispBufList + 1) % 3;
+    }
     pGraphics->unlockDrawContext();
 
     if (getDisplayState() == cReady) 
@@ -303,7 +305,9 @@ void DoubleCmdGameFrameworkCtrNw4c::waitForVBlank_()
             if (mGameArg.wait_vblank <= (u32)diff)
             {
                 Graphics::instance()->lockDrawContext();
-                nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+                {
+                    nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+                }
                 Graphics::instance()->unlockDrawContext();
 
                 mVblinkBuf = vsync;
@@ -313,7 +317,9 @@ void DoubleCmdGameFrameworkCtrNw4c::waitForVBlank_()
             if (mGameArg.wait_vblank == (u32)(diff + 1))
             {
                 Graphics::instance()->lockDrawContext();
-                nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+                {
+                    nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+                }
                 Graphics::instance()->unlockDrawContext();
 
                 Graphics::instance()->waitForVBlank();

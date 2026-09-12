@@ -2,7 +2,9 @@
 
 namespace sead
 {
-DrawLockContext::DrawLockContext() = default;
+DrawLockContext::DrawLockContext()
+{
+}
 
 void DrawLockContext::initialize(Heap*) {}
 

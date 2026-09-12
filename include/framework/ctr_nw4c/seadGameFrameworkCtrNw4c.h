@@ -77,6 +77,7 @@ protected:
     virtual void presentTop_();
     virtual void presentBtm_();
     virtual void swapBuffer_();
+    virtual void waitForVBlank_();
     virtual void clearFrameBuffers_(s32 buffer);
     virtual void doScreenShot_(const char* shot);
     virtual void doScreenShotImpl_(const char* shot);
@@ -85,7 +86,6 @@ protected:
     u32 createDisplayBuffers_(u32* dst, u32 num, u32 disp, GLenum format, s32 width, s32 height, u32 buffer);
     void createFramebuffer_(nn::gr::CTR::FrameBuffer* buffer, s32 width, s32 height, u32 vram_a, PicaDataColor color_area, u32 vram_b, PicaDataDepth depth_area);
     void initNngx_(GfxMemoryMgrCtr* memMgr);
-    void waitForVBlank_();
     void saveScreenShotToFileHandle_(FileHandle* handle, void*, int width, int height, u32);
     void requestTransferRenderImage_(u32 displayBuffer, nn::gr::CTR::FrameBuffer* frameBuffer, s32 x, s32 y, f32 scaleX, f32 scaleY);
 protected:

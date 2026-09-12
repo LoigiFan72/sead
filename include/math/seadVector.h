@@ -4,6 +4,7 @@
 #include <basis/seadTypes.h>
 #include <math/seadMathPolicies.h>
 #include <math/ctr/seadVectorCalcCtr.h>
+#include <math/seadVectorCalcCommon.h>
 
 namespace sead {
 template <typename T>
@@ -51,17 +52,23 @@ struct Vector2 : public Policies<T>::Vec2Base {
 
     bool operator!=(const Vector2& rhs) const { return !operator==(rhs); }
 
+    T dot(const Vector2& other) const;
+    T cross(const Vector2& other) const;
+    T length() const;
+    T squaredLength() const;
+    T normalize();
+
+    void add(const Self& a);
+    void div(const Self& a);
+    void multScalar(T t);
+    void negate();
     void set(const Vector2& other);
     void set(T x_, T y_);
+    void setAdd(const Vector2<T>& a, const Vector2<T>& b);
+    void setScale(const Vector2<T>& a, T t);
 
-    void setAdd(const Vector2& x, const Vector2& y);
-
-    T length() const;
-
-    bool isZero() const
-    {
-        return *this == zero;
-    }
+    bool isZero() const { return *this == zero; }
+    bool isNan() const { return sead::Mathf::isNan(this->x) || sead::Mathf::isNan(this->y); }
 
     static const Vector2 zero;
     static const Vector2 ex;

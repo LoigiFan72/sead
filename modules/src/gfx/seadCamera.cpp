@@ -3,9 +3,13 @@
 
 namespace sead
 {
-Camera::~Camera() = default;
+Camera::~Camera()
+{
+}
 
-LookAtCamera::~LookAtCamera() = default;
+LookAtCamera::~LookAtCamera()
+{
+}
 
 LookAtCamera::LookAtCamera(const Vector3f& pos, const Vector3f& at, const Vector3f& up)
     : mPos(pos), mAt(at), mUp(up)
@@ -14,8 +18,12 @@ LookAtCamera::LookAtCamera(const Vector3f& pos, const Vector3f& at, const Vector
     mUp.normalize();
 }
 
-OrthoCamera::~OrthoCamera() = default;
+OrthoCamera::~OrthoCamera()
+{
+}
 
-DirectCamera::~DirectCamera() = default;
+DirectCamera::~DirectCamera()
+{
+}
 
 }  // namespace sead

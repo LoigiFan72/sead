@@ -66,19 +66,43 @@ public:
 
     struct LoadArg
     {
+        LoadArg():
+            path(""),
+            buffer(nullptr),
+            buffer_size(),
+            heap(nullptr),
+            alignment(0),
+            buffer_size_alignment(0),
+            div_size(0),
+            read_size(0),
+            roundup_size(0),
+            need_unload(false)
+        {
+        }
+
+        LoadArg(const LoadArg& arg): 
+            path(arg.path), 
+            buffer(arg.buffer), 
+            buffer_size(arg.buffer_size), 
+            heap(arg.heap), 
+            alignment(arg.alignment), 
+            div_size(arg.div_size), 
+            read_size(arg.read_size), 
+            roundup_size(arg.roundup_size), 
+            need_unload(arg.need_unload)
+        {
+        }
+
         SafeString path;
-        u8* buffer = nullptr;
-        u32 buffer_size = 0;
-        Heap* heap = nullptr;
-        s32 alignment = 0;
-        s32 buffer_size_alignment = 0;
-        /// Read chunk size
-        u32 div_size = 0;
-        bool assert_on_alloc_fail = true;
-        bool check_read_entire_file = true;
-        u32 read_size = 0;
-        u32 roundup_size = 0;
-        bool need_unload = false;
+        u8* buffer;
+        u32 buffer_size;
+        Heap* heap;
+        s32 alignment;
+        s32 buffer_size_alignment;
+        u32 div_size;
+        u32 read_size;
+        u32 roundup_size;
+        bool need_unload;
     };
 
     struct SaveArg

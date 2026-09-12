@@ -3,6 +3,7 @@
 #include <gfx/seadColor.h>
 #include <gfx/seadDrawLockContext.h>
 #include <heap/seadDisposer.h>
+#include <nn/gx.h>
 
 namespace sead
 {
@@ -26,29 +27,266 @@ public:
         cDevicePosture_Invalid = 4,
     };
 
+    enum DepthFunc
+    {
+        cLessEqual = GL_LEQUAL,
+        cLess = GL_LESS,
+        cGreaterEqual = GL_GEQUAL,
+        cGreater = GL_GREATER,
+        cAlways = GL_ALWAYS,
+        cNever = GL_NEVER,
+        cEqual = GL_EQUAL,
+        cNotEqual = GL_NOTEQUAL,
+        cInvalid = 0xFFFFFFFF
+    };
+
     enum CullingMode
     {
+        cFront = GL_FRONT,
+        cBack = GL_BACK,
+        cNone = 0xFFFFFFF0,
+        cAll = 0xFFFFFFF1,
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum BlendFactor
+    {
+        cZero = GL_ZERO,
+        cOne = GL_ONE,
+        cSrcColor = GL_SRC_COLOR,
+        cInvSrcColor = GL_ONE_MINUS_SRC_COLOR,
+        cSrcAlpha = GL_SRC_ALPHA,
+        cInvSrcAlpha = GL_ONE_MINUS_SRC_ALPHA,
+        cDstColor = GL_DST_COLOR,
+        cInvDstColor = GL_ONE_MINUS_DST_COLOR,
+        cDstAlpha = GL_DST_ALPHA,
+        cInvDstAlpha = GL_ONE_MINUS_DST_ALPHA,
+        cConstantColor = GL_CONSTANT_COLOR,
+        cInvConstantColor = GL_ONE_MINUS_CONSTANT_COLOR,
+        cConstantAlpha = GL_CONSTANT_ALPHA,
+        cInvConstantAlpha = GL_ONE_MINUS_CONSTANT_ALPHA,
+        cSrcAlphaSaturate = GL_SRC_ALPHA_SATURATE,
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum BlendEquation
+    {
+        cAdd = GL_FUNC_ADD,
+        cSub = GL_FUNC_SUBTRACT,
+        cReverseSub = GL_FUNC_REVERSE_SUBTRACT,
+        cMin = GL_MIN,
+        cMax = GL_MAX,
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum AlphaFunc 
+    {
+        cLessEqual = GL_LEQUAL,
+        cLess = GL_LESS,
+        cGreaterEqual = GL_GEQUAL,
+        cGreater = GL_GREATER,
+        cAlways = GL_ALWAYS,
+        cNever = GL_NEVER,
+        cEqual = GL_EQUAL,
+        cNotEqual = GL_NOTEQUAL,
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum StencilFunc
+    {
+        cLessEqual = GL_LEQUAL,
+        cLess = GL_LESS,
+        cGreaterEqual = GL_GEQUAL,
+        cGreater = GL_GREATER,
+        cAlways = GL_ALWAYS,
+        cNever = GL_NEVER,
+        cEqual = GL_EQUAL,
+        cNotEqual = GL_NOTEQUAL,
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum StencilOp
+    {
+        cKeep = GL_KEEP,
+        cZero = GL_ZERO,
+        cReplace = GL_REPLACE,
+        cIncrement = GL_INCR,
+        cDecrement = GL_DECR,
+        cInvert = GL_INVERT,
+        cIncrementWrap = GL_INCR_WRAP,
+        cDecrementWrap = GL_DECR_WRAP,
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum PolygonMode
+    {
+        cInvalid = 0xFFFFFFFF
+    };
+
+    enum CullingMode
+    {
+        cFront = GL_FRONT,
+        cBack = GL_BACK,
         cNone = 0xFFFFFFF0,
         cAll = 0xFFFFFFF1,
 
         cInvalid = 0xFFFFFFFF
     };
 
-    enum class AlphaFunc;
-    enum class DepthFunc;
-    enum class StencilFunc;
-    enum class StencilOp;
-    enum class PolygonMode;
-    enum class BlendEquation;
-    enum class BlendFactor;
-
     Graphics();
     virtual ~Graphics();
 
     void initialize(Heap* heap);
+    void initializeDrawLockContext(Heap* heap);
     void lockDrawContext();
     void unlockDrawContext();
     void initHostIO();
+
+    void setViewportRealPosition(f32 x, f32 y, f32 w, f32 h)
+    {
+        setViewportImpl(x, y, w, h);
+    }
+
+    void setScissorRealPosition(f32 x, f32 y, f32 w, f32 h)
+    {
+        setScissorImpl(x, y, w, h);
+    }
+
+    void setDepthEnable(bool testEnable, bool writeEnable)
+    {
+        setDepthTestEnable(testEnable);
+        setDepthWriteEnable(writeEnable);
+    }
+
+    void setDepthTestEnable(bool enable)
+    {
+        setDepthTestEnableImpl(enable);
+    }
+
+    void setDepthWriteEnable(bool enable)
+    {
+        setDepthWriteEnableImpl(enable);
+    }
+
+    void setDepthFunc(DepthFunc func)
+    {
+        setDepthFuncImpl(func);
+    }
+
+    bool setVBlankWaitInterval(u32 interval)
+    {
+        return setVBlankWaitIntervalImpl(interval);
+    }
+
+    void setCullingMode(CullingMode mode)
+    {
+        setCullingModeImpl(mode);
+    }
+
+    void setBlendEnable(bool enable)
+    {
+        setBlendEnableImpl(enable);
+    }
+
+    void setBlendEnableMRT(u32 target, bool enable)
+    {
+        setBlendEnableMRTImpl(target, enable);
+    }
+
+    void setBlendFactor(BlendFactor srcFactor, BlendFactor dstFactor)
+    {
+        setBlendFactorImpl(srcFactor, dstFactor, srcFactor, dstFactor);
+    }
+
+    void setBlendFactorSeparate(BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA)
+    {
+        setBlendFactorImpl(srcFactorRgb, dstFactorRgb, srcFactorA, dstFactorA);
+    }
+
+    void setBlendFactorMRT(u32 target, BlendFactor srcFactor, BlendFactor dstFactor)
+    {
+        setBlendFactorMRTImpl(target, srcFactor, dstFactor, srcFactor, dstFactor);
+    }
+
+    void setBlendFactorMRTSeparate(u32 target, BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA)
+    {
+        setBlendFactorMRTImpl(target, srcFactorRgb, dstFactorRgb, srcFactorA, dstFactorA);
+    }
+
+    void setBlendEquation(BlendEquation equation)
+    {
+        setBlendEquationImpl(equation, equation);
+    }
+
+    void setBlendEquationSeparate(BlendEquation equationRgb, BlendEquation equationA)
+    {
+        setBlendEquationImpl(equationRgb, equationA);
+    }
+
+    void setBlendEquationMRT(u32 target, BlendEquation equation)
+    {
+        setBlendEquationMRTImpl(target, equation, equation);
+    }
+
+    void setBlendEquationMRTSeparate(u32 target, BlendEquation equationRgb, BlendEquation equationA)
+    {
+        setBlendEquationMRTImpl(target, equationRgb, equationA);
+    }
+
+    void setBlendConstantColor(const Color4f& color)
+    {
+        setBlendConstantColorImpl(color);
+    }
+
+    void waitForVBlank()
+    {
+        waitForVBlankImpl();
+    }
+
+    void setColorMask(bool r, bool g, bool b, bool a)
+    {
+        setColorMaskImpl(r, g, b, a);
+    }
+
+    void setColorMaskMRT(u32 target, bool r, bool g, bool b, bool a)
+    {
+        setColorMaskMRTImpl(target, r, g, b, a);
+    }
+
+    void setAlphaTestEnable(bool enable)
+    {
+        setAlphaTestEnableImpl(enable);
+    }
+
+    void setAlphaTestFunc(AlphaFunc func, f32 ref)
+    {
+        setAlphaTestFuncImpl(func, ref);
+    }
+
+    void setStencilTestEnable(bool enable)
+    {
+        setStencilTestEnableImpl(enable);
+    }
+
+    void setStencilTestFunc(StencilFunc func, s32 ref, u32 mask)
+    {
+        setStencilTestFuncImpl(func, ref, mask);
+    }
+
+    void setStencilTestOp(StencilOp fail, StencilOp zfail, StencilOp zpass)
+    {
+        setStencilTestOpImpl(fail, zfail, zpass);
+    }
+
+    void setPolygonMode(PolygonMode front, PolygonMode back)
+    {
+        setPolygonModeImpl(front, back);
+    }
+
+    void setPolygonOffsetEnable(bool fillFrontEnable, bool fillBackEnable, bool pointLineEnable)
+    {
+        setPolygonOffsetEnableImpl(fillFrontEnable, fillBackEnable, pointLineEnable);
+    }
     
     static DevicePosture getDefaultDevicePosture() { return sDefaultDevicePosture; }
     static f32 getDefaultDeviceZScale() { return sDefaultDeviceZScale; }

@@ -5,57 +5,79 @@
 #include <math/seadVector.h>
 #endif
 
-namespace sead {
+namespace sead 
+{
 template <typename T>
-inline Vector2<T>::Vector2(T x_, T y_) {
+inline Vector2<T>::Vector2(T x_, T y_) 
+{
     Vector2CalcCtr<T>::set(*this, x_, y_);
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other) {
+inline Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other) 
+{
     Vector2CalcCtr<T>::add(*this, *this, other);
     return *this;
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other) {
+inline Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other) 
+{
     Vector2CalcCtr<T>::sub(*this, *this, other);
     return *this;
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator*=(T t) {
+inline Vector2<T>& Vector2<T>::operator*=(T t) 
+{
     this->x *= t;
     this->y *= t;
     return *this;
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator/=(T t) {
+inline Vector2<T>& Vector2<T>::operator/=(T t) 
+{
     this->x /= t;
     this->y /= t;
     return *this;
 }
 
 template <typename T>
-inline Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other) {
+inline Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other) 
+{
     Vector2CalcCtr<T>::set(*this, other);
     return *this;
 }
 
 template <typename T>
-inline void Vector2<T>::set(const Vector2<T>& other) {
+inline void Vector2<T>::set(const Vector2<T>& other) 
+{
     Vector2CalcCtr<T>::set(*this, other);
 }
 
 template <typename T>
-inline void Vector2<T>::set(T x_, T y_) {
+inline void Vector2<T>::set(T x_, T y_) 
+{
     Vector2CalcCtr<T>::set(*this, x_, y_);
 }
 
 template <typename T>
-inline void Vector2<T>::setAdd(const Vector2& x, const Vector2& y) {
+inline void Vector2<T>::setAdd(const Vector2& x, const Vector2& y) 
+{
     Vector2CalcCommon<T>::add(x, y);
+}
+
+template <typename T>
+inline void Vector2<T>::add(const Self& a)
+{
+    Vector2CalcCommon<T>::add(*this, *this, a);
+}
+
+template <typename T>
+inline void Vector2<T>::div(const Self& a)
+{
+    Vector2CalcCommon<T>::div(*this, *this, a);
 }
 
 template <typename T>
@@ -70,47 +92,55 @@ inline Vector3<T>& Vector3<T>::operator=(const Vector3<T>& other) {
 }
 
 template <typename T>
-inline bool Vector3<T>::operator==(const Vector3& rhs) const {
+inline bool Vector3<T>::operator==(const Vector3& rhs) const 
+{
     return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z;
 }
 
 template <typename T>
-inline bool Vector3<T>::operator!=(const Vector3& rhs) const {
+inline bool Vector3<T>::operator!=(const Vector3& rhs) const 
+{
     return !operator==(rhs);
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator+=(const Vector3<T>& other) {
+inline Vector3<T>& Vector3<T>::operator+=(const Vector3<T>& other) 
+{
     Vector3CalcCtr<T>::add(*this, *this, other);
     return *this;
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator-=(const Vector3<T>& other) {
+inline Vector3<T>& Vector3<T>::operator-=(const Vector3<T>& other) 
+{
     Vector3CalcCtr<T>::sub(*this, *this, other);
     return *this;
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator*=(T t) {
+inline Vector3<T>& Vector3<T>::operator*=(T t) 
+{
     Vector3CalcCtr<T>::multScalar(*this, *this, t);
     return *this;
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator*=(const Mtx33& m) {
+inline Vector3<T>& Vector3<T>::operator*=(const Mtx33& m) 
+{
     mul(m);
     return *this;
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator*=(const Mtx34& m) {
+inline Vector3<T>& Vector3<T>::operator*=(const Mtx34& m) 
+{
     mul(m);
     return *this;
 }
 
 template <typename T>
-inline Vector3<T>& Vector3<T>::operator/=(T t) {
+inline Vector3<T>& Vector3<T>::operator/=(T t) 
+{
     this->x /= t;
     this->y /= t;
     this->z /= t;
@@ -118,17 +148,20 @@ inline Vector3<T>& Vector3<T>::operator/=(T t) {
 }
 
 template <typename T>
-inline T Vector3<T>::dot(const Vector3<T>& t) const {
+inline T Vector3<T>::dot(const Vector3<T>& t) const 
+{
     return Vector3CalcCtr<T>::dot(*this, t);
 }
 
 template <typename T>
-inline T Vector3<T>::length() const {
+inline T Vector3<T>::length() const 
+{
     return Vector3CalcCtr<T>::length(*this);
 }
 
 template <typename T>
-inline T Vector3<T>::squaredLength() const {
+inline T Vector3<T>::squaredLength() const 
+{
     return Vector3CalcCtr<T>::squaredLength(*this);
 }
 

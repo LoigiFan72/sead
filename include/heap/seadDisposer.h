@@ -58,10 +58,10 @@ public:                                                                         
     static CLASS* createInstance(sead::Heap* heap);                                                \
     static void deleteInstance();                                                                  \
                                                                                                    \
-    CLASS(const CLASS&) = delete;                                                                  \
-    CLASS& operator=(const CLASS&) = delete;                                                       \
-    CLASS(CLASS&&) = delete;                                                                       \
-    CLASS& operator=(CLASS&&) = delete;                                                            \
+    CLASS(const CLASS&){}                                                                          \
+    CLASS& operator=(const CLASS&){};                                                              \
+    CLASS(CLASS&&){};                                                                              \
+    CLASS& operator=(CLASS&&){};                                                                   \
                                                                                                    \
 protected:                                                                                         \
     static CLASS* sInstance;                                                                       \
@@ -126,7 +126,7 @@ protected:                                                                      
     }                                                                                              \
     SEAD_CREATE_SINGLETON_INSTANCE(CLASS)                                                          \
     SEAD_DELETE_SINGLETON_INSTANCE(CLASS)                                                          \
-    CLASS* CLASS::sInstance = NULL;                                                                \
-    CLASS::SingletonDisposer_* CLASS::SingletonDisposer_::sStaticDisposer = NULL;
+    CLASS* CLASS::sInstance;                                                                       \
+    CLASS::SingletonDisposer_* CLASS::SingletonDisposer_::sStaticDisposer;
 
 #endif  // SEAD_DISPOSER_H_

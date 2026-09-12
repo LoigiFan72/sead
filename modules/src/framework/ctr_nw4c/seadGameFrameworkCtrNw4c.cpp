@@ -276,7 +276,9 @@ void GameFrameworkCtrNw4c::mainLoop_()
     mLastDiffTime.setNow();
 
     Graphics::instance()->lockDrawContext();
-    procCalc_();
+    {
+        procCalc_();
+    }
     Graphics::instance()->unlockDrawContext();
 
     for(;;)
@@ -377,29 +379,34 @@ void GameFrameworkCtrNw4c::deallocate(GLenum area, GLenum alignment, GLuint size
 
 void GameFrameworkCtrNw4c::procFrame_()
 {
+    ProcessMeter* proc = ProcessMeter::instance();
+    if (proc)
+        proc->measureBeginFrame();
+
     Graphics::instance()->lockDrawContext();
     {
-        ProcessMeter* proc = ProcessMeter::instance();
-        if (proc)
-            proc->measureBeginFrame();
 
         nngxRunCmdlist();
         procDraw_();
         procCalc_();
         procReset_();
         swapBuffer_();
-
-        if (proc)
-            proc->measureEndFrame();
-
-        if(getDisplayState() == DisplayState::cReady)
-        {
-            nngxStartLcdDisplay();
-
-            mDisplayState = DisplayState::cShow;
-        }
     }
     Graphics::instance()->unlockDrawContext();
+
+    if (proc)
+        proc->measureEndFrame();
+
+    mLastUpdateTime = mFrameNow.diffToNow();
+    mFrameNow.setNow();
+    waitForVBlank_();
+
+    if(getDisplayState() == DisplayState::cReady)
+    {
+        nngxStartLcdDisplay();
+
+        mDisplayState = DisplayState::cShow;
+    }
 }
 
 void GameFrameworkCtrNw4c::procDraw_()
@@ -498,7 +505,9 @@ void GameFrameworkCtrNw4c::waitForVBlank_()
             Graphics* graphics = Graphics::instance();
 
             graphics->lockDrawContext();
-            nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+            {
+                nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+            }
             graphics->unlockDrawContext();
 
             mGameArg.wait_vblank = vblank;
@@ -511,7 +520,9 @@ void GameFrameworkCtrNw4c::waitForVBlank_()
             Graphics* graphics = Graphics::instance();
 
             graphics->lockDrawContext();
-            nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+            {
+                nngxSwapBuffers(NN_GX_DISPLAY_BOTH);
+            }
             graphics->unlockDrawContext();
 
             graphics->waitForVBlank();

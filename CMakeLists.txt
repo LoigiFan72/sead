@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(sead CXX ASM)
+project(sead C CXX ASM)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -21,8 +21,6 @@ macro (set_compilers)
     set(CMAKE_CXX_COMPILER ${ARM_CC})
     set(CMAKE_ASM_COMPILER ${ARM_ASM})
     set(CMAKE_LINKER ${ARM_LINK})
-endmacro()
-
 endmacro()
 
 if (WIN32)
@@ -380,6 +378,7 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     include/framework/seadDualScreenTask.h
     include/framework/seadUlcdMethodTreeMgr.h
     include/framework/seadUlcdTask.h
+    include/framework/ctr/seadConsoleFrameworkCtr.h
     include/framework/ctr_nw4c/seadGameFrameworkCtrNw4c.h
     include/framework/ctr_nw4c/seadDoubleCmdGameFrameworkCtrNw4c.h
     include/framework/ctr_nw4c/seadUlcdDoubleCmdGameFrameworkCtrNw4c.h
@@ -387,6 +386,7 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     modules/src/framework/seadDualScreenTask.cpp
     modules/src/framework/seadUlcdMethodTreeMgr.cpp
     modules/src/framework/seadUlcdTask.cpp
+    modules/src/framework/ctr/seadConsoleFrameworkCtr.cpp
     modules/src/framework/ctr_nw4c/seadGameFrameworkCtrNw4c.cpp
     modules/src/framework/ctr_nw4c/seadDoubleCmdFrameworkCtrNw4c.cpp
     modules/src/framework/ctr_nw4c/seadUlcdDoubleCmdFrameworkCtrNw4c.cpp
@@ -396,6 +396,9 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     include/gfx/ctr/seadFrameBufferCtr.h
     include/gfx/ctr/seadGfxMemoryMgrCtr.h
     include/gfx/ctr/seadGraphicsCtr.h
+    include/gfx/ctr/seadPrimitiveRendererCtr.h
+    include/gfx/ctr/seadRamCommandCacheCtr.h
+    include/gfx/ctr/seadRamCommandCacheCtr.hpp
     include/gfx/ctr/seadStereoUtilCtr.h
     include/gfx/ctr/seadTextureCtr.h
     include/gfx/ctr/seadTextureCtrGL.h
@@ -405,6 +408,7 @@ if(SEAD_PLATFORM STREQUAL "ctr")
     modules/src/gfx/ctr/seadFrameBufferCtr.cpp
     modules/src/gfx/ctr/seadGfxMemoryMgrCtr.cpp
     modules/src/gfx/ctr/seadGraphicsCtr.cpp
+    modules/src/gfx/ctr/seadPrimitiveRendererCtr.cpp
     modules/src/gfx/ctr/seadStereoUtilCtr.cpp
     modules/src/gfx/ctr/seadTextureCtr.cpp
     modules/src/gfx/ctr/seadTextureCtrGL.cpp

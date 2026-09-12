@@ -78,13 +78,17 @@ public:
     {
         SEAD_ASSERT_MSG(str != nullptr, "str must not be nullptr.");
     }
-    SafeStringBase(const SafeStringBase& other) = default;
+    SafeStringBase(const SafeStringBase& other)
+    {
+    }
 
-    SEAD_SAFESTRING_VIRTUAL_TOKEN ~SafeStringBase() = default;
+    SEAD_SAFESTRING_VIRTUAL_TOKEN ~SafeStringBase()
+    {
+    }
 
     SEAD_SAFESTRING_VIRTUAL_TOKEN SafeStringBase& operator=(const SafeStringBase& other);
 
-    bool operator==(const SafeStringBase& rhs) const { return isEqual(rhs); }
+    friend bool operator==(const SafeStringBase<CharType>& lhs, const SafeStringBase<CharType>& rhs){ return lhs.isEqual(rhs); }
     bool operator!=(const SafeStringBase& rhs) const { return !(*this == rhs); }
 
     iterator begin() const { return iterator(this, 0); }
@@ -145,6 +149,7 @@ protected:
     const T& unsafeAt_(s32 idx) const { return mStringTop[idx]; }
 
     const T* mStringTop;
+    s32 mIndex;
 };
 
 template <>

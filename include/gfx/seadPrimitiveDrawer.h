@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SEAD_PRIMITIVE_DRAWER_H_
+#define SEAD_PRIMITIVE_DRAWER_H_
 
 #include <gfx/seadColor.h>
 #include <math/seadBoundBox.h>
@@ -56,14 +57,56 @@ public:
         Color4f mColor1;
         bool mHorizontal;
     };
-
     class UVArg
     {
+    public:
+        UVArg()
+            : mUVSrc(Vector2f::zero)
+            , mUVSize(Vector2f::ones)
+        {
+        }
+
+        UVArg& setUVSrc(const Vector2f& uv_src) { mUVSrc = uv_src; return *this; }
+        UVArg& setUVSize(const Vector2f& uv_size) { mUVSize = uv_size; return *this; }
+
+        const Vector2f& getUVSrc() const { return mUVSrc; }
+        const Vector2f& getUVSize() const { return mUVSize; }
+
+    private:
+        Vector2f mUVSrc;
+        Vector2f mUVSize;
     };
 
     class CubeArg
     {
+    public:
+        CubeArg()
+            : mCenter(Vector3f::zero)
+            , mSize(Vector3f::ones)
+            , mColor0(Color4f::cWhite)
+            , mColor1(Color4f::cWhite)
+        {
+        }
+
+        CubeArg& setCenter(const Vector3f& p) { mCenter = p; return *this; }
+        CubeArg& setSize(const Vector3f& size) { mSize = size; return *this; }
+        CubeArg& setCornerAndSize(const Vector3f& p, const Vector3f& size);
+        CubeArg& setBoundBox(const BoundBox3f& box);
+        CubeArg& setColor(const Color4f& c0, const Color4f& c1) { mColor0 = c0; mColor1 = c1; return *this; }
+        CubeArg& setColor(const Color4f& color) { return setColor(color, color); }
+
+        const Vector3f& getCenter() const { return mCenter; }
+        const Vector3f& getSize() const { return mSize; }
+        const Color4f& getColor0() const { return mColor0; }
+        const Color4f& getColor1() const { return mColor1; }
+
+    private:
+        Vector3f mCenter;
+        Vector3f mSize;
+        Color4f mColor0;
+        Color4f mColor1;
     };
+
 
 public:
     explicit PrimitiveDrawer(DrawContext* drawContext);
@@ -116,3 +159,5 @@ protected:
 };
 
 } // namespace sead
+
+#endif

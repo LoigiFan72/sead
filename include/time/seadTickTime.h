@@ -23,10 +23,7 @@ public:
         return mTick - t.mTick;
     }
 
-    TickSpan diffToNow() const
-    {
-        return TickTime().diff(*this);
-    }
+    TickSpan diffToNow() const;
 
     TickTime& operator+=(const TickSpan& rhs)
     {

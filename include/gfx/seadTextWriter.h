@@ -10,7 +10,6 @@ class Camera;
 class Projection;
 class DrawContext;
 class FontBase;
-class DebugFontMgrNvn;
 
 class TextWriter
 {
