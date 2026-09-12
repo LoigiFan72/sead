@@ -3,6 +3,8 @@
 // Project: StandardEAD C++ Library for CTR
 
 #include "gfx/ctr/seadPrimitiveRendererCtr.h"
+#include "gfx/ctr/seadGraphicsCtr.h"
+#include "gfx/ctr/seadTextureCtr.h"
 #include "gfx/seadCamera.h"
 #include "gfx/seadProjection.h"
 #include "filedevice/seadFileDeviceMgr.h"
@@ -30,8 +32,10 @@ PrimitiveRendererCtr::PrimitiveRendererCtr():
     mCacheVramA(),
     mSymbolWVP_VramA(),
     mSymbolUser_VramA(),
-    mSymbolColor0_VramA(), mSymbolColor1_VramA(),
-    mSymbolUvSrc_VramA(), mSymbolUvSize_VramA(),
+    mSymbolColor0_VramA(), 
+    mSymbolColor1_VramA(),
+    mSymbolUvSrc_VramA(), 
+    mSymbolUvSize_VramA(),
     mAttrVertexLoc_VramA(),
     mAttrTexCoord0Loc_VramA(),
     mAttrColorRateLoc_VramA(),
@@ -39,8 +43,10 @@ PrimitiveRendererCtr::PrimitiveRendererCtr():
     mCacheVramB(),
     mSymbolWVP_VramB(),
     mSymbolUser_VramB(),
-    mSymbolColor0_VramB(), mSymbolColor1_VramB(),
-    mSymbolUvSrc_VramB(), mSymbolUvSize_VramB(),
+    mSymbolColor0_VramB(), 
+    mSymbolColor1_VramB(),
+    mSymbolUvSrc_VramB(), 
+    mSymbolUvSize_VramB(),
     mAttrVertexLoc_VramB(),
     mAttrTexCoord0Loc_VramB(),
     mAttrColorRateLoc_VramB(),
@@ -74,8 +80,14 @@ PrimitiveRendererCtr::PrimitiveRendererCtr():
 {
 }
 
+PrimitiveRendererCtr::~PrimitiveRendererCtr()
+{
+}
+
 void PrimitiveRendererCtr::prepareFromBinaryImpl(Heap* heap, const void* bin_data, u32 bin_size)
 {
+    /* Setup Global Shader Object */
+
     Shader* shader = const_cast<Shader*>(reinterpret_cast<const Shader*>(bin_data));
     new(shader) Shader();
 
@@ -101,8 +113,12 @@ void PrimitiveRendererCtr::prepareFromBinaryImpl(Heap* heap, const void* bin_dat
     result = shader->SearchBindSymbol(&mAttrColorRateLoc_VramA, "ColorRate");
     SEAD_ASSERT(result);
 
+    /* Cache VramA */
+
     mCacheVramA.initialize(heap, 0);
-    mCacheVramA.adjust(heap, *shader->MakeFullCommand(reinterpret_cast<u32*>(mCacheVramA.getTopPtr())));
+    u32* command = reinterpret_cast<u32*>(mCacheVramA.getTopPtr());
+    size_t cache = *shader->MakeFullCommand(command);
+    mCacheVramA.adjust(heap, cache);
     
     /* Setup VramB */
 
@@ -128,8 +144,12 @@ void PrimitiveRendererCtr::prepareFromBinaryImpl(Heap* heap, const void* bin_dat
     result = shader->SearchBindSymbol(&mDmpLineWidth, "dmp_Line.width");
     SEAD_ASSERT(result);
 
+    
+
     mCacheVramB.initialize(heap, 0);
-    mCacheVramB.adjust(heap, *shader->MakeFullCommand(reinterpret_cast<u32*>(mCacheVramB.getTopPtr())));
+    u32* command = reinterpret_cast<u32*>(mCacheVramB.getTopPtr());
+    size_t cache = *shader->MakeFullCommand(command);
+    mCacheVramB.adjust(heap, cache);
 
     loadQuadVertex_(heap);
     loadLineVertex_(heap);

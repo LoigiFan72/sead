@@ -1,8 +1,8 @@
-# sead4ctr
+# sead
 
-This is a decompilation of sead, the standard C++ library for first-party Nintendo games for the 3Ds Device. The **NX**, **cafe**, **win**, **CtrWin** devices are not considered.
+This is a decompilation of sead, the standard C++ library for first-party Nintendo games.
 
-Unlike the original [sead decompilation project](https://github.com/aboood40091/sead) & [open-ead's NX sead](https://github.com/open-ead/sead), which this repo derives from, this project targets more recent versions of sead.
+Unlike the [sead cafe decompilation project](https://github.com/aboood40091/sead) & [sead NX decompilation project](https://github.com/open-ead/sead) & [sead windows project](https://github.com/stupidestmodder/sead/tree/main), which this repo derives from, this project targets the 3DS version of sead.
 
 The objective is to recreate the standard library as accurately as possible, so that interoperability can eventually be achieved by adding support for other platforms and by making it easier to create projects that interact with sead games.
 
@@ -25,6 +25,23 @@ Nobody except Nintendo has the source code of sead, not even third-party develop
 
 Note that many names (especially for inlined, templated functions) are just plain guesses.
 
+## Folder Structure
+
+* **addins** - Additional libraries used by *sead*.
+* **include** - Headers used for *sead*.
+* **lib** - Library used by *sead*.
+* **modules/src** - Module source code.
+* **res** - `sead::PrimitiveRendererX` Res DVLP frag/vert.
+
+## Addins
+
+* **libms** - LibMessageStudio for CTR
+
+## Libraries
+
+* **CtrSDK** - The standard Software Developer Kit for 3DS.
+* **Nw4cEngine** - The NintendoWare4Ctr Graphics and Sound engine.
+
 ## Modules
 
 For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/sead). Several modules currently fail to build for Switch.
@@ -42,12 +59,12 @@ For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/s
 * **heap** - Heap (arenas, disposers, different types of heaps)
 * **hostio** - Host IO (communication with PCs)
 * **math** - Maths utilities (vector, matrix, etc.)
-* **message** - libms wrapper
+* **message** - Message Studio wrapper
 * **prim** - Primitives (strings, enums, RTTI, etc.)
 * **random** - Random number generator
 * **resource** - Resource (loading, decompressing, etc.)
 * **stream** - Stream IO
-* **tentative** - Tentative (Bitmap BMP handling)
+* **tentative** - Tentative (Bitmap handling)
 * **thread** - Thread utilities (threads, critical sections, message queues, etc.)
 * **time** - Time utilities
 
@@ -55,7 +72,8 @@ For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/s
 
 Platform-specific files are usually placed into a subdirectory that is called:
 
-* **ctr** for 3DS
+* **ctr** for 3Ds
+* **ctrwin** for CTR Emulated Windows
 
 ### Version specific source
 
@@ -90,8 +108,6 @@ Other platforms (generic Unix, iOS, Android, CTR) are not supported.
 
 ## Contributing
 
-
-
 ### Non-inlined functions
 When **implementing non-inlined functions**, please compare the assembly output against the original function and make it match the original code. At this scale, that is pretty much the only reliable way to ensure accuracy and functional equivalency.
 
@@ -109,3 +125,7 @@ For **header-only utilities** (like container classes), use pilot/debug builds, 
 Also note that introducing inlined functions is sometimes necessary to get the desired codegen.
 
 If a function is inlined, you should try as hard as possible to make it match perfectly. For inlined functions, it is better to use weird code or small hacks to force a match as differences would otherwise appear in every single function that inlines the non-matching code, which drastically complicates matching other functions. If a hack is used, wrap it inside a `#ifdef MATCHING_HACK_{PLATFORM}` (see above for a list of defines).
+
+## Planned Devices ##
+
+* **winctr** - Allow a Windows Device to Emulate the CTR Platform.
