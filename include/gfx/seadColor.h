@@ -26,68 +26,6 @@
 
 namespace sead
 {
-class Color4f
-{
-public:
-    Color4f(){ };
-    Color4f(f32 r, f32 g, f32 b, f32 a) : r(r), g(g), b(b), a(a) {}
-
-    static Color4f lerp(const Color4f& color1, const Color4f& color2, f32 t);
-
-    void setLerp(const Color4f& color1, const Color4f& color2, f32 t);
-    // This should actually be called setGammaCorrection...
-    void setGammaCollection(const Color4f& value, f32 gamma);
-    void adjustOverflow();
-
-    Color4f& operator+=(const Color4f& rhs);
-    Color4f& operator-=(const Color4f& rhs);
-    Color4f& operator*=(const Color4f& rhs);
-    Color4f& operator/=(const Color4f& rhs);
-    Color4f& operator+=(f32 x);
-    Color4f& operator-=(f32 x);
-    Color4f& operator*=(f32 x);
-    Color4f& operator/=(f32 x);
-
-    friend Color4f operator+(const Color4f& lhs, const Color4f& rhs);
-    friend Color4f operator-(const Color4f& lhs, const Color4f& rhs);
-    friend Color4f operator*(const Color4f& lhs, const Color4f& rhs);
-    friend Color4f operator/(const Color4f& lhs, const Color4f& rhs);
-    friend Color4f operator+(const Color4f& lhs, f32 x);
-    friend Color4f operator-(const Color4f& lhs, f32 x);
-    friend Color4f operator*(const Color4f& lhs, f32 x);
-    friend Color4f operator/(const Color4f& lhs, f32 x);
-    friend bool operator==(const Color4f& lhs, const Color4f& rhs);
-
-    static const f32 cElementMax;
-    static const f32 cElementMin;
-
-    static const Color4f cBlack;
-    static const Color4f cGray;
-    static const Color4f cWhite;
-    static const Color4f cRed;
-    static const Color4f cGreen;
-    static const Color4f cBlue;
-    static const Color4f cYellow;
-    static const Color4f cMagenta;
-    static const Color4f cCyan;
-
-    union
-    {
-        struct
-        {
-            f32 r;
-            f32 g;
-            f32 b;
-            f32 a;
-        };
-
-        struct
-        {
-            f32 c[4];
-        };
-    };
-};
-
 class Color4u8
 {
 public:
@@ -154,5 +92,74 @@ private:
         fn(&Color4u8::a);
         return *this;
     }
+};
+
+class Color4f
+{
+public:
+    Color4f(){ };
+    Color4f(f32 r, f32 g, f32 b, f32 a) : r(r), g(g), b(b), a(a) {}
+
+    static Color4f lerp(const Color4f& color1, const Color4f& color2, f32 t);
+
+    void setLerp(const Color4f& color1, const Color4f& color2, f32 t);
+    // This should actually be called setGammaCorrection...
+    void setGammaCollection(const Color4f& value, f32 gamma);
+    void adjustOverflow();
+
+    Color4f& operator+=(const Color4f& rhs);
+    Color4f& operator-=(const Color4f& rhs);
+    Color4f& operator*=(const Color4f& rhs);
+    Color4f& operator/=(const Color4f& rhs);
+    Color4f& operator+=(f32 x);
+    Color4f& operator-=(f32 x);
+    Color4f& operator*=(f32 x);
+    Color4f& operator/=(f32 x);
+
+    operator Color4u8() const
+    { 
+        Color4u8 c;
+        c.setf(r, g, b, a);
+        return c;
+    }
+
+    friend Color4f operator+(const Color4f& lhs, const Color4f& rhs);
+    friend Color4f operator-(const Color4f& lhs, const Color4f& rhs);
+    friend Color4f operator*(const Color4f& lhs, const Color4f& rhs);
+    friend Color4f operator/(const Color4f& lhs, const Color4f& rhs);
+    friend Color4f operator+(const Color4f& lhs, f32 x);
+    friend Color4f operator-(const Color4f& lhs, f32 x);
+    friend Color4f operator*(const Color4f& lhs, f32 x);
+    friend Color4f operator/(const Color4f& lhs, f32 x);
+    friend bool operator==(const Color4f& lhs, const Color4f& rhs);
+
+    static const f32 cElementMax;
+    static const f32 cElementMin;
+
+    static const Color4f cBlack;
+    static const Color4f cGray;
+    static const Color4f cWhite;
+    static const Color4f cRed;
+    static const Color4f cGreen;
+    static const Color4f cBlue;
+    static const Color4f cYellow;
+    static const Color4f cMagenta;
+    static const Color4f cCyan;
+
+    union
+    {
+        struct
+        {
+            f32 r;
+            f32 g;
+            f32 b;
+            f32 a;
+        };
+
+        struct
+        {
+            f32 c[4];
+        };
+    };
 };
 }  // namespace sead

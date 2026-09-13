@@ -19,6 +19,11 @@ public:
         mVirtualSize(virtual_size), mPhysicalArea(physical_area)
     {
     }
+    LogicalFrameBuffer()
+        : mVirtualSize(1.0f, 1.0f)
+        , mPhysicalArea(0.0f, 0.0f, 1.0f, 1.0f)
+    {
+    }
     LogicalFrameBuffer(const Vector2f& virtual_size, f32 physical_x, f32 physical_y, f32 physical_w,
                        f32 physical_h): 
         mVirtualSize(virtual_size),
@@ -39,6 +44,10 @@ public:
     void setPhysicalArea(const BoundBox2f& ph_size)
     {
         mPhysicalArea.set(ph_size.getMin(), ph_size.getMax());
+    }
+    void setVirtualSize(f32 x, f32 y)
+    {
+        mVirtualSize.set(x, y);
     }
     void setPhysicalArea(f32 x, f32 y, f32 w, f32 h) { mPhysicalArea.set(x, y, x + w, y + h); }
     void setPhysicalArea(f32 x, f32 y, u32 w, u32 h) { mPhysicalArea.set(x, y, x + w, y + h); }

@@ -14,7 +14,9 @@ public:
     static StringBuilderBase* create(s32 buffer_size, Heap* heap, s32 alignment);
     static StringBuilderBase* create(const T* str, Heap* heap, s32 alignment);
 
-    StringBuilderBase(const StringBuilderBase<T>& other) = delete;
+    StringBuilderBase(const StringBuilderBase<T>& other)
+    {
+    }
 
     class iterator
     {

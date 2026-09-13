@@ -25,47 +25,56 @@ class ResourceMgr
 public:
     struct CreateArg
     {
-        u8* buffer = nullptr;
-        u32 file_size = 0;
-        u32 buffer_size = 0;
-        bool need_unload = false;
-        ResourceFactory* factory = nullptr;
+        CreateArg():
+            buffer(nullptr),
+            file_size(0),
+            buffer_size(0),
+            need_unload(false),
+            factory(nullptr),
+            ext(),
+            heap(nullptr),
+            alignment(32)
+        {
+        }
+
+        u8* buffer;
+        u32 file_size;
+        u32 buffer_size;
+        bool need_unload;
+        ResourceFactory* factory;
         SafeString ext;
-        Heap* heap = nullptr;
-        s32 alignment = 0x20;
+        Heap* heap;
+        s32 alignment;
     };
-#ifdef NNSDK
-#if SEAD_SAFESTRING_NONVIRTUAL
-    static_assert(sizeof(CreateArg) == 0x38);
-#else
-    static_assert(sizeof(CreateArg) == 0x40);
-#endif
-#endif  // NNSDK
 
     struct LoadArg
     {
+        LoadArg(): 
+            path(), 
+            instance_heap(nullptr), 
+            load_data_heap(nullptr), 
+            instance_alignment(32), 
+            load_data_alignment(0), 
+            load_data_buffer(nullptr), 
+            load_data_buffer_size(0), 
+            factory(nullptr), 
+            device(nullptr), 
+            div_size(0)
+        {
+        }
+
         SafeString path;
-        Heap* instance_heap = nullptr;
-        Heap* load_data_heap = nullptr;
-        s32 instance_alignment = 0x20;
-        s32 load_data_alignment = 0;
-        u8* load_data_buffer = nullptr;
-        u32 load_data_buffer_size = 0;
-        s32 load_data_buffer_alignment = 0;
-        ResourceFactory* factory = nullptr;
-        FileDevice* device = nullptr;
-        // Read chunk size.
-        u32 div_size = 0;
-        bool assert_on_alloc_fail = true;
-        bool* has_tried_create_with_decomp = nullptr;
+        Heap* instance_heap;
+        Heap* load_data_heap;
+        s32 instance_alignment;
+        s32 load_data_alignment;
+        u8* load_data_buffer;
+        u32 load_data_buffer_size;
+        s32 load_data_buffer_alignment;
+        ResourceFactory* factory;
+        FileDevice* device;
+        u32 div_size;
     };
-#ifdef NNSDK
-#if SEAD_SAFESTRING_NONVIRTUAL
-    static_assert(sizeof(LoadArg) == 0x50);
-#else
-    static_assert(sizeof(LoadArg) == 0x58);
-#endif
-#endif  // NNSDK
 
 public:
     ResourceMgr();
@@ -86,11 +95,7 @@ public:
     void unregisterDecompressor(Decompressor* decompressor);
     Decompressor* findDecompressor(const SafeString& name);
 
-    Resource* tryLoad(const LoadArg& arg,
-#if not SEAD_RESOURCEMGR_TRYCREATE_NO_FACTORY_NAME
-                      const SafeString& factory_name,
-#endif
-                      Decompressor* decompressor);
+    Resource* tryLoad(const LoadArg& arg, const SafeString& factory_name, Decompressor* decompressor);
     Resource* tryLoadWithoutDecomp(const LoadArg& arg);
     void unload(Resource* res);
 
@@ -100,12 +105,9 @@ private:
 
     FactoryList mFactoryList;
     DecompressorList mDecompList;
-    ResourceFactory* mNullResourceFactory = nullptr;
-    ResourceFactory* mDefaultResourceFactory = nullptr;
+    ResourceFactory* mNullResourceFactory;
+    ResourceFactory* mDefaultResourceFactory;
 };
-#ifdef NNSDK
-static_assert(sizeof(ResourceMgr) == 0x60);
-#endif
 
 }  // namespace sead
 

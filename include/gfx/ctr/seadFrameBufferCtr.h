@@ -27,6 +27,8 @@ public:
     mutable nn::gr::CTR::FrameBuffer nn_buffer;
 
     static nn::gr::CTR::FrameBuffer sCurrentBuffer;
+
+    static nn::gr::CTR::FrameBuffer* getBoundFrameBufferGR() { return &sCurrentBuffer; }
 };
 
 inline bool FrameBufferCtr::isSameFrameBuffer_(nn::gr::CTR::FrameBuffer* src, const nn::gr::CTR::FrameBuffer& dst)

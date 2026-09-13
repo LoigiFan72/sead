@@ -8,7 +8,7 @@ class GfxMemoryMgrCtr
 {
     SEAD_RTTI_BASE(GfxMemoryMgrCtr);
 public:
-    virtual int  allocate(size_t area, u32 alignment, u32 size, Heap* heap) = 0;
+    virtual s32  allocate(size_t area, u32 alignment, u32 size, Heap* heap) = 0;
     virtual void deallocate(size_t area, u32 alignment, u32 size, void* obj) = 0;
 
     static u32 aimToAlignment(u32 alignment);

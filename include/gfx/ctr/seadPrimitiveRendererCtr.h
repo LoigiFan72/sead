@@ -2,6 +2,7 @@
 #define SEAD_PRIMITIVE_RENDERER_CTR_H_
 
 #include "gfx/seadPrimitiveRenderer.h"
+#include "gfx/seadPrimitiveRendererUtil.h"
 #include "gfx/ctr/seadRamCommandCacheCtr.h"
 #include <nn/gr.h>
 
@@ -14,31 +15,31 @@ class PrimitiveRendererCtr : public PrimitiveRendererBase
 public:
     enum Mode
     {
-        cDraw,
+        cDraw3D,
         cDrawTexture,
-        cDrawAttr,
+        cDraw2D,
         cDrawMax
     };
 
     struct Shape : public Vertex
     {
-        struct Index : public nn::gr::CTR::Vertex::IndexStream
+        struct Index
         {
             Index():
-                Vertex::IndexStream()
+                mIndexStream()
             {
             }
-
-            u32 mTextureIndex;
+            
+            u16* mTextureIndex;
+            nn::gr::CTR::Vertex::IndexStream mIndexStream;
         };
 
-        Shape():
-            Vertex(),
-            mShapeIndex()
-        {
-        }
+        Shape();
 
         Index mShapeIndex;
+        Vector3f* mShapePos;
+        Vector2f* mShapeUV;
+        f32*  mShapeColor;
     };
 
     PrimitiveRendererCtr();
@@ -68,42 +69,47 @@ public:
     virtual void drawCylinder32Impl(const Matrix34f& model_mtx, const Color4f& top, const Color4f& btm);
     virtual ~PrimitiveRendererCtr();
 protected:
+    void copyAndSetupVtx_(PrimitiveRendererCtr::Shape* shape, PrimitiveRendererUtil::Vertex const* vtx, size_t size3D, size_t size2D);
+    void createBuffer_(Heap* heap, Shape* shape, size_t size3D, size_t size2D);
     void setup_(Mode mode, TextureCtr const* pTexture);
     void loadBoxIndex_(Heap* heap);
     void loadCircleIndex_(Heap* heap, Shape::Index* index, s32 size);
     void loadCubeVertex_(Heap* heap);
-    void loadCylinderVertex_(Heap* heap, Shape* index, s32 size);
+    void loadCylinderVertex_(Heap* heap, Shape* shape, s32 size);
     void loadDiskVertex_(Heap* heap, Shape* index, s32 size);
     void loadLineVertex_(Heap* heap);
     void loadQuadVertex_(Heap* heap);
     void loadSphereVertex_(Heap* heap, Shape* index, s32 height, s32 width);
     void loadWireCubeIndex_(Heap* heap);
+    void drawShape_(Shape const& shape);
+    void drawShape_(nn::gr::CTR::Vertex const& vert, nn::gr::CTR::Vertex::IndexStream const& vertIndex);
+    void checkCmdlist_();
 
 
 private:
-    RawCommandCacheCtr mCacheVramA;
-    BindSymbolVSFloat mSymbolWVP_VramA;
-    BindSymbolVSFloat mSymbolUser_VramA;
-    BindSymbolVSFloat mSymbolColor0_VramA;
-    BindSymbolVSFloat mSymbolColor1_VramA;
-    BindSymbolVSFloat mSymbolUvSrc_VramA;
-    BindSymbolVSFloat mSymbolUvSize_VramA;
-    BindSymbolVSInput mAttrVertexLoc_VramA;
-    BindSymbolVSInput mAttrTexCoord0Loc_VramA;
-    BindSymbolVSInput mAttrColorRateLoc_VramA;
+    RawCommandCacheCtr mCache3D;
+    BindSymbolVSFloat mSymbolWVP_3D;
+    BindSymbolVSFloat mSymbolUser_3D;
+    BindSymbolVSFloat mSymbolColor0_3D;
+    BindSymbolVSFloat mSymbolColor1_3D;
+    BindSymbolVSFloat mSymbolUvSrc_3D;
+    BindSymbolVSFloat mSymbolUvSize_3D;
+    BindSymbolVSInput mAttrVertexLoc_3D;
+    BindSymbolVSInput mAttrTexCoord0Loc_3D;
+    BindSymbolVSInput mAttrColorRateLoc_3D;
 
     /* CTR Device VRAM-B*/
 
-    RawCommandCacheCtr mCacheVramB;
-    BindSymbolVSFloat mSymbolWVP_VramB;
-    BindSymbolVSFloat mSymbolUser_VramB;
-    BindSymbolVSFloat mSymbolColor0_VramB;
-    BindSymbolVSFloat mSymbolColor1_VramB;
-    BindSymbolVSFloat mSymbolUvSrc_VramB;
-    BindSymbolVSFloat mSymbolUvSize_VramB;
-    BindSymbolVSInput mAttrVertexLoc_VramB;
-    BindSymbolVSInput mAttrTexCoord0Loc_VramB;
-    BindSymbolVSInput mAttrColorRateLoc_VramB;
+    RawCommandCacheCtr mCache2D;
+    BindSymbolVSFloat mSymbolWVP_2D;
+    BindSymbolVSFloat mSymbolUser_2D;
+    BindSymbolVSFloat mSymbolColor0_2D;
+    BindSymbolVSFloat mSymbolColor1_2D;
+    BindSymbolVSFloat mSymbolUvSrc_2D;
+    BindSymbolVSFloat mSymbolUvSize_2D;
+    BindSymbolVSInput mAttrVertexLoc_2D;
+    BindSymbolVSInput mAttrTexCoord0Loc_2D;
+    BindSymbolVSInput mAttrColorRateLoc_2D;
 
     /* dmp_Line.width */
 
@@ -122,19 +128,19 @@ private:
     /* Utils */
 
     Mode mMode;
-    TextureCtr* mCtrTexture;
+    const TextureCtr* mCtrTexture;
 
     /* Shapes */
     
+    Shape mBox;
+    Shape mCube;
+    Shape mLine;
     Shape mSphere4x8; 
     Shape mSphere8x16;
-    Shape mCube;
-    Shape mWireCube;
-    Shape mDisk16; 
+    Shape mDisk16;
     Shape mDisk32;
-    Shape mLine;
-    Shape::Index mWireCube16Index; 
-    Shape::Index mWireCube32Index; 
+    Shape::Index mWireCubeIndex; 
+    Shape::Index mBoxIndex; 
     Shape::Index mCircle16Index; 
     Shape::Index mCircle32Index;
     Shape mCylinder16;

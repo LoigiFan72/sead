@@ -12,8 +12,17 @@ namespace PrimitiveRendererUtil
 class Vertex
 {
 public:
-    Vertex(const Vector3f& pos, const Vector2f& uv, const Color4f& color)
-        : pos(pos), uv(uv), color(color)
+    Vertex():
+        pos(),
+        uv(),
+        color()
+    {
+    }
+
+    Vertex(const Vector3f& pos, const Vector2f& uv, const Color4f& color): 
+        pos(pos), 
+        uv(uv), 
+        color(color)
     {
     }
 
@@ -29,6 +38,15 @@ void setWireCubeVertex(Vertex* vtx, u16* idx);
 void setSphereVertex(Vertex* vtx, u16* idx, s32 x, s32 y);
 void setDiskVertex(Vertex* vtx, u16* idx, s32 div);
 void setCylinderVertex(Vertex* vtx, u16* idx, s32 div);
+
+inline s32 calcDiskVertexNum(s32 divNum){ return divNum + 1; }
+inline s32 calcDiskIndexNum(s32 divNum) { return divNum * 3; }
+
+inline s32 calcSphereVertexNum(s32 x, s32 y) { return x * y + 2; }
+inline s32 calcSphereIndexNum(s32 x, s32 y) { return (x * 2 * (y + -1) + x * 2) * 3; }
+
+inline s32 calcCylinderVertexNum(s32 divNum){ return calcDiskVertexNum(divNum) << 1; }
+inline s32 calcCylinderIndexNum(s32 divNum){ return calcDiskIndexNum(divNum) * 2 + divNum * 6; }
 
 }  // namespace PrimitiveRendererUtil
 }  // namespace sead

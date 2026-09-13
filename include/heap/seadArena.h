@@ -15,7 +15,7 @@ public:
     Arena();
     ~Arena();
 
-    void initialize(size_t size);
+    u8* initialize(size_t size);
     void destroy();
 
     u8* mStart;

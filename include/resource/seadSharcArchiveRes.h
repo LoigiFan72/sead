@@ -55,28 +55,13 @@ public:
     SharcArchiveRes();
     virtual ~SharcArchiveRes();
 
-    virtual const void* getFileImpl_(const SafeString& file_path,
-                             FileInfo* file_info = NULL) SEAD_ARCHIVERES_CONST_TOKEN;
-    virtual const void* getFileFastImpl_(s32 entry_id,
-                                 FileInfo* file_info) SEAD_ARCHIVERES_CONST_TOKEN;
-#if SEAD_ARCHIVERES_TRYGETFILEPATH
-    virtual bool tryGetFilePathImpl_(SafeString* out_file_path,
-                             s32 entry_id) SEAD_ARCHIVERES_CONST_TOKEN;
-#endif
-    virtual s32 convertPathToEntryIDImpl_(const SafeString& file_path) SEAD_ARCHIVERES_CONST_TOKEN;
+    virtual const void* getFileImpl_(const SafeString& file_path, FileInfo* file_info = NULL);
+    virtual const void* getFileFastImpl_(s32 entry_id, FileInfo* file_info);
+    virtual s32 convertPathToEntryIDImpl_(const SafeString& file_path);
     virtual bool setCurrentDirectoryImpl_(const SafeString&);
-    virtual bool openDirectoryImpl_(HandleBuffer* handle,
-                            const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN;
-    virtual bool
-    closeDirectoryImpl_(HandleBuffer* handle) SEAD_ARCHIVERES_CONST_TOKEN
-    {
-        return true;
-    }
-    virtual u32 readDirectoryImpl_(HandleBuffer* handle, DirectoryEntry* entry,
-                           u32 num) SEAD_ARCHIVERES_CONST_TOKEN;
-#if SEAD_ARCHIVERES_ISEXISTFILEIMPL
-    virtual bool isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN;
-#endif
+    virtual bool openDirectoryImpl_(HandleBuffer* handle, const SafeString& path);
+    virtual bool closeDirectoryImpl_(HandleBuffer* handle) { return true; }
+    virtual u32 readDirectoryImpl_(HandleBuffer* handle, DirectoryEntry* entry, u32 num);
     virtual bool prepareArchive_(const void* archive);
 
 protected:

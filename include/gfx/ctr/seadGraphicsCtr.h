@@ -24,7 +24,7 @@ public:
     virtual void setBlendEnableImpl(bool enable);
     virtual void setBlendEnableMRTImpl(u32 target, bool enable){ };
     virtual void setBlendFactorImpl(BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA);
-    virtual void setBlendFactorMRTImpl(u32 target, BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA);
+    virtual void setBlendFactorMRTImpl(u32 target, BlendFactor srcFactorRgb, BlendFactor dstFactorRgb, BlendFactor srcFactorA, BlendFactor dstFactorA){ }
     virtual void setBlendEquationImpl(BlendEquation equationRgb, BlendEquation equationA);
     virtual void setBlendEquationMRTImpl(u32 target, BlendEquation equationRgb, BlendEquation equationA){ };
     virtual void setBlendConstantColorImpl(const Color4f& color);
@@ -32,7 +32,7 @@ public:
     virtual void unlockDrawContextImpl(){}
     virtual void waitForVBlankImpl(){ nngxWaitVSync(NN_GX_DISPLAY_BOTH); }
     virtual void setColorMaskImpl(bool r, bool g, bool b, bool a);
-    virtual void setColorMaskMRTImpl(u32 target, bool r, bool g, bool b, bool a);
+    virtual void setColorMaskMRTImpl(u32 target, bool r, bool g, bool b, bool a){ }
     virtual void setAlphaTestEnableImpl(bool enable);
     virtual void setAlphaTestFuncImpl(AlphaFunc func, f32 ref);
     virtual void setStencilTestEnableImpl(bool enable);
@@ -40,9 +40,15 @@ public:
     virtual void setStencilTestOpImpl(StencilOp fail, StencilOp zfail, StencilOp zpass);
     virtual void setPolygonModeImpl(PolygonMode front, PolygonMode back){}
     virtual void setPolygonOffsetEnableImpl(bool fillFrontEnable, bool fillBackEnable, bool pointLineEnable){}
+
+    static GfxMemoryMgrCtr* sMemoryMgr;
+    static s32 allocate(size_t area, u32 alignment, u32 size, s32 heap);
+    static void deallocate(size_t area, u32 alignment, u32 size, void* obj);
+
+    nn::gr::CTR::Viewport const& getGrViewport() const { return mViewportCtr; }
 private:
     RenderState mRenderState;
-    Viewport mViewportCtr;
+    nn::gr::CTR::Viewport mViewportCtr;
     Scissor mScissor;
 };
 }

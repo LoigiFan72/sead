@@ -120,11 +120,13 @@ add_library(sead OBJECT
   modules/src/devenv/seadGameConfig.cpp
   modules/src/devenv/seadStackTrace.cpp
 
+  include/filedevice/seadAnyFileDevice.h
   include/filedevice/seadArchiveFileDevice.h
   include/filedevice/seadFileDevice.h
   include/filedevice/seadFileDeviceMgr.h
   include/filedevice/seadMainFileDevice.h
   include/filedevice/seadPath.h
+  modules/src/filedevice/seadAnyFileDevice.cpp
   modules/src/filedevice/seadArchiveFileDevice.cpp
   modules/src/filedevice/seadFileDevice.cpp
   modules/src/filedevice/seadFileDeviceMgr.cpp
@@ -161,19 +163,23 @@ add_library(sead OBJECT
 
   include/gfx/seadCamera.h
   include/gfx/seadColor.h
-  include/gfx/seadDrawContext.h
   include/gfx/seadDrawLockContext.h
   include/gfx/seadFrameBuffer.h
+  include/gfx/seadGraphics.h
+  include/gfx/seadGraphicsContext.h
   include/gfx/seadPrimitiveRenderer.h
   include/gfx/seadPrimitiveRendererUtil.h
   include/gfx/seadProjection.h
   include/gfx/seadTexture.h
   include/gfx/seadTextureUtil.h
+  include/gfx/seadTextWriter.h
   include/gfx/seadViewport.h
   modules/src/gfx/seadCamera.cpp
   modules/src/gfx/seadColor.cpp
   modules/src/gfx/seadDrawLockContext.cpp
   modules/src/gfx/seadFrameBuffer.cpp
+  modules/src/gfx/seadGraphics.cpp
+  modules/src/gfx/seadGraphicsContext.xpp
   modules/src/gfx/seadPrimitiveRenderer.cpp
   modules/src/gfx/seadPrimitiveRendererUtil.cpp
   modules/src/gfx/seadProjection.cpp

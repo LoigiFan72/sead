@@ -3,8 +3,8 @@
 #include <framework/seadTask.h>
 #include <framework/seadTaskMgr.h>
 
-namespace sead {
-
+namespace sead 
+{
 class SeadMenuMgr : public Task
 {
     SEAD_TASK_SINGLETON_DISPOSER(SeadMenuMgr);

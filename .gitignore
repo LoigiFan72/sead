@@ -45,3 +45,12 @@ tgt/*
 
 # SDK for Dev
 .vscode/*
+
+# R&D
+include/basis/win/*
+include/controller/win/*
+include/framework/win/*
+include/gfx/gl/*
+modules/src/controller/win/*
+modules/src/framework/win/*
+lib/glad/*

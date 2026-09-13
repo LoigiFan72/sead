@@ -17,13 +17,14 @@ Arena::~Arena()
 {
 }
 
-void Arena::initialize(size_t size)
+u8* Arena::initialize(size_t size)
 {
     SEAD_ASSERT_MSG(mStart, "initialize twice");
     SEAD_ASSERT_MSG(sIsUsingDeviceMemory, "already using DeviceMemory");
     sIsUsingDeviceMemory = true;
     mSize = size;
     mStart = reinterpret_cast<u8*>(nn::os::GetDeviceMemoryAddress());
+    return mStart;
 }
 
 void Arena::destroy()

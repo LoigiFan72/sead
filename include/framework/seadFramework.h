@@ -72,7 +72,7 @@ public:
     virtual void run(Heap*, const TaskBase::CreateArg&, const RunArg&);
     virtual void createSystemTasks(TaskBase*, const CreateSystemTaskArg&);
     virtual FrameBuffer* getMethodFrameBuffer(s32) const = 0;
-    virtual LogicalFrameBuffer* getMethodLogicalFrameBuffer(s32 methodType) const{ { return getMethodFrameBuffer(methodType); } }
+    virtual const LogicalFrameBuffer* getMethodLogicalFrameBuffer(s32 methodType) const{ { return getMethodFrameBuffer(methodType); } }
     virtual bool setProcessPriority(ProcessPriority);
     virtual void reserveReset(void*);
 

@@ -1,7 +1,8 @@
 #ifndef SEAD_PRIMITIVE_RENDERER_H_
 #define SEAD_PRIMITIVE_RENDERER_H_
 
-#include <gfx/seadPrimitiveDrawer.h>
+#include <math/seadVector.h>
+#include <math/seadMatrix.h>
 #include <heap/seadDisposer.h>
 
 namespace sead
@@ -47,9 +48,93 @@ class PrimitiveRenderer : public IDisposer
 {
     SEAD_SINGLETON_DISPOSER(PrimitiveRenderer)
 public:
-    using QuadArg = PrimitiveDrawer::QuadArg;
-    using UVArg = PrimitiveDrawer::UVArg;
-    using CubeArg = PrimitiveDrawer::CubeArg;
+    class QuadArg
+    {
+    public:
+        QuadArg(): 
+            mCenter(Vector3f::zero), 
+            mSize(Vector2f::ones), 
+            mColor0(Color4f::cWhite), 
+            mColor1(Color4f::cWhite), 
+            mHorizontal(false)
+        {
+        }
+
+        QuadArg& setCenter(const Vector3f& p) { mCenter = p; return *this; }
+        QuadArg& setCenter(f32 x, f32 y, f32 z) { mCenter.set(x, y, z); return *this; }
+        QuadArg& setSize(const Vector2f& size) { mSize = size; return *this; }
+        QuadArg& setSize(f32 x, f32 y) { mSize.set(x, y); return *this; }
+        QuadArg& setCornerAndSize(const Vector3f& p, const Vector2f& size);
+        QuadArg& setCornerAndSize(f32 x, f32 y, f32 z, const Vector2f& size) { return setCornerAndSize(Vector3f(x, y, z), size); }
+        QuadArg& setCornerAndSize(const Vector3f& p, f32 w, f32 h) { return setCornerAndSize(p, Vector2f(w, h)); }
+        QuadArg& setCornerAndSize(f32 x, f32 y, f32 z, f32 w, f32 h) { return setCornerAndSize(Vector3f(x, y, z), Vector2f(w, h)); }
+        QuadArg& setBoundBox(const BoundBox2f& box, f32 z);
+        QuadArg& setColor(const Color4f& colorT, const Color4f& colorB);
+        QuadArg& setColor(const Color4f& color) { return setColor(color, color); }
+        QuadArg& setColorHorizontal(const Color4f& colorL, const Color4f& colorR);
+
+        const Vector3f& getCenter() const { return mCenter; }
+        const Vector2f& getSize() const { return mSize; }
+        const Color4f& getColor0() const { return mColor0; }
+        const Color4f& getColor1() const { return mColor1; }
+        bool isHorizontal() const { return mHorizontal; }
+
+    private:
+        Vector3f mCenter;
+        Vector2f mSize;
+        Color4f mColor0;
+        Color4f mColor1;
+        bool mHorizontal;
+    };
+    class UVArg
+    {
+    public:
+        UVArg(): 
+            mUVSrc(Vector2f::zero), 
+            mUVSize(Vector2f::ones)
+        {
+        }
+
+        UVArg& setUVSrc(const Vector2f& uv_src) { mUVSrc = uv_src; return *this; }
+        UVArg& setUVSize(const Vector2f& uv_size) { mUVSize = uv_size; return *this; }
+
+        const Vector2f& getUVSrc() const { return mUVSrc; }
+        const Vector2f& getUVSize() const { return mUVSize; }
+
+    private:
+        Vector2f mUVSrc;
+        Vector2f mUVSize;
+    };
+
+    class CubeArg
+    {
+    public:
+        CubeArg(): 
+            mCenter(Vector3f::zero), 
+            mSize(Vector3f::ones), 
+            mColor0(Color4f::cWhite), 
+            mColor1(Color4f::cWhite)
+        {
+        }
+
+        CubeArg& setCenter(const Vector3f& p) { mCenter = p; return *this; }
+        CubeArg& setSize(const Vector3f& size) { mSize = size; return *this; }
+        CubeArg& setCornerAndSize(const Vector3f& p, const Vector3f& size);
+        CubeArg& setBoundBox(const BoundBox3f& box);
+        CubeArg& setColor(const Color4f& c0, const Color4f& c1) { mColor0 = c0; mColor1 = c1; return *this; }
+        CubeArg& setColor(const Color4f& color) { return setColor(color, color); }
+
+        const Vector3f& getCenter() const { return mCenter; }
+        const Vector3f& getSize() const { return mSize; }
+        const Color4f& getColor0() const { return mColor0; }
+        const Color4f& getColor1() const { return mColor1; }
+
+    private:
+        Vector3f mCenter;
+        Vector3f mSize;
+        Color4f mColor0;
+        Color4f mColor1;
+    };
     
     PrimitiveRenderer();
     virtual ~PrimitiveRenderer() {}

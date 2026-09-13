@@ -53,8 +53,12 @@ public:
         mLocked->lock();
     }
 
-    ConditionalScopedLock(const ConditionalScopedLock& other) = delete;
-    ConditionalScopedLock& operator=(const ConditionalScopedLock& other) = delete;
+    ConditionalScopedLock(const ConditionalScopedLock& other)
+    {
+    }
+    ConditionalScopedLock& operator=(const ConditionalScopedLock& other)
+    {
+    }
 
     ConditionalScopedLock(ConditionalScopedLock&& other) noexcept { *this = std::move(other); }
     ConditionalScopedLock& operator=(ConditionalScopedLock&& other) noexcept

@@ -82,11 +82,13 @@ public:
     {
     }
 
-    SEAD_SAFESTRING_VIRTUAL_TOKEN ~SafeStringBase()
+    virtual ~SafeStringBase()
     {
     }
 
-    SEAD_SAFESTRING_VIRTUAL_TOKEN SafeStringBase& operator=(const SafeStringBase& other);
+    SafeStringBase& operator=(const SafeStringBase& other)
+    {
+    }
 
     friend bool operator==(const SafeStringBase<CharType>& lhs, const SafeStringBase<CharType>& rhs){ return lhs.isEqual(rhs); }
     bool operator!=(const SafeStringBase& rhs) const { return !(*this == rhs); }
@@ -145,7 +147,7 @@ public:
     static const s32 cMaximumLength = 0x80000;
 
 protected:
-    SEAD_SAFESTRING_VIRTUAL_TOKEN void assureTerminationImpl_() const {}
+    virtual void assureTerminationImpl_() const {}
     const T& unsafeAt_(s32 idx) const { return mStringTop[idx]; }
 
     const T* mStringTop;
@@ -206,10 +208,14 @@ public:
 
         this->assureTerminationImpl_();
     }
-    ~BufferedSafeStringBase() SEAD_SAFESTRING_OVERRIDE_TOKEN{ };
+    virtual ~BufferedSafeStringBase(){ };
 
     BufferedSafeStringBase<T>&
-    operator=(const SafeStringBase<T>& other) SEAD_SAFESTRING_OVERRIDE_TOKEN;
+    operator=(const SafeStringBase<T>& other)
+    {
+        copy(other);
+        return *this;
+    }
 
     const T& operator[](s32 idx) const;
 
@@ -326,7 +332,7 @@ public:
     inline void clear() { getMutableStringTop_()[0] = this->cNullChar; }
 
 protected:
-    void assureTerminationImpl_() const SEAD_SAFESTRING_OVERRIDE_TOKEN;
+    virtual void assureTerminationImpl_() const;
 
     T* getMutableStringTop_() { return const_cast<T*>(this->mStringTop); }
 
@@ -354,7 +360,9 @@ public:
         this->copy(str);
     }
 
-    ~FixedSafeStringBase() SEAD_SAFESTRING_OVERRIDE_TOKEN = default;
+    virtual ~FixedSafeStringBase()
+    {
+    }
 
     FixedSafeStringBase& operator=(const FixedSafeStringBase& other)
     {
@@ -362,7 +370,7 @@ public:
         return *this;
     }
 
-    FixedSafeStringBase& operator=(const SafeStringBase<T>& other) SEAD_SAFESTRING_OVERRIDE_TOKEN
+    FixedSafeStringBase& operator=(const SafeStringBase<T>& other)
     {
         this->copy(other);
         return *this;
@@ -410,7 +418,7 @@ public:
         return *this;
     }
 
-    FixedSafeString<L>& operator=(const SafeStringBase<char>& other) SEAD_SAFESTRING_OVERRIDE_TOKEN
+    FixedSafeString<L>& operator=(const SafeStringBase<char>& other)
     {
         this->copy(other);
         return *this;
@@ -431,7 +439,7 @@ public:
         return *this;
     }
 
-    WFixedSafeString& operator=(const WSafeString& other) SEAD_SAFESTRING_OVERRIDE_TOKEN
+    WFixedSafeString& operator=(const WSafeString& other)
     {
         this->copy(other);
         return *this;
@@ -455,7 +463,9 @@ public:
         this->formatV(format, args);
         va_end(args);
     }
-    ~FormatFixedSafeString() SEAD_SAFESTRING_OVERRIDE_TOKEN = default;
+    virtual ~FormatFixedSafeString()
+    {
+    }
 };
 
 template <s32 L>
@@ -469,7 +479,9 @@ public:
         this->formatV(format, args);
         va_end(args);
     }
-    ~WFormatFixedSafeString() SEAD_SAFESTRING_OVERRIDE_TOKEN = default;
+    virtual ~WFormatFixedSafeString()
+    {
+    }
 };
 
 template <typename T>
@@ -483,8 +495,13 @@ public:
         this->copy(string);
     }
 
-    HeapSafeStringBase(const HeapSafeStringBase&) = delete;
-    HeapSafeStringBase& operator=(const HeapSafeStringBase&) = delete;
+    HeapSafeStringBase(const HeapSafeStringBase&)
+    {
+    }
+
+    HeapSafeStringBase& operator=(const HeapSafeStringBase&)
+    {
+    }
 
     HeapSafeStringBase(HeapSafeStringBase&& other) noexcept
     {
@@ -498,13 +515,17 @@ public:
         return *this;
     }
 
-    ~HeapSafeStringBase() SEAD_SAFESTRING_OVERRIDE_TOKEN
+    virtual ~HeapSafeStringBase()
     {
         if (this->mStringTop)
             delete[] this->mStringTop;
     }
 
-    HeapSafeStringBase<T>& operator=(const SafeStringBase<T>& other) SEAD_SAFESTRING_OVERRIDE_TOKEN;
+    HeapSafeStringBase<T>& operator=(const SafeStringBase<T>& other)
+    {
+        this->copy(other);
+        return *this;
+    }
 };
 
 using HeapSafeString = HeapSafeStringBase<char>;

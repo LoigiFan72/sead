@@ -10,14 +10,12 @@ Event::Event(bool manual_reset):
     IDisposer(),
     mEventInner(manual_reset)
 {
-
 }
 
 Event::Event():
     IDisposer(),
     mEventInner()
 {
-
 }
 
 Event::~Event()

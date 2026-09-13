@@ -10,20 +10,14 @@ namespace sead
 {
 class Heap;
 
-class CriticalSection
-#if not SEAD_CRITICALSECTION_PURE
-    : public IDisposer
-#endif
+class CriticalSection : public IDisposer
 {
 public:
     CriticalSection();
     explicit CriticalSection(Heap* disposer_heap);
-#if not SEAD_CRITICALSECTION_PURE
-    CriticalSection(Heap* disposer_heap, HeapNullOption heap_null_option);
-#endif
+    CriticalSection(const CriticalSection&){ };
     virtual ~CriticalSection();
 
-    CriticalSection(const CriticalSection&){ };
     CriticalSection& operator=(const CriticalSection&){ };
 
     void lock();

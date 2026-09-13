@@ -10,7 +10,7 @@
 namespace
 {
 u8 cFontBitmap[4608];
-sead::Vector2<int> cCharSize;
+sead::Vector2i cCharSize;
 
 u32 getByteByDot_(u32 format)
 {
@@ -40,11 +40,11 @@ namespace sead
 DirectPrintCtr::DirectPrintCtr():
     mStringTop(NULL),
     mStringByte(0),
-    mBufferSize(Vector2<int>::zero),
+    mBufferSize(Vector2i::zero),
     mDispBox(),
     mBGColor(Color4u8::cWhite), 
     mCharColor(Color4u8::cBlack),
-    mCursorPos(Vector2<int>::zero),
+    mCursorPos(Vector2i::zero),
     mCharSize(0x3F)
 {
 }
@@ -58,7 +58,7 @@ void DirectPrintCtr::changeDisplayBuffer(void* stringTop)
     mStringTop = stringTop;
 }
 
-void DirectPrintCtr::changeDisplayBuffer(void* stringTop, u32 byte, Vector2<int> const& bufSize, BoundBox2<int> const& box)
+void DirectPrintCtr::changeDisplayBuffer(void* stringTop, u32 byte, Vector2i const& bufSize, BoundBox2i const& box)
 {
     changeDisplayBuffer(stringTop);
     mStringByte = byte;
@@ -66,7 +66,7 @@ void DirectPrintCtr::changeDisplayBuffer(void* stringTop, u32 byte, Vector2<int>
 
     if(box.isUndef())
     {
-        mDispBox.set(Vector2<int>::zero, mBufferSize);
+        mDispBox.set(Vector2i::zero, mBufferSize);
     }
     else
     {
@@ -93,7 +93,7 @@ void DirectPrintCtr::checkBufferIsNotOnVRAM_()
     }
 }
 
-void DirectPrintCtr::convertPositionUserOriginToDeviceOrigin_(Vector2<int>* org, Vector2<int> const& bufSize)
+void DirectPrintCtr::convertPositionUserOriginToDeviceOrigin_(Vector2i* org, Vector2i const& bufSize)
 {
     org->x = mBufferSize.y - bufSize.y;
     org->y = bufSize.x;
@@ -106,40 +106,40 @@ void DirectPrintCtr::flush()
     nn::dsp::CTR::FlushDataCache(mStringByte, mBufferSize.x * byteFmt * mBufferSize.y);
 }
 
-void DirectPrintCtr::printf(Vector2<int> const& bufSize, const char* msg, ...)
+void DirectPrintCtr::printf(Vector2i const& bufSize, const char* msg, ...)
 {
     SafeString string(msg);
     vprintf(bufSize, msg, string);
 }
 
-void DirectPrintCtr::printf(Vector2<int> const& bufSize, bool autoWrap, bool drawDot, const char* msg, ...)
+void DirectPrintCtr::printf(Vector2i const& bufSize, bool autoWrap, bool drawDot, const char* msg, ...)
 {
     SafeString string(msg);
     vprintf(bufSize, autoWrap, drawDot, msg, string);
 }
 
-void DirectPrintCtr::vprintf(Vector2<int> const& bufSize, SafeString const& msg, std::__va_list list)
+void DirectPrintCtr::vprintf(Vector2i const& bufSize, SafeString const& msg, std::__va_list list)
 {
     vprintf(bufSize, true, true, msg, list);
 }
 
-void DirectPrintCtr::vprintf(Vector2<int> const& bufSize, bool autoWrap, bool drawDot, SafeString const& msg, std::__va_list list)
+void DirectPrintCtr::vprintf(Vector2i const& bufSize, bool autoWrap, bool drawDot, SafeString const& msg, std::__va_list list)
 {
     FixedSafeString<256> string;
     string.formatV(msg.cstr(), list);
     putString(bufSize, autoWrap, drawDot, msg);
 }
 
-void DirectPrintCtr::putString(Vector2<int> const& bufSize, SafeString const& string)
+void DirectPrintCtr::putString(Vector2i const& bufSize, SafeString const& string)
 {
     putString(bufSize, true, true, string);
 }
 
-void DirectPrintCtr::putString(Vector2<int> const& bufSize, bool autoWrap, bool drawDot, SafeString const& string)
+void DirectPrintCtr::putString(Vector2i const& bufSize, bool autoWrap, bool drawDot, SafeString const& string)
 {
     checkBufferIsNotOnVRAM_();
 
-    Vector2<int> curPos = mBufferSize;
+    Vector2i curPos = mBufferSize;
     int right = mDispBox.getSizeX();
 
     for(SafeString::iterator it = string.begin(); it != string.end(); ++it)
@@ -172,20 +172,20 @@ void DirectPrintCtr::putString(Vector2<int> const& bufSize, bool autoWrap, bool 
     }
 }
 
-void* DirectPrintCtr::putDot_(Vector2<int> const& bufSize, const u8* src, s32 size)
+void* DirectPrintCtr::putDot_(Vector2i const& bufSize, const u8* src, s32 size)
 {
     uptr dst = reinterpret_cast<uptr>(mStringTop) + static_cast<uptr>(bufSize.y) * mBufferSize.y + static_cast<uptr>(bufSize.x) * size;
     return MemUtil::copy(reinterpret_cast<void*>(dst), src, size);
 }
 
-void DirectPrintCtr::putChar(Vector2<int> const& bufSize, char c)
+void DirectPrintCtr::putChar(Vector2i const& bufSize, char c)
 {
     putChar(bufSize, true, c);
 }
 
-void DirectPrintCtr::putChar(Vector2<int> const& bufSize, bool drawDot, char c)
+void DirectPrintCtr::putChar(Vector2i const& bufSize, bool drawDot, char c)
 {
-    Vector2<int> min;
+    Vector2i min;
     min.setAdd(bufSize, mDispBox.getMin());
 
     SEAD_ASSERT_MSG(mStringTop, "Current display buffer is null");
@@ -198,9 +198,9 @@ void DirectPrintCtr::putChar(Vector2<int> const& bufSize, bool drawDot, char c)
     convertColorFormat_(bgFmt, mBGColor, mStringByte);
     convertColorFormat_(charFmt, mCharColor, mStringByte);
 
-    Vector2<int> org;
+    Vector2i org;
 
-    Vector2<int> charSize(0, cCharSize.y);
+    Vector2i charSize(0, cCharSize.y);
 
     org = bufSize + charSize;
 
@@ -234,24 +234,24 @@ void DirectPrintCtr::putChar(Vector2<int> const& bufSize, bool drawDot, char c)
 
                 if (*src != 0)
                 {
-                    Vector2<int> pos(org.x + x, org.y + y);
+                    Vector2i pos(org.x + x, org.y + y);
                     putDot_(pos, charFmt, byte);
                 }
             }
 
             if (drawDot)
             {
-                Vector2<int> pos(org.x + x, org.y + y);
+                Vector2i pos(org.x + x, org.y + y);
                 putDot_(pos, bgFmt, byte);
             }
         }
     }
 }
 
-void DirectPrintCtr::clear(BoundBox2<int> const& box)
+void DirectPrintCtr::clear(BoundBox2i const& box)
 {
-    Vector2<int> min;
-    Vector2<int> size(box.getSizeX(), box.getSizeY());
+    Vector2i min;
+    Vector2i size(box.getSizeX(), box.getSizeY());
     min.setAdd(box.getMin(), box.getMin());
     SEAD_ASSERT_MSG(mStringTop, "Current display buffer is null");
     SEAD_ASSERT(mBufferSize.x > 0 && mBufferSize.y > 0);
@@ -261,10 +261,10 @@ void DirectPrintCtr::clear(BoundBox2<int> const& box)
     u8 bgColor[4];
     convertColorFormat_(bgColor, mBGColor, mStringByte);
 
-    Vector2<int> dotSize;
+    Vector2i dotSize;
     dotSize.set(0, cCharSize.y);
 
-    Vector2<int> bufSize;
+    Vector2i bufSize;
     bufSize = min + dotSize;
 
     convertPositionUserOriginToDeviceOrigin_(&dotSize, bufSize);
@@ -272,7 +272,7 @@ void DirectPrintCtr::clear(BoundBox2<int> const& box)
     {
         for (s32 y = 0; y < dotSize.y; ++y)
         {
-            Vector2<int> pos(min.x + x, min.y + y);
+            Vector2i pos(min.x + x, min.y + y);
 
             putDot_(pos, bgColor, byte);
         }

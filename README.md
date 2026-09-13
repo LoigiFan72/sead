@@ -27,11 +27,12 @@ Note that many names (especially for inlined, templated functions) are just plai
 
 ## Folder Structure
 
-* **addins** - Additional libraries used by *sead*.
-* **include** - Headers used for *sead*.
-* **lib** - Library used by *sead*.
-* **modules/src** - Module source code.
-* **res** - `sead::PrimitiveRendererX` Res DVLP frag/vert.
+* **/LIBRARY_ROOT/sead/**
+    |____ **addins** - Additional libraries used by *sead*.
+    |____ **include** - Headers used for *sead*.
+    |____ **lib** - Libraries used by *sead*.
+    |____ **modules/src** - Module source code.
+    |____ **res** - Raw DVLE / DVLP Shader binary files for CTR. Contains the **primitive_renderer_ctr.bsm** sead shader as well.
 
 ## Addins
 
@@ -39,14 +40,14 @@ Note that many names (especially for inlined, templated functions) are just plai
 
 ## Libraries
 
-* **CtrSDK** - The standard Software Developer Kit for 3DS.
-* **Nw4cEngine** - The NintendoWare4Ctr Graphics and Sound engine.
+* **CtrSDK** - The standard Software Development Kit for 3DS.
+* **Nw4cEngine** - The NintendoWare4Ctr (NW4C) Graphics and Sound engine.
 
 ## Modules
 
 For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/sead). Several modules currently fail to build for Switch.
 
-* **audio** - Audio
+* **audio** - Audio and sound
 * **basis** - Types, asserts, allocation operators
 * **codec** - Base64, CRC16, CRC32
 * **container** - Templated container classes
@@ -64,7 +65,7 @@ For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/s
 * **random** - Random number generator
 * **resource** - Resource (loading, decompressing, etc.)
 * **stream** - Stream IO
-* **tentative** - Tentative (Bitmap handling)
+* **tentative** - Tentative Resources (Bitmap handling)
 * **thread** - Thread utilities (threads, critical sections, message queues, etc.)
 * **time** - Time utilities
 
@@ -80,11 +81,12 @@ Platform-specific files are usually placed into a subdirectory that is called:
 Different features of sead can be implemented/left out in conjunction to which game the library is being used for:
 
 Set `SEAD_VERSION` to:
+- `SEAD_VERSION_NONE`      (0): Placeholder until determined
 - `SEAD_VERSION_REDPEPPER` (1): Super Mario 3D Land
 - `SEAD_VERSION_CTRDASH`   (2): Mario Kart 7
-- `TODO`
 - `SEAD_VERSION_GARDEN`    (3): Animal-Crossing: New Leaf
 - `SEAD_VERSION_BIGRED`    (4): New Super Mario Bros. 2
+- `SEAD_VERSION_CTRDASHE3` (5): Mario Kart for 3DS (E3 2010)
 
 Presets and features for more games can be added if desired.
 
@@ -92,8 +94,10 @@ Presets and features for more games can be added if desired.
 
 Building this project requires:
 
-- A partially C++17 capable compiler (like >= Clang 3.9). While older parts of sead are written in C++03, the newer modules in sead target C++11 (or newer) and recent C++ language or library features make writing C++ more convenient. Not all features of C++17 are utilized, compilers supporting parts of C++1z might be enough to compile the project.
-- CMake 3.10+
+- ARM C++ Complier (ARMCC) Version 4.0/4.1/5.0 [which can be found here.](https://github.com/RE-Pepper/data/releases/tag/dasdasdsa)
+- The Nintendo 3DS Software Development Kit hooked to your project [which can be found here.](https://github.com/LoigiFan72/CTRSDK).
+- The Nintendo 3DS NintendoWare Graphics / Sound engine hooked to your project [which can be found here.](https://github.com/LoigiFan72/NW4C). (*required* for **audio**, **gfx**, **framework/ctr_nw4c** libraries.)
+- **Note:** Compiler is the same has your games version. i.e. MK7 Uses 894, so **sead** will use the same.
 
 ### Configuration
 
@@ -102,7 +106,8 @@ sead can be configured with several compile-time defines:
 * `SEAD_DEBUG`: enables assertions and HostIO code.
 
 #### Platforms
-* `CTRSDK` : HorizonSDK (CTRSDK) (Nintendo 3DS or any member of the 3D-Screen Family not including DS)
+* `CTRSDK` : Platform for CTR
+* `CTRWIN` : Platform for Windows emulating CTR
 
 Other platforms (generic Unix, iOS, Android, CTR) are not supported.
 
@@ -128,4 +133,4 @@ If a function is inlined, you should try as hard as possible to make it match pe
 
 ## Planned Devices ##
 
-* **winctr** - Allow a Windows Device to Emulate the CTR Platform.
+* **ctrwin** - Allow a Windows Device to Emulate the CTR Platform.

@@ -22,7 +22,9 @@ template <typename T, bool AutoDestruct = false>
 class StorageFor
 {
 public:
-    constexpr StorageFor() = default;
+    constexpr StorageFor()
+    {
+    }
 
     explicit StorageFor(InitializeTag) { constructDefault(); }
 

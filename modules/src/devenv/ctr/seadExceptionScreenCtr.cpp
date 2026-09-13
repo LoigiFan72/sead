@@ -146,7 +146,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
 
     disableAssertCallback();
 
-    Vector2<int> bufPos = Vector2<int>::zero;
+    Vector2i bufPos = Vector2i::zero;
 
     putHaltMessage_(bufPos, msg);
     mPrinter.flush();
@@ -172,7 +172,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
     {
         if (redraw)
         {
-            putHaltMessage_(Vector2<int>(bufPos.x, bufPos.y + yOffset), msg);
+            putHaltMessage_(Vector2i(bufPos.x, bufPos.y + yOffset), msg);
 
             mPrinter.flush();
         }
@@ -201,7 +201,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
             if (!redraw)
                 break;
 
-            putHaltMessage_(Vector2<int>(bufPos.x, bufPos.y + yOffset), msg);
+            putHaltMessage_(Vector2i(bufPos.x, bufPos.y + yOffset), msg);
 
             yOffset -= 8;
             redraw = true;
@@ -210,7 +210,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
         {
             if (yOffset + 8 <= 0)
             {
-                putHaltMessage_(Vector2<int>(bufPos.x, bufPos.y + yOffset), msg);
+                putHaltMessage_(Vector2i(bufPos.x, bufPos.y + yOffset), msg);
 
                 yOffset += 8;
                 redraw = true;
@@ -219,7 +219,7 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
     }
 }
 
-int ExceptionScreenCtr::putHaltMessage_(Vector2<int> const& pos, char const* msg)
+int ExceptionScreenCtr::putHaltMessage_(Vector2i const& pos, char const* msg)
 {
 {
     SafeString string(msg);
@@ -229,7 +229,7 @@ int ExceptionScreenCtr::putHaltMessage_(Vector2<int> const& pos, char const* msg
     return lastY < mPrinter.getBoundBox().getSizeY();
 }
 
-void ExceptionScreenCtr::clearMessage_(Vector2<int> const& bufSize, const char* msg)
+void ExceptionScreenCtr::clearMessage_(Vector2i const& bufSize, const char* msg)
 {
     Color4u8 color = mPrinter.getCharColor();
     mPrinter.setCharColor(mPrinter.getBGColor());

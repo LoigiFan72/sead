@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SEAD_BITMAP_BUILDER_H_
+#define SEAD_BITMAP_BUILDER_H_
 
 #include "stream/seadStream.h"
 
@@ -33,3 +34,5 @@ private:
     s32 mHeight;
 };
 }
+
+#endif

@@ -9,12 +9,10 @@ namespace sead
 {
 MessageQueue::MessageQueue()
 {
-
 }
 
 MessageQueue::~MessageQueue()
 {
-
 }
 
 void MessageQueue::allocate(s32 size, Heap* heap)
@@ -52,31 +50,35 @@ bool MessageQueue::push(MessageQueue::Element message, MessageQueue::BlockType b
 
 MessageQueue::Element MessageQueue::pop(MessageQueue::BlockType block_type)
 {
-    u64 message;
+    u32 message;
 
     if (block_type == BlockType::Blocking)
     {
-        mMessageQueueInner.Dequeue(&message);
+        mMessageQueueInner.Dequeue();
         return message;
     }
 
     if (mMessageQueueInner.TryDequeue(&message))
+    {
         return message;
+    }
     return 0;
 }
 
 MessageQueue::Element MessageQueue::peek(MessageQueue::BlockType block_type) const
 {
-    u64 message;
+    u32 message;
 
     if (block_type == BlockType::Blocking)
     {
-        mMessageQueueInner.GetFront(&message);
+        mMessageQueueInner.GetFront();
         return message;
     }
 
     if (mMessageQueueInner.TryGetFront(&message))
+    {
         return message;
+    }
     return 0;
 }
 

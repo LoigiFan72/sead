@@ -9,7 +9,6 @@ namespace sead
 CriticalSection::CriticalSection():
     IDisposer()
 {
-    
 }
 
 CriticalSection::~CriticalSection(){}

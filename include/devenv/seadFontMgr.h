@@ -39,9 +39,9 @@ public:
     virtual float getCharWidth(char16_t c) const = 0;
     virtual u32 getEncoding() const = 0;
     virtual u32 getMaxDrawNum() const = 0;
-    virtual void begin(DrawContext* ctx) const = 0;
-    virtual void end(DrawContext* ctx) const = 0;
-    virtual void print(DrawContext* ctx, const Projection& proj, const Camera& cam,
+    virtual void begin() const = 0;
+    virtual void end() const = 0;
+    virtual void print(const Projection& proj, const Camera& cam,
                        const Matrix34f& mtx, const Color4f& color, const void* text,
                        int len) const = 0;
 };

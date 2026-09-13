@@ -18,10 +18,18 @@ using HandleBuffer = SafeArray<u8, 32>;
 class HandleBase
 {
 public:
-    HandleBase() = default;
-    HandleBase(const HandleBase&) = delete;
-    HandleBase& operator=(const HandleBase&) = delete;
-    virtual ~HandleBase() = default;
+    HandleBase()
+    {
+    }
+    HandleBase(const HandleBase&)
+    {
+    }
+    HandleBase& operator=(const HandleBase&)
+    {
+    }
+    virtual ~HandleBase()
+    {
+    }
 
     FileDevice* getDevice() const { return mDevice; }
     FileDevice* getOriginalDevice() const { return mOriginalDevice; }
@@ -50,6 +58,7 @@ public:
         cFileOpenFlag_WriteOnly = 1,  // w
         cFileOpenFlag_ReadWrite = 2,  // r+
         cFileOpenFlag_Create = 3      // w+
+
     };
 
     enum SeekOrigin
@@ -342,11 +351,7 @@ public:
     }
     virtual bool isMatchDevice_(const HandleBase* handle) const;
 
-#ifdef SWITCH
-    static const s32 cBufferMinAlignment = 0x20;
-#else
     static const s32 cBufferMinAlignment = 0x40;
-#endif
 
 protected:
     virtual bool doIsAvailable_() const = 0;

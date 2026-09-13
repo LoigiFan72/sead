@@ -3,7 +3,7 @@
 
 namespace
 {
-static const char16 cEmptyStringChar16[1] = u"";
+static const char16 cEmptyStringChar16[1] = L"";
 
 }  // namespace
 
@@ -26,44 +26,6 @@ const char16 SafeStringBase<char16>::cLineBreakChar = static_cast<char16>('\n');
 
 template <>
 const SafeStringBase<char16> SafeStringBase<char16>::cEmptyString(cEmptyStringChar16);
-
-template <>
-SafeStringBase<char>& SafeStringBase<char>::operator=(const SafeStringBase<char>& other) = default;
-
-template <>
-SafeStringBase<char16>&
-SafeStringBase<char16>::operator=(const SafeStringBase<char16>& other) = default;
-
-template <>
-BufferedSafeStringBase<char>&
-BufferedSafeStringBase<char>::operator=(const SafeStringBase<char>& other)
-{
-    copy(other);
-    return *this;
-}
-
-template <>
-BufferedSafeStringBase<char16>&
-BufferedSafeStringBase<char16>::operator=(const SafeStringBase<char16>& other)
-{
-    copy(other);
-    return *this;
-}
-
-template <>
-HeapSafeStringBase<char>& HeapSafeStringBase<char>::operator=(const SafeStringBase<char>& other)
-{
-    this->copy(other);
-    return *this;
-}
-
-template <>
-HeapSafeStringBase<char16>&
-HeapSafeStringBase<char16>::operator=(const SafeStringBase<char16>& other)
-{
-    this->copy(other);
-    return *this;
-}
 
 template <>
 void BufferedSafeStringBase<char>::assureTerminationImpl_() const

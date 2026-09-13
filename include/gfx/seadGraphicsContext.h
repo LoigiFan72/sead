@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gfx/seadGraphics.h>
+#include <nn/gr.h>
 
 namespace sead 
 {
@@ -14,6 +15,11 @@ public:
     }
 
     void apply() const;
+    void applyAlphaTest() const;
+    void applyBlendAndConstantColor() const;
+    void applyCulling() const;
+    void applyDepthTest() const;
+    void applyStencilTest() const;
 
     void setDepthEnable(bool testEnable, bool writeEnable)
     {
@@ -157,19 +163,6 @@ public:
         mStencilOpZPass = zpass;
     }
 
-    void setPolygonMode(Graphics::PolygonMode front, Graphics::PolygonMode back)
-    {
-        mPolygonModeFront = front;
-        mPolygonModeBack = back;
-    }
-
-    void setPolygonOffsetEnable(bool fillFrontEnable, bool fillBackEnable, bool pointLineEnable)
-    {
-        mPolygonOffsetFrontEnable = fillFrontEnable;
-        mPolygonOffsetBackEnable = fillBackEnable;
-        mPolygonOffsetPointLineEnable = pointLineEnable;
-    }
-
     bool getDepthTestEnable() const
     {
         return mDepthTestEnable;
@@ -300,31 +293,6 @@ public:
         return mStencilOpZPass;
     }
 
-    Graphics::PolygonMode getPolygonModeFront() const
-    {
-        return mPolygonModeFront;
-    }
-
-    Graphics::PolygonMode getPolygonModeBack() const
-    {
-        return mPolygonModeBack;
-    }
-
-    bool getPolygonOffsetFrontEnable() const
-    {
-        return mPolygonOffsetFrontEnable;
-    }
-
-    bool getPolygonOffsetBackEnable() const
-    {
-        return mPolygonOffsetBackEnable;
-    }
-
-    bool getPolygonOffsetPointLineEnable() const
-    {
-        return mPolygonOffsetPointLineEnable;
-    }
-
 protected:
     bool mDepthTestEnable;
     bool mDepthWriteEnable;
@@ -352,11 +320,11 @@ protected:
     Graphics::StencilOp mStencilOpFail;
     Graphics::StencilOp mStencilOpZFail;
     Graphics::StencilOp mStencilOpZPass;
-    Graphics::PolygonMode mPolygonModeFront;
-    Graphics::PolygonMode mPolygonModeBack;
-    bool mPolygonOffsetFrontEnable;
-    bool mPolygonOffsetBackEnable;
-    bool mPolygonOffsetPointLineEnable;
+    RenderState mRenderState;
+    PicaDataDepthTest mPicaDepthTest;
+    PicaDataAlphaTest mPicaAlphaTest;
+    PicaDataStencilTest mPicaStencilTest;
+    u32 mPicaDataMask;
 };
 
 } // namespace sead

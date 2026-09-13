@@ -103,7 +103,9 @@ private:
 };
 
 typedef BoundBox2<f32> BoundBox2f;
+typedef BoundBox2<s32> BoundBox2i;
 typedef BoundBox3<f32> BoundBox3f;
+typedef BoundBox3<s32> BoundBox3i;
 
 }  // namespace sead
 

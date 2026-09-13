@@ -11,7 +11,9 @@ public:
     explicit ArchiveFileDevice(ArchiveRes* archive_res) : FileDevice("arc"), mArchive(archive_res)
     {
     }
-    ~ArchiveFileDevice() override = default;
+    virtual ~ArchiveFileDevice()
+    {
+    }
 
     u8* tryLoadWithEntryID(s32 id, LoadArg& arg);
     FileDevice* tryOpenWithEntryID(FileHandle* handle, s32 id, FileOpenFlag flag, u32 div_size);

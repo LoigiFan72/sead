@@ -17,8 +17,7 @@ class ControllerAddon;
 
 class ControllerMgr : public CalculateTask
 {
-    SEAD_TASK_SINGLETON(ControllerMgr)
-    SEAD_RTTI_OVERRIDE(ControllerMgr, CalculateTask)
+    SEAD_TASK_SINGLETON_DISPOSER(ControllerMgr);
 
 private:
     class ConstructArg : public TaskConstructArg
