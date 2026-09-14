@@ -25,7 +25,7 @@ Heap* Heap::findContainHeap_(const void* ptr)
     if (!isInclude(ptr))
         return nullptr;
 
-    for (auto it = mChildren.begin(); it != mChildren.end(); ++it)
+    for (HeapList::iterator it = mChildren.begin(); it != mChildren.end(); ++it)
     {
         if (it->isInclude(ptr))
             return it->findContainHeap_(ptr);

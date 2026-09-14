@@ -41,7 +41,7 @@ public:
             return false;
         }
 
-        auto* buf = new (heap, alignment, std::nothrow) u8[calculateWorkBufferSize(capacity)];
+        u8* buf = new (heap, alignment, std::nothrow) u8[calculateWorkBufferSize(capacity)];
         if (!buf)
             return false;
 
@@ -116,7 +116,7 @@ public:
         {
             for (int i = index; i < index + count; ++i)
             {
-                auto* ptr = unsafeAt(i);
+                T* ptr = unsafeAt(i);
                 ptr->~T();
                 mFreeList.free(ptr);
             }
@@ -128,7 +128,7 @@ public:
     {
         for (s32 i = 0; i < mPtrNum; ++i)
         {
-            auto* ptr = unsafeAt(i);
+            T* ptr = unsafeAt(i);
             ptr->~T();
             mFreeList.free(ptr);
         }

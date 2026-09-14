@@ -18,8 +18,7 @@ protected:
     virtual FileDevice* doOpen_(FileHandle* handle, const SafeString& path, FileOpenFlag flag);
     virtual bool doClose_(FileHandle* handle);
     virtual bool doRead_(u32* bytesRead, FileHandle* handle, u8* outBuffer, u32 bytesToRead);
-    virtual bool doWrite_(u32* bytesWritten, FileHandle* handle, const u8* inBuffer,
-                  u32 bytesToWrite);
+    virtual bool doWrite_(u32* bytesWritten, FileHandle* handle, const u8* inBuffer, u32 bytesToWrite);
     virtual bool doSeek_(FileHandle* handle, s32 offset, SeekOrigin origin);
     virtual bool doGetCurrentSeekPos_(u32* seekPos, FileHandle* handle);
     virtual bool doGetFileSize_(u32* fileSize, const SafeString& path);
@@ -28,11 +27,11 @@ protected:
     virtual bool doIsExistDirectory_(bool* exists, const SafeString& path);
     virtual FileDevice* doOpenDirectory_(DirectoryHandle* handle, const SafeString& path);
     virtual bool doCloseDirectory_(DirectoryHandle* handle);
-    virtual bool doReadDirectory_(u32* entriesRead, DirectoryHandle* handle, DirectoryEntry* entries,
-                          u32 entriesToRead);
+    virtual bool doReadDirectory_(u32* entriesRead, DirectoryHandle* handle, DirectoryEntry* entries, u32 entriesToRead);
     virtual bool doMakeDirectory_(const SafeString& path, u32 u_32);
     virtual s32 doGetLastRawError_() const;
     virtual void doResolvePath_(BufferedSafeString* out, const SafeString& path) const;
+    virtual const char* getArchiveName_() const = 0;
 
     nn::Result openDirectryImpl_(nn::fs::Directory* dir, SafeString const& pathInner, SafeString const& pathOutter);
     nn::Result openFileStreamImpl_(nn::fs::FileStream* fs, SafeString const& pathInner, SafeString const& pathOutter, u32 mode);

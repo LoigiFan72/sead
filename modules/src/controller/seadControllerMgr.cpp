@@ -8,7 +8,7 @@
 
 namespace sead
 {
-SEAD_TASK_SINGLETON_IMPL(ControllerMgr)
+SEAD_TASK_SINGLETON_DISPOSER_IMPL(ControllerMgr);
 
 // NON_MATCHING: storing too much 00s into stack (for ConstructArg)
 ControllerMgr::ControllerMgr(): 
@@ -51,13 +51,12 @@ void ControllerMgr::finalize()
 void ControllerMgr::initializeDefault(Heap* heap)
 {
     s32 controller_max;
-#ifdef cafe
-    controller_max = 6;
-#elif defined(NNSDK)
-    controller_max = 16;
-#else
-#error "Unknown Platform"
-#endif
+
+    // Ctr Bros are cooked...
+    //
+    // 1 fucking controller, ref do something
+    controller_max = 1;
+
     initialize(controller_max, heap);
 
 #ifdef NNSDK
@@ -155,7 +154,7 @@ s32 ControllerMgr::findControllerPort(const Controller* controller) const
 Framework* ControllerMgr::getFramework() const
 {
     if (mTaskMgr)
-        return mTaskMgr->mParentFramework;
+        return mTaskMgr->getFramework();
     return nullptr;
 }
 

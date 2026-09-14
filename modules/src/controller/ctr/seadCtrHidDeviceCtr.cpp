@@ -32,82 +32,72 @@ CtrHidDevice::CtrHidDevice(ControllerMgr* mgr):
 
 void CtrHidDevice::calc()
 {
-    if (mPadReaderPtr != nullptr)
+    if (mPadReaderPtr->ReadLatest(&mPadStatus))
     {
-        if (mPadReaderPtr->ReadLatest(&mPadStatus))
-        {
-            mFlags |= nn::hid::CTR::BUTTON_A;
-        }
-        else
-        {
-            mFlags &= nn::hid::CTR::BUTTON_A;
-        }
-    }
-
-    if (mTouchPanelReaderPtr != nullptr)
-    {
-        if (mTouchPanelReaderPtr->ReadLatest(&mTouchPanelStatus))
-        {
-            mFlags |= nn::hid::CTR::BUTTON_B;
-        }
-        else
-        {
-            mFlags &= ~nn::hid::CTR::BUTTON_B;
-        }
+        mFlags |= cPadReader;
     }
     else
     {
-        mFlags &= ~nn::hid::CTR::BUTTON_B;
+        mFlags &= ~cPadReader;
+    }
+
+    if (mTouchPanelReaderPtr->ReadLatest(&mTouchPanelStatus))
+    {
+        mFlags |= cTouchPanel;
+    }
+    else
+    {
+        mFlags &= ~cTouchPanel;
     }
 
     if (mAccelerometerReaderPtr != nullptr)
     {
         if (mAccelerometerReaderPtr->ReadLatest(&mAccelerometerStatus))
         {
-            mFlags |= nn::hid::CTR::PSEUDO_BUTTON_SELECT;
+            mFlags |= cAccelerometer;
 
             mAccelerometerReaderPtr->ConvertToAcceleration(&mAccelerometerFloat, 1, &mAccelerometerStatus);
         }
         else
         {
-            mFlags &= ~nn::hid::CTR::PSEUDO_BUTTON_SELECT;
+            mFlags &= ~cAccelerometer;
         }
     }
     else
     {
-        mFlags &= ~nn::hid::CTR::PSEUDO_BUTTON_SELECT;
+        mFlags &= ~cAccelerometer;
     }
 
     if (mGyroscopeReaderPtr != nullptr)
     {
         if (mGyroscopeReaderPtr->ReadLatest(&mGyroscopeStatus))
         {
-            mFlags |= nn::hid::CTR::BUTTON_START;
+            mFlags |= cGyroscope;
         }
         else
         {
-            mFlags &= ~nn::hid::CTR::BUTTON_START;
+            mFlags &= ~cGyroscope;
         }
     }
     else
     {
-        mFlags &= ~nn::hid::CTR::BUTTON_START;
+        mFlags &= ~cGyroscope;
     }
 #ifdef SEAD_DEBUG
     if (mDebugPadReaderPtr != nullptr)
     {
         if (mDebugPadReaderPtr->ReadLatest(&mDebugPadStatus))
         {
-            mFlags |= nn::hid::CTR::DEBUG_PAD_BUTTON_A;
+            mFlags |= cDebugPadReader;
         }
         else
         {
-            mFlags &= ~nn::hid::CTR::DEBUG_PAD_BUTTON_A;
+            mFlags &= ~cDebugPadReader;
         }
     }
     else
     {
-        mFlags &= ~nn::hid::CTR::DEBUG_PAD_BUTTON_A;
+        mFlags &= ~cDebugPadReader;
     }
 #endif
 }

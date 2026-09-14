@@ -140,7 +140,7 @@ void TaskMgr::listenPropertyEvent(const hostio::PropertyEvent* ev)
 
 void TaskMgr::genMessage(hostio::Context* context)
 {
-    for (auto it = mActiveList.begin(); it != mActiveList.end(); ++it)
+    for (TaskBase::List::iterator it = mActiveList.begin(); it != mActiveList.end(); ++it)
     {
         TaskBase* task = *it;
 

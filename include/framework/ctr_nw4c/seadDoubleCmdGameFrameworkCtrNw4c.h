@@ -31,8 +31,8 @@ protected:
 protected:
     s32 _2068; // 0x2068
     u32 mDoubleBuf[2]; // 0x206C
-    GLuint mDoubleBufferSizeTop[3]; // 0x2074
-    GLuint mDoubleBufferSizeBtm[3]; // 0x2080
+    GLuint mDoubleBufferTop[3]; // 0x2074
+    GLuint mDoubleBufferBtm[3]; // 0x2080
     u32 mDoubleDispBufList; // 0x208C
     u32 mDoubleDispBufState; // 0x2090
     u32 _2094;

@@ -61,7 +61,7 @@ T curveLinear_(f32 t, const CurveDataInfo* info, const T* f)
     if (t < 0)
         return f[0];
 
-    const auto n = info->numUse - 1;
+    const u8 n = info->numUse - 1;
     const int i = n * t;
     if (i >= n)
         return f[n];
@@ -77,14 +77,14 @@ T curveHermit_(f32 t, const CurveDataInfo* info, const T* f)
     if (t < 0)
         return f[0];
 
-    const auto n = (info->numUse / 2) - 1;
+    const u8 n = (info->numUse / 2) - 1;
     const int i = n * t;
     const int j = 2 * i;
     if (i >= n)
         return f[j];
 
-    const auto x = fracPart(n * t);
-    const auto coeff = &f[j];
+    const f32 x = fracPart(n * t);
+    const T* coeff = &f[j];
 
     return ((2 * x * x * x) - (3 * x * x) + 1) * coeff[0]  // (2t^3 - 3t^2 + 1)p0
            + ((-2 * x * x * x) + (3 * x * x)) * coeff[2]   // (-2t^3 + 2t^2)p1
@@ -118,7 +118,7 @@ template <typename T>
 T curveSinPow2_(f32 t_, const CurveDataInfo*, const T* f)
 {
     const T t = t_;
-    const auto y = std::sin(f[0] * t * (2 * numbers::pi_v<T>));
+    const f32 y = std::sin(f[0] * t * (2 * numbers::pi_v<T>));
     return y * y * f[1];
 }
 
@@ -130,13 +130,13 @@ T curveLinear2D_(f32 t_, const CurveDataInfo* info, const T* f)
     if (f[0] >= t)
         return f[1];
 
-    const auto n = info->numUse / 2;
+    const u8 n = info->numUse / 2;
     if (f[2 * (n - 1)] <= t)
         return f[2 * (n - 1) + 1];
 
     for (s32 i = 0; i < n; ++i)
     {
-        const auto j = 2 * i;
+        const s32 j = 2 * i;
         if (f[j + 2] > t)
             return f[j + 1] + ((t - f[j]) / (f[j + 2] - f[j])) * (f[j + 3] - f[j + 1]);
     }
@@ -157,10 +157,10 @@ T curveHermit2D_(f32 t_, const CurveDataInfo* info, const T* f)
 
     for (s32 i = 0; i < n; ++i)
     {
-        const auto j = 3 * i;
+        const s32 j = 3 * i;
         if (f[j + 3] > t)
         {
-            const auto x = (t - f[j]) / (f[j + 3] - f[j]);
+            const T x = (t - f[j]) / (f[j + 3] - f[j]);
             return ((2 * x * x * x) - (3 * x * x) + 1) * f[j + 1]  // (2t^3 - 3t^2 + 1)p0
                    + ((-2 * x * x * x) + (3 * x * x)) * f[j + 4]   // (-2t^3 + 2t^2)p1
                    + ((x * x * x) - (x * x)) * f[j + 5]            // (t^3 - t^2)m1

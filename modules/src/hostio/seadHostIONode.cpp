@@ -3,7 +3,10 @@
 #include "hostio/seadHostIOReflexible.h"
 #include "hostio/seadHostIOThreadLock.h"
 
-namespace sead::hostio
+#if defined(SEAD_DEBUG)
+namespace sead
+{
+namespace hostio
 {
 Node::Node()
 {
@@ -73,4 +76,6 @@ void Node::disposeHostIOImpl_()
 {
     destroy();
 }
-}  // namespace sead::hostio
+}  // namespace hostio
+}  // namespace sead
+#endif // SEAD_DEBUG

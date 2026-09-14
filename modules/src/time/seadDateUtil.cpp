@@ -8,7 +8,7 @@ namespace DateUtil
 {
 bool isLeapYear(u32 year)
 {
-#ifdef MATCHING_HACK_NX_CLANG
+#ifdef MATCHING_HACK_CTR_CLANG
     bool div100, div4;
     return (div100 = year % 100 == 0, div4 = year % 4 == 0, !div100 & div4) | (year % 400 == 0);
 #else

@@ -166,52 +166,50 @@ template <typename T>
 class BufferedSafeStringBase : public SafeStringBase<T>
 {
 public:
-    __attribute__((always_inline)) BufferedSafeStringBase(T* buffer, s32 size)
-        : SafeStringBase<T>(buffer)
+    BufferedSafeStringBase(T* buffer, s32 size): 
+        SafeStringBase<T>(buffer)
+        mBufferSize(size)
     {
-        mBufferSize = size;
         if (size <= 0)
         {
             SEAD_ASSERT_MSG(false, "Invalied buffer size(%d).\n", this->getBufferSize());
-            this->mStringTop = nullptr;
-            this->mBufferSize = 0;
+            mStringTop = nullptr;
+            mBufferSize = 0;
         }
-        else
-        {
-            this->assureTerminationImpl_();
-        }
+
+        assureTerminationImpl_();
     }
 
-    BufferedSafeStringBase(const BufferedSafeStringBase&){ };
-    BufferedSafeStringBase(SafeStringBase<T>* original, s32 size):
-        SafeStringBase<T>(original->cstr())
+    BufferedSafeStringBase(const BufferedSafeStringBase&)
+    { 
+    };
+
+    BufferedSafeStringBase(BufferedSafeStringBase* original, s32 pos): 
+        SafeStringBase<T>(),
+        mBufferSize(0)
     {
-        if (original == nullptr)
+        if (!original)
         {
             SEAD_ASSERT_MSG(false, "original string must not be nullptr.");
             this->mStringTop = nullptr;
-            mBufferSize = 0;
             return;
         }
 
         if (pos < 0 || pos >= original->getBufferSize())
         {
-            SEAD_ASSERT_MSG(false, "pos(%d) out of bounds[0,%d)", pos,
-                        original->getBufferSize());
+            SEAD_ASSERT_MSG(false, "pos(%d) out of bounds[0,%d)", pos, original->getBufferSize());
             this->mStringTop = nullptr;
-            mBufferSize = 0;
             return;
         }
 
-        this->mStringTop = original->getMutableStringTop_() + pos;
+        this->mStringTop = original->getBuffer() + pos;
         mBufferSize = original->getBufferSize() - pos;
 
-        this->assureTerminationImpl_();
+        assureTerminationImpl_();
     }
     virtual ~BufferedSafeStringBase(){ };
 
-    BufferedSafeStringBase<T>&
-    operator=(const SafeStringBase<T>& other)
+    BufferedSafeStringBase<T>& operator=(const SafeStringBase<T>& other)
     {
         copy(other);
         return *this;
@@ -405,10 +403,16 @@ template <s32 L>
 class FixedSafeString : public FixedSafeStringBase<char, L>
 {
 public:
-    FixedSafeString() : FixedSafeStringBase<char, L>() {}
-    FixedSafeString(const SafeString& str) : FixedSafeStringBase<char, L>(str) {}
-    FixedSafeString(const FixedSafeString& other)
-        : FixedSafeString(static_cast<const SafeString&>(other))
+    FixedSafeString():
+        FixedSafeStringBase<char, L>()
+    {
+    }
+    FixedSafeString(const SafeString& str):
+        FixedSafeStringBase<char, L>(str)
+    {
+    }
+    FixedSafeString(const FixedSafeString& other): 
+        FixedSafeString(static_cast<const SafeString&>(other))
     {
     }
 

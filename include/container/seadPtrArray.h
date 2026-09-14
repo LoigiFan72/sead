@@ -41,7 +41,7 @@ public:
 
     void swap(s32 pos1, s32 pos2)
     {
-        auto* ptr = mPtrs[pos1];
+        void* ptr = mPtrs[pos1];
         mPtrs[pos1] = mPtrs[pos2];
         mPtrs[pos2] = ptr;
     }
@@ -168,7 +168,7 @@ protected:
         // Symbols show that `sort()` accepts a `void*` comparer, but needs to receive a `T*`
         // comparer in order to match SMO. This overload exists to safely accept a `T*` comparer.
         // This cast is UB, but we know that `cmpT` and `cmpVoid` have the same representation.
-        auto cmpVoid = reinterpret_cast<s32 (*)(const void*, const void*)>(cmpT);
+        s32 cmpVoid = reinterpret_cast<s32 (*)(const void*, const void*)>(cmpT);
         sort(cmpVoid);
     }
 
@@ -180,7 +180,7 @@ protected:
         // Symbols show that `sort()` accepts a `void*` comparer, but needs to receive a `T*`
         // comparer in order to match SMO. This overload exists to safely accept a `T*` comparer.
         // This cast is UB, but we know that `cmpT` and `cmpVoid` have the same representation.
-        auto cmpVoid = reinterpret_cast<s32 (*)(const void*, const void*)>(cmpT);
+        s32 cmpVoid = reinterpret_cast<s32 (*)(const void*, const void*)>(cmpT);
         heapSort(cmpVoid);
     }
     void heapSort(CompareCallbackImpl cmp);

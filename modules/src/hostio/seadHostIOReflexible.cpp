@@ -73,7 +73,7 @@ void Reflexible::safeDelete_(Reflexible::AllocFlg flag)
 
     if (string)
     {
-        auto pair = reinterpret_cast<ReflexibleStringCopy*>(uintptr_t(string) - sizeof(void*));
+        ReflexibleStringCopy* pair = reinterpret_cast<ReflexibleStringCopy*>(uintptr_t(string) - sizeof(void*));
         pair->heap->free(pair);
     }
 }
@@ -90,7 +90,7 @@ const char* Reflexible::createStringBuffer_(Reflexible::AllocFlg flag, const Saf
 
     SEAD_ASSERT(heap);
 
-    auto pair = static_cast<ReflexibleStringCopy*>(heap->alloc(name_len + 1 + sizeof(Heap*)));
+    ReflexibleStringCopy* pair = static_cast<ReflexibleStringCopy*>(heap->alloc(name_len + 1 + sizeof(Heap*)));
     pair->heap = heap;
     // Copy the string into the buffer and terminate it.
     MemUtil::copy(&pair->string_data, name.cstr(), name_len);

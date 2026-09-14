@@ -226,7 +226,7 @@ u32 SZSDecompressor::getDecompSize(const void* src)
     return Endian::toHostU32(Endian::cBig, BitUtil::bitCastPtr<u32>(src, 4));
 }
 
-s32 SZSDecompressor::readHeader_(DecompContext* context, const u8* src, u32 srcSize)
+s32 SZSDecompressor::readHeader_(DecompContext* context, const u8* src, u32 src_size)
 {
     s32 len = 0;
 
@@ -277,7 +277,7 @@ s32 SZSDecompressor::readHeader_(DecompContext* context, const u8* src, u32 srcS
     return len;
 }
 
-s32 SZSDecompressor::streamDecomp(DecompContext* context, const void* src, u32 srcSize)
+s32 SZSDecompressor::streamDecomp(DecompContext* context, const void* src, u32 src_size)
 {
     const u8* _src = static_cast<const u8*>(src);
     u32 n;
@@ -363,8 +363,11 @@ s32 SZSDecompressor::streamDecomp(DecompContext* context, const void* src, u32 s
         return context->destCount;
 }
 
-s32 SZSDecompressor::decomp(void* dst, u32 dstSize, const void* src, u32)
+s32 SZSDecompressor::decomp(void* dst, u32 dstSize, const void* src, u32 src_size)
 {
+    SEAD_ASSERT(dst);
+    SEAD_ASSERT(src);
+
     u32 magic = Endian::toHostU32(Endian::cBig, BitUtil::bitCastPtr<u32>(src));
     if (magic != 0x59617A30)
         return -1;

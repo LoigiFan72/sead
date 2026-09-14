@@ -58,6 +58,8 @@ public:
         u8 headerSize;
     };
 
+    s32 getHeaderSize(){ return 16; }
+
 public:
     SZSDecompressor(u32 workSize, u8* workBuffer);
     virtual ~SZSDecompressor() {}
@@ -67,9 +69,9 @@ public:
 
     static u32 getDecompAlignment(const void* src);
     static u32 getDecompSize(const void* src);
-    static s32 readHeader_(DecompContext* context, const u8* src, u32 srcSize);
-    static s32 streamDecomp(DecompContext* context, const void* src, u32 srcSize);
-    static s32 decomp(void* dst, u32 dstSize, const void* src, u32 srcSize);
+    static s32 readHeader_(DecompContext* context, const u8* src, u32 src_size);
+    static s32 streamDecomp(DecompContext* context, const void* src, u32 src_size);
+    static s32 decomp(void* dst, u32 dstSize, const void* src, u32 src_size);
 
     u32 mWorkSize;
     u8* mWorkBuffer;

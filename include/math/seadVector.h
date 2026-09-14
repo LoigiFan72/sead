@@ -158,6 +158,7 @@ struct Vector3 : public Policies<T>::Vec3Base {
     void setScaleAdd(T t, const Vector3<T>& a, const Vector3<T>& b);
     void setMul(const Mtx33& m, const Vector3& a);
     void setMul(const Mtx34& m, const Vector3& a);
+    void setMulAndDivByW(const Mtx44& m, const Self& v);
 
     static const Vector3 zero;
     static const Vector3 ex;

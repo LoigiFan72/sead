@@ -90,7 +90,7 @@ void HaltWithDetail(const char* file, int lineNo, const char* fmt, ...)
     PrintString(tmp, len);
 
     {
-        BufferedSafeString backtraceBuf(tmp[len], sizeof(tmp) - len);
+        BufferedSafeString backtraceBuf(tmp + len, static_cast<u32>(sizeof(tmp) - len));
         ExceptionScreenCtr::putBackTraceString(&backtraceBuf, getStackPointer());
     }
 

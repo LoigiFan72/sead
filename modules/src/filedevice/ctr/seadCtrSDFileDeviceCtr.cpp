@@ -9,11 +9,8 @@ namespace sead
 bool CtrSDFileDevice::doIsExistFile_(bool* exists, const SafeString& path)
 {
     nn::fs::Directory dir;
-    {
-        doGetLastRawError_();
-        SafeString inner;
-        nn_result = openDirectryImpl_(&dir, inner, path);
-    }
+    nn_result = openDirectryImpl_(&dir, getArchiveName_(), path);
+
     if(nn_result.IsSuccess())
     {
         exists = NULL;
@@ -22,11 +19,8 @@ bool CtrSDFileDevice::doIsExistFile_(bool* exists, const SafeString& path)
     if(Result::ConstRange<Result::Level::LEVEL_STATUS, Result::Summary::SUMMARY_NOT_FOUND, Result::Module::MODULE_NN_FS, 100, 100, 179>::Includes(nn_result))
     {
         FileStream fstream;
-        {
-            doGetLastRawError_();
-            SafeString inner;
-            nn_result = openFileStreamImpl_(&fstream, inner, path, nn::fs::OPEN_MODE_READ);
-        }
+        nn_result = openFileStreamImpl_(&fstream, getArchiveName_(), path, nn::fs::OPEN_MODE_READ);
+
         if(nn_result.IsSuccess())
         {
             *exists = true;

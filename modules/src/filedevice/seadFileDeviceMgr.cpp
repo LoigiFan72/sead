@@ -43,8 +43,8 @@ FileDeviceMgr::~FileDeviceMgr()
 void FileDeviceMgr::mount_(Heap* heap)
 {
     nn::fs::Initialize();
-    int archive = nn::fs::GetRomRequiredMemorySize(16, 16, true);
-    SEAD_ASSERT_MIN_MSG(archive, "Cannot mount rom archive.(%d)", archive);
+    int archiveSize = nn::fs::GetRomRequiredMemorySize(16, 16, true);
+    SEAD_ASSERT_MSG(0 < archiveSize, "Cannot mount rom archive.(%d)", archiveSize);
 }
 
 void FileDeviceMgr::unmount_()
@@ -155,7 +155,7 @@ FileDevice* FileDeviceMgr::findDeviceFromPath(const SafeString& path,
 
 FileDevice* FileDeviceMgr::findDevice(const SafeString& name) const
 {
-    for (auto it = mDeviceList.begin(); it != mDeviceList.end(); ++it)
+    for (DeviceList::iterator it = mDeviceList.begin(); it != mDeviceList.end(); ++it)
         if ((*it)->getDriveName() == name)
             return *it;
 
@@ -232,28 +232,5 @@ bool FileDeviceMgr::trySave(FileDevice::SaveArg& arg)
     arg.write_size = arg2.write_size;
     return ret;
 }
-
-#ifdef NNSDK
-void FileDeviceMgr::mountSaveDataForDebug(Heap*)
-{
-    const auto result = nn::fs::MountSaveDataForDebug("save");
-    SEAD_ASSERT_MSG(
-        result.IsSuccess(),
-        "nn::fs::MountSaveDataForDebug() failed. module = %d desc = %d innervalue = 0x%08x",
-        result.GetModule(), result.GetDescription(), result.GetInnerValueForDebug());
-}
-
-void FileDeviceMgr::unmountSaveDataForDebug()
-{
-    nn::fs::Unmount("save");
-}
-#endif
-
-#ifdef cafe
-void FileDeviceMgr::stateChangeCallback_(FSClient* client, FSVolumeState state, void* context)
-{
-    FSGetLastError(client);
-}
-#endif  // cafe
 
 }  // namespace sead

@@ -30,14 +30,14 @@ const SafeStringBase<char16> SafeStringBase<char16>::cEmptyString(cEmptyStringCh
 template <>
 void BufferedSafeStringBase<char>::assureTerminationImpl_() const
 {
-    auto* mutableSafeString = const_cast<BufferedSafeStringBase<char>*>(this);
+    BufferedSafeString* mutableSafeString = const_cast<BufferedSafeStringBase<char>*>(this);
     mutableSafeString->getMutableStringTop_()[mBufferSize - 1] = cNullChar;
 }
 
 template <>
 void BufferedSafeStringBase<char16>::assureTerminationImpl_() const
 {
-    auto* mutableSafeString = const_cast<BufferedSafeStringBase<char16>*>(this);
+    BufferedSafeStringBase* mutableSafeString = const_cast<BufferedSafeStringBase<char16>*>(this);
     mutableSafeString->getMutableStringTop_()[mBufferSize - 1] = cNullChar;
 }
 

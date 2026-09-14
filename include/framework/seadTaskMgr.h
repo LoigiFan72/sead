@@ -29,22 +29,28 @@ private:
     friend class TaskMgr;
 };
 
-class TaskMgr final : public sead::hostio::Node
+class TaskMgr : public sead::hostio::Node
 {
 public:
     struct InitializeArg
     {
     public:
-        InitializeArg(const TaskBase::CreateArg& roottask_arg) : roottask_create_arg(roottask_arg)
+        InitializeArg(const TaskBase::CreateArg& roottask_arg):
+            create_queue_size(0x20),
+            prepare_stack_size(0x8000),
+            prepare_priority(-1),
+            roottask_create_arg(roottask_arg),
+            heap(nullptr),
+            parent_framework(nullptr)
         {
         }
 
-        u32 create_queue_size = 0x20;
-        u32 prepare_stack_size = 0x8000;
-        s32 prepare_priority = -1;
+        u32 create_queue_size;
+        u32 prepare_stack_size;
+        s32 prepare_priority;
         const TaskBase::CreateArg& roottask_create_arg;
-        Heap* heap = nullptr;
-        Framework* parent_framework = nullptr;
+        Heap* heap;
+        Framework* parent_framework;
     };
 
     class TaskCreateContextMgr : public ObjList<TaskCreateContext>

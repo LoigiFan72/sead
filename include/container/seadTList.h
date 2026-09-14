@@ -76,7 +76,7 @@ public:
 
     TListNode<T>* prev(const TListNode<T>* node) const
     {
-        auto prev_node = static_cast<TListNode<T>*>(node->prev());
+        TListNode<T>* prev_node = static_cast<TListNode<T>*>(node->prev());
         if (prev_node == &mStartEnd)
             return nullptr;
         return prev_node;
@@ -84,7 +84,7 @@ public:
 
     TListNode<T>* next(const TListNode<T>* node) const
     {
-        auto next_node = static_cast<TListNode<T>*>(node->next());
+        TListNode<T>* next_node = static_cast<TListNode<T>*>(node->next());
         if (next_node == &mStartEnd)
             return nullptr;
         return next_node;
@@ -205,8 +205,8 @@ public:
 
     struct RobustRange
     {
-        auto begin() const { return mList.robustBegin(); }
-        auto end() const { return mList.robustEnd(); }
+        robustIterator begin() const { return mList.robustBegin(); }
+        robustIterator end() const { return mList.robustEnd(); }
         const TList& mList;
     };
     RobustRange robustRange() const { return {*this}; }

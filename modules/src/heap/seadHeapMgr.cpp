@@ -46,7 +46,7 @@ void HeapMgr::initialize(Arena* arena)
 
 void HeapMgr::createRootHeap_()
 {
-    auto* expHeap = ExpHeap::tryCreate(sArena->mStart, sArena->mSize, "RootHeap", false);
+    ExpHeap* expHeap = ExpHeap::tryCreate(sArena->mStart, sArena->mSize, "RootHeap", false);
     sRootHeaps.pushBack(expHeap);
 }
 
@@ -77,12 +77,12 @@ void HeapMgr::initHostIO() {}
 
 bool HeapMgr::isContainedInAnyHeap(const void* ptr)
 {
-    for (auto& heap : sRootHeaps)
+    for (Heap& heap : sRootHeaps)
     {
         if (heap.isInclude(ptr))
             return true;
     }
-    for (auto& heap : sIndependentHeaps)
+    for (Heap& heap : sIndependentHeaps)
     {
         if (heap.isInclude(ptr))
             return true;
@@ -92,11 +92,11 @@ bool HeapMgr::isContainedInAnyHeap(const void* ptr)
 void HeapMgr::dumpTreeYAML(WriteStream& stream)
 {
     sHeapTreeLockCS.lock();
-    for (auto& heap : sRootHeaps)
+    for (Heap& heap : sRootHeaps)
     {
         heap.dumpTreeYAML(stream, 0);
     }
-    for (auto& heap : sIndependentHeaps)
+    for (Heap& heap : sIndependentHeaps)
     {
         heap.dumpTreeYAML(stream, 0);
     }
@@ -110,7 +110,7 @@ void HeapMgr::setAllocFromNotSeadThreadHeap(Heap* heap)
 
 void HeapMgr::removeFromFindContainHeapCache_(Heap* heap)
 {
-    auto* threadMgr = ThreadMgr::instance();
+    ThreadMgr* threadMgr = ThreadMgr::instance();
     if (!threadMgr)
         return;
 
@@ -127,14 +127,14 @@ void HeapMgr::removeFromFindContainHeapCache_(Heap* heap)
 
 Heap* HeapMgr::findHeapByName(const sead::SafeString& name, int index) const
 {
-    auto lock = makeScopedLock(sHeapTreeLockCS);
-    for (auto& heap : sRootHeaps)
+    ScopedLock<sead::CriticalSection> lock = makeScopedLock(sHeapTreeLockCS);
+    for (Heap& heap : sRootHeaps)
     {
         Heap* found = findHeapByName_(&heap, name, &index);
         if (found)
             return found;
     }
-    for (auto& heap : sIndependentHeaps)
+    for (Heap& heap : sIndependentHeaps)
     {
         Heap* found = findHeapByName_(&heap, name, &index);
         if (found)
@@ -151,7 +151,7 @@ Heap* HeapMgr::findHeapByName_(Heap* heap, const SafeString& name, int* index)
             return heap;
         --*index;
     }
-    for (auto& child : heap->mChildren)
+    for (Heap& child : heap->mChildren)
     {
         Heap* found = findHeapByName_(&child, name, index);
         if (found)

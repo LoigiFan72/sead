@@ -135,15 +135,14 @@ void CtrController::calcImpl_()
 
     ctrDevice->mPadReaderPtr->NormalizeStickWithScale(mLeftStick, mRightStick, ctrDevice->mPadStatus.stick.x, ctrDevice->mPadStatus.stick.y);
 
-    if (ctrDevice->mFlags & ControllerDefine::DeviceId::cDevice_CtrHid)
+    if (ctrDevice->mFlags & CtrHidDevice::cTouchPanel)
     {
         const u16 touchX = ctrDevice->mTouchPanelStatus.x;
         const u16 touchY = ctrDevice->mTouchPanelStatus.y;
 
         const u8 touch = ctrDevice->mTouchPanelStatus.touch;
-        const Vector2f pointer(static_cast<f32>(touchX), static_cast<f32>(touchY));
 
-        setPointerWithBound_(true, touch == 1, pointer);
+        setPointerWithBound_(true, touch == 1, Vector2f(static_cast<f32>(touchX), static_cast<f32>(touchY)));
     }
 }
 

@@ -4,7 +4,8 @@
 
 namespace sead
 {
-const u8 ControllerWrapper::cPadConfigDefault[Controller::cPadIdx_Max] = {
+const u8 ControllerWrapper::cPadConfigDefault[Controller::cPadIdx_Max] = 
+{
     Controller::cPadIdx_A,
     Controller::cPadIdx_B,
     Controller::cPadIdx_C,

@@ -221,10 +221,8 @@ void ExceptionScreenCtr::onHalt_(const char* msg)
 
 int ExceptionScreenCtr::putHaltMessage_(Vector2i const& pos, char const* msg)
 {
-{
-    SafeString string(msg);
-    mPrinter.putString(pos, string);
-}
+    mPrinter.putString(pos, msg);
+    
     f32 lastY = mPrinter.getLastCursorPos().y;
     return lastY < mPrinter.getBoundBox().getSizeY();
 }

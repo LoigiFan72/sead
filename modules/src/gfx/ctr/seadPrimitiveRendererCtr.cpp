@@ -207,12 +207,12 @@ void PrimitiveRendererCtr::setProjectionImpl(const Projection& projection)
 void PrimitiveRendererCtr::beginImpl()
 {
     mMode = cDrawMax;
-    mCylinder32.mShapeIndex.mTextureIndex = 0;
+    mCurrentList = 0;
     mCtrTexture = nullptr;
 
-    nngxGetCmdlistParameteri(NN_GX_CMDLIST_CURRENT_BUFADDR, reinterpret_cast<s32*>(mCylinder32.mShapeIndex.mIndexStream.physicalAddr));
-    mCylinder32.mShapeIndex.mIndexStream.drawVtxNum   = mCylinder32.mShapeIndex.mIndexStream.physicalAddr;
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *nn::gr::CTR::Vertex::MakeDisableCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr);
+    nngxGetCmdlistParameteri(NN_GX_CMDLIST_CURRENT_BUFADDR, mListCommand);
+    mListCommand[1] = mListCommand[0];
+    mListCommand[0] = *nn::gr::CTR::Vertex::MakeDisableCommand((u32*)mListCommand);
     s32 ctop;
     nngxGetCmdlistParameteri(NN_GX_CMDLIST_TOP_BUFADDR, &ctop);
     s32 caddr = 0;
@@ -222,15 +222,15 @@ void PrimitiveRendererCtr::beginImpl()
 
 void PrimitiveRendererCtr::endImpl()
 {
-    nngxMoveCommandbufferPointer((mCylinder32.mShapeIndex.mIndexStream.physicalAddr - mCylinder32.mShapeIndex.mIndexStream.drawVtxNum >> 2) << 2);
+    nngxMoveCommandbufferPointer((mListCommand[0] - mListCommand[1] >> 2) << 2);
 }
 
 void PrimitiveRendererCtr::drawQuadImpl(const Matrix34f& model_mtx, const Color4f& colorL, const Color4f& colorR)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, colorL);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, colorR);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, colorL);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, colorR);
     drawShape_(mSphere4x8);
 }
 
@@ -239,16 +239,16 @@ void PrimitiveRendererCtr::drawQuadImpl(const Matrix34f& model_mtx, Texture cons
 {
     const TextureCtr* ctrTex = DynamicCast<TextureCtr const>(&texture);
     setup_(cDrawTexture, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, colorL);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, colorR);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, colorL);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, colorR);
 
     {
-        mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUvSrc_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, Vector4f(colorL.r, colorL.g, 0.0f, 0.0f));
+        mListCommand[0] = *mSymbolUvSrc_3D.MakeUniformCommand((u32*)mListCommand, Vector4f(colorL.r, colorL.g, 0.0f, 0.0f));
     }
 
     {
-        mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUvSize_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, Vector4f(colorR.r, colorR.g, 0.0f, 0.0f));
+        mListCommand[0] = *mSymbolUvSize_3D.MakeUniformCommand((u32*)mListCommand, Vector4f(colorR.r, colorR.g, 0.0f, 0.0f));
     }
     drawShape_(mBox);
 }
@@ -256,108 +256,108 @@ void PrimitiveRendererCtr::drawQuadImpl(const Matrix34f& model_mtx, Texture cons
 void PrimitiveRendererCtr::drawBoxImpl(const Matrix34f& model_mtx, const Color4f& colorL, const Color4f& colorR)
 {
     setup_(cDraw2D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_2D.symbolType, colorL);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_2D.symbolType, colorR);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_2D.symbolType, colorL);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_2D.symbolType, colorR);
     drawShape_(mBox);
 }
 
 void PrimitiveRendererCtr::drawCubeImpl(const Matrix34f& model_mtx, const Color4f& c0, const Color4f& c1)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, c0);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, c1);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, c0);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, c1);
     drawShape_(mBox);
 }
 
 void PrimitiveRendererCtr::drawWireCubeImpl(const Matrix34f& model_mtx, const Color4f& c0, const Color4f& c1)
 {
     setup_(cDraw2D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, c0);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, c1);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, c0);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, c1);
     drawShape_(mBox);
 }
 
 void PrimitiveRendererCtr::drawLineImpl(const Matrix34f& model_mtx, const Color4f& c0, const Color4f& c1)
 {
     setup_(cDraw2D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_2D.symbolType, c0);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_2D.symbolType, c1);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_2D.symbolType, c0);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_2D.symbolType, c1);
     drawShape_(mLine);
 }
 
 void PrimitiveRendererCtr::drawSphere4x8Impl(const Matrix34f& model_mtx, const Color4f& north, const Color4f& south)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, north);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, south);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, north);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, south);
     drawShape_(mSphere4x8);
 }
 
 void PrimitiveRendererCtr::drawSphere8x16Impl(const Matrix34f& model_mtx, const Color4f& north, const Color4f& south)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, north);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, south);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, north);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, south);
     drawShape_(mSphere8x16);
 }
 
 void PrimitiveRendererCtr::drawDisk16Impl(const Matrix34f& model_mtx, const Color4f& center, const Color4f& edge)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, center);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, edge);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, center);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, edge);
     drawShape_(mDisk16);
 }
 
 void PrimitiveRendererCtr::drawDisk32Impl(const Matrix34f& model_mtx, const Color4f& center, const Color4f& edge)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, center);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, edge);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, center);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, edge);
     drawShape_(mDisk32);
 }
 
 void PrimitiveRendererCtr::drawCircle16Impl(const Matrix34f& model_mtx, const Color4f& edge)
 {
     setup_(cDraw2D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_2D.symbolType, edge);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_2D.symbolType, edge);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_2D.symbolType, edge);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_2D.symbolType, edge);
     drawShape_(mDisk16, mCircle16Index.mIndexStream);
 }
 
 void PrimitiveRendererCtr::drawCircle32Impl(const Matrix34f& model_mtx, const Color4f& edge)
 {
     setup_(cDraw2D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_2D.symbolType, edge);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_2D.symbolType, edge);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_2D.symbolType, edge);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_2D.symbolType, edge);
     drawShape_(mDisk32, mCircle32Index.mIndexStream);
 }
 
 void PrimitiveRendererCtr::drawCylinder16Impl(const Matrix34f& model_mtx, const Color4f& top, const Color4f& btm)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, top);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, btm);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, top);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, btm);
     drawShape_(mCylinder16);
 }
 
 void PrimitiveRendererCtr::drawCylinder32Impl(const Matrix34f& model_mtx, const Color4f& top, const Color4f& btm)
 {
     setup_(cDraw3D, nullptr);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *mSymbolUser_3D.MakeUniformCommand(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, model_mtx);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor0_3D.symbolType, top);
-    mCylinder32.mShapeIndex.mIndexStream.physicalAddr = *makeUniformCommand_(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mSymbolColor1_3D.symbolType, btm);
+    mListCommand[0] = *mSymbolUser_3D.MakeUniformCommand((u32*)mListCommand, model_mtx);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor0_3D.symbolType, top);
+    mListCommand[0] = *makeUniformCommand_((u32*)mListCommand, mSymbolColor1_3D.symbolType, btm);
     drawShape_(mCylinder32);
 }
 
@@ -528,6 +528,6 @@ void PrimitiveRendererCtr::loadWireCubeIndex_(Heap* heap)
 
 void PrimitiveRendererCtr::checkCmdlist_()
 {
-    SEAD_ASSERT_MSG(PtrUtil::diff(&mCylinder32.mShapeIndex.mIndexStream.physicalAddr, mCmdlistBufSize) < 0, "cmdlist buffer overrun.");
+    SEAD_ASSERT_MSG(PtrUtil::diff((u32*)mListCommand, mCmdlistBufSize) < 0, "cmdlist buffer overrun.");
 }
 }

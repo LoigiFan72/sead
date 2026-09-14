@@ -6,7 +6,6 @@
 #include <hostio/seadHostIOFramework.h>
 #include <hostio/seadHostIOReflexible.h>
 #include <prim/seadFormatPrint.h>
-
 //#include <hostio/ctr/seadHostIOPortHIOCtr.h>
 
 #include <basis/seadRawPrint.h>

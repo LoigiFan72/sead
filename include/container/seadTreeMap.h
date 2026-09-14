@@ -53,7 +53,7 @@ public:
 
         // Otherwise, walk back up to the node P from which we reached this node
         // by following P's left child pointer.
-        while (auto* const parent = node->getParent())
+        while (TreeMapNode<Key>* const parent = node->getParent())
         {
             if (parent->mLeft == node)
                 return parent;
@@ -245,8 +245,8 @@ public:
     template <typename Callable>
     void forEach(const Callable& delegate) const
     {
-        MapImpl::forEach([delegate](auto* base_node) {
-            auto* node = static_cast<Node*>(base_node);
+        MapImpl::forEach([delegate](Node* base_node) {
+            Node* node = static_cast<Node*>(base_node);
             delegate(node);
         });
     }
@@ -583,8 +583,8 @@ template <typename Key, typename Value>
 template <typename Callable>
 inline void TreeMap<Key, Value>::forEach(const Callable& delegate) const
 {
-    MapImpl::forEach([&delegate](auto* base_node) {
-        auto* node = static_cast<Node*>(base_node);
+    MapImpl::forEach([&delegate](Node* base_node) {
+        Node* node = static_cast<Node*>(base_node);
         delegate(node->key(), node->value());
     });
 }

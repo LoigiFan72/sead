@@ -1,16 +1,66 @@
-#ifndef SEAD_HOST_IO_MGR_H_
-#define SEAD_HOST_IO_MGR_H_
+#pragma once
 
-namespace sead
+#include <framework/seadCalculateTask.h>
+#include <framework/seadTaskMgr.h>
+#include <framework/seadTaskParameter.h>
+#include <hostio/seadHostIOConfig.h>
+
+namespace sead 
 {
+#if defined(SEAD_DEBUG)
+class HostIORoot;
+
+class HostIOMgr : public CalculateTask
+{
+    SEAD_TASK_SINGLETON_DISPOSER(HostIOMgr);
+
+public:
+    class Parameter : public TaskParameter
+    {
+        SEAD_RTTI_OVERRIDE(Parameter, TaskParameter);
+
+    public:
+        Parameter(); // TODO
+
+        hostio::Config* getConfig()
+        {
+            return &mConfig;
+        }
+
+        bool isAutoRootNode() const
+        {
+            return mIsAutoRootNode;
+        }
+
+    private:
+        hostio::Config mConfig;
+        bool mIsAutoRootNode;
+    };
+
+public:
+    HostIOMgr(const TaskConstructArg& arg);
+    HostIOMgr();
+
+    void prepare() override;
+    void exit() override;
+    void calc() override;
+
+    HostIORoot* getSeadRoot()
+    {
+        return mSeadRoot;
+    }
+
+private:
+    HostIORoot* mSeadRoot;
+};
+#else
 class HostIOMgr
 {
 public:
-    struct Parameter
+    class Parameter
     {
     };
 };
+#endif // SEAD_DEBUG
 
-}  // namespace sead
-
-#endif  // SEAD_HOST_IO_MGR_H_
+} // namespace sead

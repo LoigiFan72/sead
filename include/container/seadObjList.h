@@ -14,7 +14,9 @@ template <typename T>
 class ObjList : public ListImpl
 {
 public:
-    ObjList() = default;
+    ObjList() 
+    {
+    }
     ObjList(s32 max_num, void* buf) { setBuffer(max_num, buf); }
 
     void allocBuffer(s32 capacity, Heap* heap, s32 alignment = sizeof(void*))
@@ -31,7 +33,7 @@ public:
         if (capacity < 1)
             return false;
 
-        auto* buf = new (heap, alignment, std::nothrow) u8[calculateWorkBufferSize(capacity)];
+        u8* buf = new (heap, alignment, std::nothrow) u8[calculateWorkBufferSize(capacity)];
         if (!buf)
             return false;
 
@@ -88,7 +90,7 @@ public:
 
     T popBack()
     {
-        auto* item = back();
+        T* item = back();
         if (!item)
             return {};
 
@@ -99,7 +101,7 @@ public:
 
     T popFront()
     {
-        auto* item = front();
+        T* item = front();
         if (!item)
             return {};
 
@@ -137,7 +139,7 @@ public:
             ListNode* next = node->next();
             ListImpl::erase(node);
 
-            auto* item = listNodeToObj(node);
+            T* item = listNodeToObj(node);
             item->~T();
             mFreeList.free(item);
 
@@ -175,8 +177,8 @@ public:
         bool operator!=(const iterator& other) const { return !operator==(other); }
         iterator& operator++()
         {
-            constexpr auto offset = Node::getListNodeOffset();
-            auto* node = static_cast<ListNode*>(PtrUtil::addOffset(mPtr, offset))->next();
+            constexpr s32 offset = Node::getListNodeOffset();
+            ListNode* node = static_cast<ListNode*>(PtrUtil::addOffset(mPtr, offset))->next();
             mPtr = static_cast<T*>(PtrUtil::addOffset(node, -offset));
             return *this;
         }
@@ -196,7 +198,7 @@ public:
 private:
     struct Node
     {
-        static constexpr auto getListNodeOffset() { return offsetof(Node, node); }
+        static constexpr s32 getListNodeOffset() { return offsetof(Node, node); }
         T item;
         ListNode node;
     };

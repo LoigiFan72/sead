@@ -4,6 +4,8 @@
 #include "prim/seadBitUtil.h"
 #include "prim/seadPtrUtil.h"
 #include "prim/seadScopedLock.h"
+#include "hostio/seadHostIOFramework.h"
+#include "hostio/seadHostIOMgr.h"
 #include "thread/seadThreadUtil.h"
 
 namespace sead
@@ -131,6 +133,17 @@ void Thread::initStackCheck_()
 
 SEAD_SINGLETON_DISPOSER_IMPL(ThreadMgr)
 
+ThreadMgr::ThreadMgr():
+#ifdef SEAD_DEBUG
+    hostio::Node(),
+#endif
+    mList(),
+    mListCS(),
+    mMainThread(nullptr),
+    mThreadPtrTLS()
+{
+}
+
 ThreadMgr::~ThreadMgr()
 {
     ScopedLock<CriticalSection> lock(getListCS());
@@ -198,4 +211,23 @@ void ThreadMgr::quitAndWaitDoneMultipleThread(Thread** threads, s32 num, bool is
 
     waitDoneMultipleThread(threads, num);
 }
+
+#ifdef SEAD_DEBUG
+void ThreadMgr::initHostIO()
+{
+    hostio::AddNode(HostIOMgr::instance()->getSeadRoot(), "ThreadMgr", this, "$SEAD_META_THREADMGR");
+}
+
+void ThreadMgr::genMessage(hostio::Context* context)
+{
+    context->genNode(mMainThread->getName(), mMainThread, "$SEAD_META_THREAD");
+
+    ScopedLock<CriticalSection> lock(&mIterateLockCS);
+    for (ThreadList::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+        Thread* thread = *it;
+        context->genNode(thread->getName(), thread, "$SEAD_META_THREAD");
+    }
+}
+#endif
 }  // namespace sead

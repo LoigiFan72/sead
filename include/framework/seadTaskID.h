@@ -43,13 +43,16 @@ TaskBase* TTaskFactory(const TaskConstructArg& arg)
 class TaskClassID
 {
 public:
-    enum class Type : u32
+    enum Type
     {
         cInvalid = 0,
         cInt = 1,
         cFactory = 2,
         cString = 3
     };
+
+    using IntTaskCreator = TaskBase* (*)(s32, const TaskConstructArg&);
+    using StringTaskCreator = TaskBase* (*)(const char*, const TaskConstructArg&);
 
     TaskBase* create(const TaskConstructArg& arg) const;
 
@@ -80,7 +83,9 @@ public:
 
         return false;
     }
-
+private:
+    static IntTaskCreator sIntTaskCreator;
+    static StringTaskCreator sStringTaskCreator;
 public:
     Type mType = Type::cInvalid;
     union

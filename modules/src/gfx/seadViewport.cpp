@@ -1,8 +1,8 @@
 #include <gfx/seadViewport.h>
 #include <gfx/seadFrameBuffer.h>
 
-namespace sead {
-
+namespace sead 
+{
 Viewport::Viewport(const LogicalFrameBuffer& frame_buffer): 
     mDevicePosture(Graphics::getDefaultDevicePosture())
 {

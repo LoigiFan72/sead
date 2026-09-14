@@ -53,7 +53,7 @@ Resource* ResourceMgr::create(const ResourceMgr::CreateArg& arg)
     if (arg.factory)
         return arg.factory->create(arg);
 
-    auto* factory = findFactory(arg.ext);
+    ResourceFactory* factory = findFactory(arg.ext);
     if (factory)
         return factory->create(arg);
 
@@ -83,7 +83,7 @@ ResourceFactory* ResourceMgr::setDefaultFactory(ResourceFactory* factory)
 
 ResourceFactory* ResourceMgr::findFactory(const SafeString& name)
 {
-    for (auto& factory : mFactoryList)
+    for (ResourceFactory* factory : mFactoryList)
         if (factory->getExt() == name)
             return factory;
 
@@ -110,7 +110,7 @@ void ResourceMgr::unregisterDecompressor(Decompressor* decompressor)
 
 Decompressor* ResourceMgr::findDecompressor(const SafeString& name)
 {
-    for (auto& decompressor : mDecompList)
+    for (Decompressor* decompressor : mDecompList)
         if (decompressor->getName() == name)
             return decompressor;
 
@@ -140,7 +140,7 @@ Resource* ResourceMgr::tryLoad(const ResourceMgr::LoadArg& arg, const SafeString
     else
         actual_factory_name = ext;
 
-    auto* factory = arg.factory;
+    ResourceFactory* factory = arg.factory;
     if (!factory)
     {
         factory = findFactory(actual_factory_name);
@@ -158,7 +158,7 @@ Resource* ResourceMgr::tryLoad(const ResourceMgr::LoadArg& arg, const SafeString
 
 Resource* ResourceMgr::tryLoadWithoutDecomp(const ResourceMgr::LoadArg& arg)
 {
-    auto* factory = arg.factory;
+    ResourceFactory* factory = arg.factory;
     if (!factory)
     {
         FixedSafeString<32> ext;

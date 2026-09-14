@@ -17,7 +17,8 @@
 #include <thread/seadThreadLocalStorage.h>
 #include <time/seadTickSpan.h>
 
-namespace sead{
+namespace sead
+{
 
 class Heap;
 class Thread;
@@ -25,7 +26,8 @@ class Thread;
 using ThreadList = TList<Thread*>;
 using ThreadListNode = TListNode<Thread*>;
 
-class Thread : public IDisposer, public INamable, public hostio::Reflexible{
+class Thread : public IDisposer, public INamable, public hostio::Reflexible
+{
 public:
     SEAD_ENUM(State, cInitialized, cRunning, cQuitting, cTerminated, cReleased)
 
@@ -115,9 +117,6 @@ protected:
 };
 
 class ThreadMgr : public hostio::Node{
-#if not SEAD_THREADMGR_MOVED_SINGLETON_DISPOSER
-    SEAD_SINGLETON_DISPOSER(ThreadMgr)
-#endif
 public:
     ThreadMgr();
     virtual ~ThreadMgr();
@@ -152,8 +151,8 @@ public:
 
 #ifdef SEAD_DEBUG
     void initHostIO();
-    void genMessage(hostio::Context* context) override;
-    void listenPropertyEvent(const hostio::PropertyEvent* event) override;
+    virtual void genMessage(hostio::Context* context);
+    virtual void listenPropertyEvent(const hostio::PropertyEvent* event){ }
 #endif
 
 protected:
@@ -176,12 +175,10 @@ protected:
 private:
     ThreadList mList;
     CriticalSection mListCS;
-    Thread* mMainThread = nullptr;
+    Thread* mMainThread;
     ThreadLocalStorage mThreadPtrTLS;
 
-#if SEAD_THREADMGR_MOVED_SINGLETON_DISPOSER
     SEAD_SINGLETON_DISPOSER(ThreadMgr)
-#endif
 };
 
 class MainThread : public Thread
@@ -196,7 +193,8 @@ public:
     virtual void destroy() { SEAD_ASSERT_MSG(false, "Main thread can not destroy"); }
     virtual void quit(bool) { SEAD_ASSERT_MSG(false, "Main thread can not quit"); }
     virtual void waitDone() { SEAD_ASSERT_MSG(false, "Main thread can not waitDone"); }
-    virtual void quitAndDestroySingleThread(bool){
+    virtual void quitAndDestroySingleThread(bool)
+    {
         SEAD_ASSERT_MSG(false, "Main thread can not quit");
     }
     virtual void setPriority(s32) { SEAD_ASSERT_MSG(false, "Main thread can not set priority"); }

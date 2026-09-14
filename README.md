@@ -28,11 +28,16 @@ Note that many names (especially for inlined, templated functions) are just plai
 ## Folder Structure
 
 * **/LIBRARY_ROOT/sead/**
-    |____ **addins** - Additional libraries used by *sead*.
-    |____ **include** - Headers used for *sead*.
-    |____ **lib** - Libraries used by *sead*.
-    |____ **modules/src** - Module source code.
-    |____ **res** - Raw DVLE / DVLP Shader binary files for CTR. Contains the **primitive_renderer_ctr.bsm** sead shader as well.
+
+        |____ **addins** - Additional libraries used by *sead*.
+
+        |____ **include** - Headers used for *sead*.
+
+        |____ **lib** - Libraries used by *sead*.
+
+        |____ **modules/src** - Module source code.
+
+        |____ **res** - Raw DVLE / DVLP Shader binary files for CTR. Contains the **primitive_renderer_ctr.bsm** sead shader as well. 
 
 ## Addins
 
@@ -65,7 +70,7 @@ For progress, refer to [the GitHub project page](https://github.com/LoigiFan72/s
 * **random** - Random number generator
 * **resource** - Resource (loading, decompressing, etc.)
 * **stream** - Stream IO
-* **tentative** - Tentative Resources (Bitmap handling)
+* **tentative** - Tentative resources (Bitmap handler)
 * **thread** - Thread utilities (threads, critical sections, message queues, etc.)
 * **time** - Time utilities
 

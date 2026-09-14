@@ -57,7 +57,7 @@ void IndirectResource::create(sead::ReadStream* stream, u32 size, sead::Heap* he
 
 ResourceFactory::~ResourceFactory()
 {
-    auto* mgr = ResourceMgr::instance();
+    ResourceMgr* mgr = ResourceMgr::instance();
     if (mgr == nullptr)
         return;
 
@@ -103,7 +103,6 @@ Resource* DirectResourceFactoryBase::tryCreate(const ResourceMgr::LoadArg& loadA
     fileLoadArg.buffer_size_alignment = loadArg.load_data_buffer_alignment;
     fileLoadArg.heap = loadArg.load_data_heap;
     fileLoadArg.div_size = loadArg.div_size;
-    fileLoadArg.assert_on_alloc_fail = loadArg.assert_on_alloc_fail;
 
     if (loadArg.load_data_alignment != 0)
         fileLoadArg.alignment = loadArg.load_data_alignment;

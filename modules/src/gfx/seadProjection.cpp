@@ -5,11 +5,19 @@
 
 namespace sead
 {
-Projection::Projection()
+Projection::Projection():
+    mDirty(true), 
+    mDeviceDirty(true), 
+    mMatrix(), 
+    mDeviceMatrix(), 
+    mDevicePosture(Graphics::getDefaultDevicePosture()), 
+    mDeviceZScale(Graphics::getDefaultDeviceZScale()), 
+    mDeviceZOffset(Graphics::getDefaultDeviceZOffset())
 {
-    mDevicePosture = Graphics::getDefaultDevicePosture();
-    mDeviceZScale = Graphics::getDefaultDeviceZScale();
-    mDeviceZOffset = Graphics::getDefaultDeviceZOffset();
+}
+
+Projection::~Projection()
+{
 }
 
 void Projection::updateAttributesForDirectProjection() {}
@@ -50,7 +58,7 @@ const Matrix44f& Projection::getDeviceProjectionMatrix() const
 
 void Projection::cameraPosToScreenPos(Vector3f* screen_pos, const Vector3f& camera_pos) const
 {
-    screen_pos->setMul(getProjectionMatrix(), camera_pos);
+    screen_pos->setMulAndDivByW(getProjectionMatrix(), camera_pos);
 }
 
 void Projection::screenPosToCameraPos(Vector3f* camera_pos, const Vector3f& screen_pos) const

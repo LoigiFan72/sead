@@ -76,13 +76,13 @@ void DoubleCmdGameFrameworkCtrNw4c::initializeGraphicsSystem(Heap* heap, const V
         nngxEnableCmdlistCallback(-1);
     }
     nngxBindCmdlist(mDoubleBuf[0]);
-    createDisplayBuffers_(mDoubleBufferSizeTop, 2, NN_GX_DISPLAY0, mGameArg.format, mGameArg.widthTop, mGameArg.heightTop, NN_GX_MEM_FCRAM);
-    createDisplayBuffers_(mDoubleBufferSizeTop, 2, NN_GX_DISPLAY1, mGameArg.format, mGameArg.widthBtm, mGameArg.heightBtm, NN_GX_MEM_FCRAM);
+    createDisplayBuffers_(mDoubleBufferTop, 2, NN_GX_DISPLAY0, mGameArg.format, mGameArg.widthTop, mGameArg.heightTop, NN_GX_MEM_FCRAM);
+    createDisplayBuffers_(mDoubleBufferTop, 2, NN_GX_DISPLAY1, mGameArg.format, mGameArg.widthBtm, mGameArg.heightBtm, NN_GX_MEM_FCRAM);
     nngxActiveDisplay(NN_GX_DISPLAY1);
 
     for(int disp = 0; disp < 2; disp++)
     {
-        nngxBindDisplaybuffer(mDoubleBufferSizeBtm[disp]);
+        nngxBindDisplaybuffer(mDoubleBufferBtm[disp]);
         GLint p;
         nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &p);
         mDoubleCmdParam[disp] = p;
@@ -226,12 +226,12 @@ void DoubleCmdGameFrameworkCtrNw4c::procFrame_()
 
 void DoubleCmdGameFrameworkCtrNw4c::presentTop_()
 {
-    requestTransferRenderImage_(mFrameBufferNo[mDoubleBufferSizeTop[0]], &mBuffer, mGameArg.widthTop, mGameArg.heightTop, NN_GX_ANTIALIASE_NOT_USED, 0);
+    requestTransferRenderImage_(mFrameBufferNo[mDoubleBufferTop[0]], &mBuffer, mGameArg.widthTop, mGameArg.heightTop, NN_GX_ANTIALIASE_NOT_USED, 0);
 }
 
 void DoubleCmdGameFrameworkCtrNw4c::presentBtm_()
 {
-    requestTransferRenderImage_(mFrameBufferNo[mDoubleBufferSizeBtm[0]], &mBuffer, mGameArg.widthBtm, mGameArg.heightBtm, NN_GX_ANTIALIASE_NOT_USED, 0);
+    requestTransferRenderImage_(mFrameBufferNo[mDoubleBufferBtm[0]], &mBuffer, mGameArg.widthBtm, mGameArg.heightBtm, NN_GX_ANTIALIASE_NOT_USED, 0);
 }
 
 void DoubleCmdGameFrameworkCtrNw4c::swapBuffer_()
@@ -255,10 +255,10 @@ void DoubleCmdGameFrameworkCtrNw4c::swapBuffer_()
     mFrameBufferNo[0] = (mFrameBufferNo[0] + 2) % 3;
 
     nngxActiveDisplay(NN_GX_DISPLAY0);
-    nngxBindDisplaybuffer(mDoubleBufferSizeTop[0]);
+    nngxBindDisplaybuffer(mDoubleBufferTop[0]);
 
     nngxActiveDisplay(NN_GX_DISPLAY1);
-    nngxBindDisplaybuffer(mDoubleBufferSizeBtm[0]);
+    nngxBindDisplaybuffer(mDoubleBufferBtm[0]);
 
 #ifdef SEAD_DEBUG
     if(mException != nullptr)
@@ -373,7 +373,7 @@ void DoubleCmdGameFrameworkCtrNw4c::doScreenShotImpl_(char const* shot)
         {
             SEAD_WARNING("Can't open file handle(%s). Can't save screen-shot.\n", shot);
         }
-        nngxBindDisplaybuffer(mDoubleBufferSizeTop[0]);
+        nngxBindDisplaybuffer(mDoubleBufferTop[0]);
         GLint param;
         nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &param);
         saveScreenShotToFileHandle_(&topHandle, &param, mGameArg.widthTop, mGameArg.heightTop, mGameArg.format);
@@ -392,7 +392,7 @@ void DoubleCmdGameFrameworkCtrNw4c::doScreenShotImpl_(char const* shot)
         {
             SEAD_WARNING("Can't open file handle(%s). Can't save screen-shot.\n", shot);
         }
-        nngxBindDisplaybuffer(mDoubleBufferSizeBtm[0]);
+        nngxBindDisplaybuffer(mDoubleBufferBtm[0]);
         GLint param;
         nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &param);
         saveScreenShotToFileHandle_(&btmHandle, &param, mGameArg.widthBtm, mGameArg.heightBtm, mGameArg.format);

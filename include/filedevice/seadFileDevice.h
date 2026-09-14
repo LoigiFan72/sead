@@ -163,7 +163,7 @@ public:
 
     FileDevice* open(FileHandle* handle, const SafeString& path, FileOpenFlag flag, u32 divSize = 0)
     {
-        auto* device = tryOpen(handle, path, flag, divSize);
+        FileDevice* device = tryOpen(handle, path, flag, divSize);
         if (!device)
         {
             SEAD_ASSERT_MSG(false, "file open error");
@@ -283,7 +283,7 @@ public:
 
     FileDevice* openDirectory(DirectoryHandle* handle, const SafeString& path)
     {
-        auto* device = tryOpenDirectory(handle, path);
+        FileDevice* device = tryOpenDirectory(handle, path);
         if (!device)
         {
             SEAD_ASSERT_MSG(false, "directory open error");

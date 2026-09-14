@@ -3,11 +3,15 @@
 #include <nn/os.h>
 #include "basis/seadTypes.h"
 
-namespace sead{
-
-class ThreadLocalStorage{
+namespace sead
+{
+class ThreadLocalStorage
+{
 public:
-    ThreadLocalStorage(){ }
+    ThreadLocalStorage():
+        mTlsSlot()
+    {
+    }
     ~ThreadLocalStorage(){}
 
     ThreadLocalStorage(const ThreadLocalStorage&){ };
@@ -22,7 +26,5 @@ private:
 }  // namespace sead
 
 #define SEAD_THREAD_THREAD_LOCAL_STORAGE_H_
-
 #include "thread/ctr/seadThreadLocalStorageCtr.hpp"
-
 #undef SEAD_THREAD_THREAD_LOCAL_STORAGE_H_

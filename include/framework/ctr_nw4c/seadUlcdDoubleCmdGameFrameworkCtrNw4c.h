@@ -26,6 +26,6 @@ protected:
     virtual void presentLeft_();
     virtual void presentRight_();
 
-    GLuint* mBufferSizeRight;
+    GLuint mDisplayBufferRight[3];
 };
 }

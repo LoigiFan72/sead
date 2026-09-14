@@ -22,7 +22,7 @@ template <typename T>
 StringBuilderBase<T>* StringBuilderBase<T>::create(const T* str, Heap* heap, s32 alignment)
 {
     const s32 len = calcStrLength_(str);
-    auto* builder = createImpl_(len + 1, heap, alignment);
+    StringBuilderBase<T>* builder = createImpl_(len + 1, heap, alignment);
     builder->copy(str, len);
     return builder;
 }
@@ -908,5 +908,5 @@ s32 StringBuilderBase<T>::prepend(T c, s32 num)
 }
 
 template s32 StringBuilder::prepend(char c, s32 length);
-template s32 WStringBuilder::prepend(char16_t c, s32 length);
+//template s32 WStringBuilder::prepend(char16_t c, s32 length);
 }  // namespace sead

@@ -122,7 +122,7 @@ bool CtrDebugController::isConnected() const
 
     if (ctrDevice != nullptr)
     {
-        return (ctrDevice->mFlags & 0x10) != 0;
+        return (ctrDevice->mFlags & CtrHidDevice::cDebugPadReader) != 0;
     }
 
     SEAD_ASSERT_MSG(false, "cannot get device");

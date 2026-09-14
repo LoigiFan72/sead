@@ -146,6 +146,11 @@ private:
     Shape mCylinder16;
     Shape mCylinder32;
 
+    /* Lists */
+
+    s32 mCurrentList;
+    s32 mListCommand[2];
+
     /* Matrixes */
 
     Matrix34f mViewMtx;

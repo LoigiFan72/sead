@@ -4,15 +4,18 @@
 #include "controller/seadControllerBase.h"
 #include "controller/seadControllerDefine.h"
 
-namespace sead{
+namespace sead
+{
 class ControllerAddon;
 class ControllerMgr;
 class ControllerWrapperBase;
 
-class Controller : public ControllerBase{
+class Controller : public ControllerBase
+{
     SEAD_RTTI_OVERRIDE(Controller, ControllerBase)
 public:
-    enum PadIdx{
+    enum PadIdx
+    {
         cPadIdx_A = 0,
         cPadIdx_B = 1,
         cPadIdx_C = 2,
@@ -76,7 +79,8 @@ private:
 
 
 template <typename T>
-T Controller::getAddonAs() const{
+T Controller::getAddonAs() const
+{
     for (sead::ControllerAddon& addon : mAddons){
         T result = DynamicCast<typename std::remove_pointer<T>>(addon);
         if (result)

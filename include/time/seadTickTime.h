@@ -3,8 +3,8 @@
 #include <time/seadTickSpan.h>
 #include <nn/os.h>
 
-namespace sead {
-
+namespace sead 
+{
 class TickTime
 {
 public:

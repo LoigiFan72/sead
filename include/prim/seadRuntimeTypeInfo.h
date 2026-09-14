@@ -65,20 +65,6 @@ inline DerivedType* DynamicCast(Type* obj)
 
 }  // namespace sead
 
-#if SEAD_RTTI_CHECKDERIVEDRUNTIMETYPEINFO_RETURNS_INSTANCE
-#define SEAD_RTTI_CHECKDERIVEDRUNTIMETYPEINFO_BASE(CLASS)                                          \
-    virtual const CLASS* checkDerivedRuntimeTypeInfo(                                              \
-        const sead::RuntimeTypeInfo::Interface* typeInfo) const                                    \
-    {                                                                                              \
-        return checkDerivedRuntimeTypeInfoStatic(typeInfo) ? this : nullptr;                       \
-    }
-#define SEAD_RTTI_CHECKDERIVEDRUNTIMETYPEINFO_OVERRIDE(CLASS)                                      \
-    const CLASS* checkDerivedRuntimeTypeInfo(const sead::RuntimeTypeInfo::Interface* typeInfo)     \
-        const override                                                                             \
-    {                                                                                              \
-        return checkDerivedRuntimeTypeInfoStatic(typeInfo) ? this : nullptr;                       \
-    }
-#else
 #define SEAD_RTTI_CHECKDERIVEDRUNTIMETYPEINFO_BASE(CLASS)                                          \
     virtual bool checkDerivedRuntimeTypeInfo(const sead::RuntimeTypeInfo::Interface* typeInfo)     \
         const                                                                                      \
@@ -91,7 +77,6 @@ inline DerivedType* DynamicCast(Type* obj)
     {                                                                                              \
         return checkDerivedRuntimeTypeInfoStatic(typeInfo);                                        \
     }
-#endif
 
 /// Use this macro to declare sead RTTI machinery for a base class.
 /// You must use SEAD_RTTI_OVERRIDE in all derived classes.

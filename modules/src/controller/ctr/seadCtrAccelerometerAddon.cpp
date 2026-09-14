@@ -24,12 +24,10 @@ bool CtrAccelerometerAddon::calc()
         return false;
     }
 
-    if (ctrDevice->mFlags & ControllerDefine::cAddon_Gyro) // maybe or PSEUDO_BUTTON_SELECT
+    if (ctrDevice->mFlags & CtrHidDevice::cAccelerometer)
     {
         mAcceleration = Vector3f(ctrDevice->mAccelerometerFloat.x, ctrDevice->mAccelerometerFloat.y, ctrDevice->mAccelerometerFloat.z);
-
         mAccelerationStatus = ctrDevice->mAccelerometerStatus;
-
         mIsEnable = true;
     }
     else

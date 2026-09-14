@@ -136,12 +136,14 @@ s32 Thread::getPriority() const
 
 void Thread::yield()
 {
-    mThreadInner->Yield();
+    nn::os::Thread* thread;
+    thread->Yield();
 }
 
 void Thread::sleep(TickSpan howLong)
 {
-    mThreadInner->Sleep(howLong.toS64());
+    nn::os::Thread* thread;
+    thread->Sleep(howLong.toS64());
 }
 
 uintptr_t Thread::getStackCheckStartAddress_() const
@@ -151,11 +153,11 @@ uintptr_t Thread::getStackCheckStartAddress_() const
 
 void Thread::ctrThreadFunc_(uptr arg)
 {
-    sead::Thread* self = static_cast<sead::Thread*>(arg);
+    sead::Thread* self = reinterpret_cast<sead::Thread*>(arg);
 
-    ThreadMgr::instance()->mTlsSlot.setValue(reinterpret_cast<uintptr_t>(self));
+    ThreadMgr::instance()->mThreadPtrTLS.setValue(reinterpret_cast<uintptr_t>(self));
 
-    const u32 id = self->mThreadInner->GetThreadId();
+    const u32 id = self->mThreadInner->GetCurrentId();
     self->mState = State::cRunning;
     self->mId = id;
     self->run_();
@@ -164,11 +166,6 @@ void Thread::ctrThreadFunc_(uptr arg)
 
 /* sead::ThreadMgr */
 
-ThreadMgr::ThreadMgr()
-{ 
-
-}
-
 u32 ThreadMgr::getCurrentThreadID_()
 {
     return u32(uintptr_t(nn::os::Thread::GetCurrentId()));
@@ -176,10 +173,10 @@ u32 ThreadMgr::getCurrentThreadID_()
 
 void ThreadMgr::initMainThread_(Heap* heap)
 {
-    nn::os::Thread* nn_thread = nn::os::Thread::GetMainThread();
-    const u64 thread_id = nn::os::Thread::GetThreadId();
+    nn::os::Thread& nn_thread = nn::os::Thread::GetMainThread();
+    const u64 thread_id = nn::os::Thread::GetCurrentId();
 
-    MainThread thread = new (heap) MainThread(heap, nn_thread, thread_id);
+    Thread* thread = new (heap) MainThread(heap, &nn_thread, thread_id);
     mMainThread = thread;
     mThreadPtrTLS.setValue(uintptr_t(thread));
 }

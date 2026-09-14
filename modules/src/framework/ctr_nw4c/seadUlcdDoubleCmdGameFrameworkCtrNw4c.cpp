@@ -33,7 +33,7 @@ void UlcdDoubleCmdGameFrameworkCtrNw4c::initializeGraphicsSystem(Heap* heap, con
 {
     ScopedCurrentHeapSetter chs(heap);
     DoubleCmdGameFrameworkCtrNw4c::initializeGraphicsSystem(heap, leftFbSize, rightFbSize);
-    createDisplayBuffers_(mBufferSizeRight, 2, NN_GX_DISPLAY1, mGameArg.format, mGameArg.widthTop, mGameArg.heightTop, NN_GX_MEM_FCRAM);
+    createDisplayBuffers_(mDisplayBufferRight, 2, NN_GX_DISPLAY1, mGameArg.format, mGameArg.widthTop, mGameArg.heightTop, NN_GX_MEM_FCRAM);
     setUlcdEnable(true);
 }
 
@@ -82,13 +82,13 @@ void UlcdDoubleCmdGameFrameworkCtrNw4c::swapBuffer_()
     mFrameBufferNo[0] = (mFrameBufferNo[0] + 2) % 3;
 
     nngxActiveDisplay(NN_GX_DISPLAY0);
-    nngxBindDisplaybuffer(mDoubleBufferSizeTop[0]);
+    nngxBindDisplaybuffer(mDoubleBufferTop[0]);
 
     nngxActiveDisplay(NN_GX_DISPLAY0_RIGHT);
-    nngxBindDisplaybuffer(mBufferSizeRight[0]);
+    nngxBindDisplaybuffer(mDisplayBufferRight[0]);
 
     nngxActiveDisplay(NN_GX_DISPLAY1);
-    nngxBindDisplaybuffer(mDoubleBufferSizeBtm[0]);
+    nngxBindDisplaybuffer(mDoubleBufferBtm[0]);
 
 #ifdef SEAD_DEBUG
     if(mException != nullptr)
@@ -128,7 +128,7 @@ void UlcdDoubleCmdGameFrameworkCtrNw4c::doScreenShotImpl_(char const* shot)
         {
             SEAD_WARNING("Can't open file handle(%s). Can't save screen-shot.\n", shot);
         }
-        nngxBindDisplaybuffer(mBufferSizeRight[0]);
+        nngxBindDisplaybuffer(mDisplayBufferRight[0]);
         GLint param;
         nngxGetDisplaybufferParameteri(NN_GX_DISPLAYBUFFER_ADDRESS, &param);
         saveScreenShotToFileHandle_(&topHandle, &param, mGameArg.widthTop, mGameArg.heightTop, mGameArg.format);
@@ -142,7 +142,7 @@ void UlcdDoubleCmdGameFrameworkCtrNw4c::presentLeft_()
 
 void UlcdDoubleCmdGameFrameworkCtrNw4c::presentRight_()
 {
-    requestTransferRenderImage_(mFrameBufferNo[mBufferSizeRight[0]], &mBuffer, mGameArg.widthBtm, mGameArg.heightBtm, NN_GX_ANTIALIASE_NOT_USED, 0);
+    requestTransferRenderImage_(mFrameBufferNo[mDisplayBufferRight[0]], &mBuffer, mGameArg.widthBtm, mGameArg.heightBtm, NN_GX_ANTIALIASE_NOT_USED, 0);
 }
 
 void UlcdDoubleCmdGameFrameworkCtrNw4c::setUlcdEnable(bool enable)
